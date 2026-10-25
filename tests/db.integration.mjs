@@ -21,7 +21,16 @@ await db.exec(sql);
 // Reapply the upgrade against an existing schema, as the live project will do.
 await db.exec('drop function public.delete_team(uuid,text,boolean)');
 await db.exec(
-  await readFile(new URL('../supabase/migrations/20261025_delete_team.sql', import.meta.url), 'utf8'),
+  await readFile(
+    new URL('../supabase/migrations/20261025_delete_team.sql', import.meta.url),
+    'utf8',
+  ),
+);
+await db.exec(
+  "update storage.buckets set file_size_limit=10485760, allowed_mime_types=array['image/png','image/jpeg','image/webp','application/pdf','text/plain'] where id='team-files'",
+);
+await db.exec(
+  await readFile(new URL('../supabase/migrations/20261025_cad_files.sql', import.meta.url), 'utf8'),
 );
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
@@ -46,6 +55,17 @@ function ok(value, message) {
   count++;
   console.log('PASS', message);
 }
+const cadBucket = (
+  await db.query(
+    "select public, file_size_limit, allowed_mime_types from storage.buckets where id='team-files'",
+  )
+).rows[0];
+ok(
+  cadBucket.public === false &&
+    Number(cadBucket.file_size_limit) === 52428800 &&
+    cadBucket.allowed_mime_types.includes('application/octet-stream'),
+  'CAD upgrade keeps the bucket private and allows 50 MB binary files',
+);
 async function rejects(fn, message) {
   await assert.rejects(fn);
   count++;

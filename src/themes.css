@@ -248,3 +248,231 @@ html[data-theme-mode='light'] .demo-bar b {
   display: block;
   margin: 10px 0;
 }
+
+.robot-tool-intro,
+.cad-panel {
+  padding: 24px;
+  margin-bottom: 18px;
+}
+.robot-tool-intro h2,
+.cad-panel h2 {
+  font-size: 22px;
+  margin: 9px 0;
+}
+.robot-tool-intro p,
+.cad-panel p {
+  max-width: 800px;
+  margin: 8px 0 12px;
+}
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.hub-card {
+  padding: 20px;
+}
+.hub-card .panel-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hub-port-group {
+  margin-top: 22px;
+}
+.hub-port-group h3 {
+  text-transform: uppercase;
+  color: var(--theme-muted);
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  margin-bottom: 9px;
+}
+.hub-ports {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+.hub-port {
+  display: flex;
+  justify-content: flex-start;
+  text-align: left;
+  padding: 10px;
+  min-height: 60px;
+  background: var(--theme-surfaceRaised);
+  color: var(--theme-text);
+  border: 1px solid var(--theme-border);
+  border-radius: 7px;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease;
+}
+.hub-port:hover,
+.hub-port:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--theme-accent);
+}
+.hub-port.assigned {
+  border-color: color-mix(in srgb, var(--theme-accent) 55%, var(--theme-border));
+}
+.port-number {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  flex: 0 0 27px;
+  border-radius: 5px;
+  background: var(--theme-background);
+  color: var(--theme-accent);
+  font-family: var(--mono);
+}
+.hub-port strong {
+  display: block;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.hub-port small {
+  display: block;
+  margin-top: 3px;
+  color: var(--theme-muted);
+}
+.inspection-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--theme-accent) !important;
+  font-weight: 700;
+}
+.inspection-group {
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.inspection-group h2 {
+  margin-bottom: 12px;
+}
+.inspection-items {
+  display: grid;
+  gap: 0;
+}
+.inspection-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 0;
+  border-top: 1px solid var(--theme-border);
+}
+.inspection-item strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.inspection-item a {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 10px;
+}
+.inspection-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.inspection-actions button {
+  padding: 6px 9px;
+  font-size: 10px;
+  border: 1px solid var(--theme-border);
+  border-radius: 5px;
+  background: var(--theme-surfaceRaised);
+  color: var(--theme-text);
+}
+.inspection-actions button.selected {
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
+.inspection-actions button.selected.pass {
+  border-color: #52b977;
+  color: #52b977;
+}
+.inspection-actions button.selected.needs {
+  border-color: #df7169;
+  color: #df7169;
+}
+.capacity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+.capacity-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  border-radius: 8px;
+  border: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+}
+.capacity-card small {
+  color: var(--theme-muted);
+  letter-spacing: 0.1em;
+}
+.capacity-card strong {
+  color: var(--theme-accent);
+  font-family: var(--mono);
+  font-size: 32px;
+  line-height: 1.4;
+}
+.capacity-card span {
+  color: var(--theme-muted);
+  font-size: 11px;
+}
+.capacity-card.over strong,
+.capacity-card.over span {
+  color: #df7169;
+}
+.limits-table {
+  margin: 18px 0;
+  padding: 0;
+}
+.limits-table table {
+  min-width: 1100px;
+}
+.limits-table th,
+.limits-table td {
+  white-space: normal;
+  min-width: 90px;
+}
+.limit-checks {
+  margin-top: 14px;
+}
+.cad-upload-form {
+  display: grid;
+  gap: 14px;
+  max-width: 650px;
+  margin-top: 20px;
+}
+.cad-upload-form label {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+}
+.cad-upload-form input {
+  width: 100%;
+}
+.cad-upload-form .primary {
+  justify-self: start;
+}
+@media (max-width: 780px) {
+  .hub-grid {
+    grid-template-columns: 1fr;
+  }
+  .inspection-item {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 450px) {
+  .hub-ports {
+    grid-template-columns: 1fr;
+  }
+  .capacity-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

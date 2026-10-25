@@ -132,7 +132,7 @@ grant execute on function public.team_role(uuid),public.team_admin(uuid),public.
 grant select on public.memberships,public.notifications,public.activity to authenticated;
 grant select,insert,update,delete on public.records to authenticated;
 grant select,insert on public.comments to authenticated;
-insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('team-files','team-files',false,10485760,array['image/png','image/jpeg','image/webp','application/pdf','text/plain']);
+insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types) values('team-files','team-files',false,52428800,array['image/png','image/jpeg','image/webp','application/pdf','text/plain','application/octet-stream']);
 create policy files_read on storage.objects for select to authenticated using(bucket_id='team-files' and public.team_role(((storage.foldername(name))[1])::uuid) in ('Captain','Coach','Mentor','Member'));
 create policy files_upload on storage.objects for insert to authenticated with check(bucket_id='team-files' and public.team_editor(((storage.foldername(name))[1])::uuid) and (storage.foldername(name))[2]=auth.uid()::text);
 create policy files_delete on storage.objects for delete to authenticated using(bucket_id='team-files' and public.team_admin(((storage.foldername(name))[1])::uuid));

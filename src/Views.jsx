@@ -44,6 +44,8 @@ import Records, { Badge, RecordForm } from './Records';
 import { entities } from './schema';
 import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
+import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
+import { officialRules } from './robot-rules';
 const palette = [
   'var(--orange)',
   'color-mix(in srgb, var(--orange) 78%, white)',
@@ -122,7 +124,7 @@ export function Dashboard({ w, navigate }) {
   const d = w.data,
     f = w.member.role === 'Parent/Sponsor' && w.summary ? w.summary : finance(d),
     robot = d.robot[0] || w.dashboard?.robot || {},
-    rules = legality(robot, d.hardware, d.rules[0]),
+    rules = legality(robot, d.hardware, officialRules),
     upcoming = [...(d.events.length ? d.events : w.dashboard?.events || [])]
       .filter(
         (e) =>
@@ -319,8 +321,20 @@ export function Dashboard({ w, navigate }) {
             </div>
             <div>
               <small>LEGALITY</small>
-              <Badge tone={rules.verified ? (rules.pass ? 'green' : 'red') : 'yellow'}>
-                {rules.verified ? (rules.pass ? 'PASS' : 'CHECK') : 'UNVERIFIED'}
+              <Badge
+                tone={
+                  rules.checks.some((c) => c.actual === 'Missing')
+                    ? 'yellow'
+                    : rules.pass
+                      ? 'green'
+                      : 'red'
+                }
+              >
+                {rules.checks.some((c) => c.actual === 'Missing')
+                  ? 'MEASURE'
+                  : rules.pass
+                    ? 'WITHIN LIMITS'
+                    : 'CHECK'}
               </Badge>
             </div>
           </div>
@@ -823,9 +837,12 @@ export function Finance({ w, initial = 'overview' }) {
   );
 }
 export function Robot({ w, initial = 'robot' }) {
-  const [tab, setTab] = useState(initial),
+  const [tab, setTab] = useState(
+      ['robot', 'hardware', 'inspection', 'limits'].includes(initial) ? initial : 'robot',
+    ),
     r = w.data.robot[0],
-    check = legality(r, w.data.hardware, w.data.rules[0]);
+    check = legality(r, w.data.hardware, officialRules);
+  const missing = check.checks.some((c) => c.actual === 'Missing');
   return (
     <>
       <div className="page-intro">
@@ -851,19 +868,19 @@ export function Robot({ w, initial = 'robot' }) {
             <h2>Legality checks</h2>
             <ShieldCheck className="orange" />
           </div>
-          {!check.verified ? (
+          {missing ? (
             <div className="rule-warning">
               <AlertTriangle />
-              <h3>Ruleset needs verification.</h3>
+              <h3>Measurements still needed.</h3>
               <p>
-                Draft limits are for testing only. Enter limits and an official source under
-                Legality limits, then mark the ruleset verified.
+                The current BIOBUZZ limits are loaded from the FIRST manual. Enter your robot's
+                counts and dimensions under Limits &amp; capacity to compare them.
               </p>
             </div>
           ) : (
             <>
               <Badge tone={check.pass ? 'green' : 'red'}>
-                {check.pass ? 'WITHIN CONFIGURED LIMITS' : 'OUTSIDE CONFIGURED LIMITS'}
+                {check.pass ? 'WITHIN LISTED LIMITS' : 'OUTSIDE LISTED LIMITS'}
               </Badge>
               {check.checks.map((c) => (
                 <div key={c.name} className="check-row">
@@ -881,13 +898,21 @@ export function Robot({ w, initial = 'robot' }) {
         </section>
       </div>
       <div className="tabs page-tabs">
-        {['robot', 'subsystems', 'hardware', 'inspection', 'rules'].map((t) => (
+        {['robot', 'hardware', 'inspection', 'limits'].map((t) => (
           <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
-            {entities[t].title}
+            {t === 'limits' ? 'Limits & capacity' : entities[t].title}
           </button>
         ))}
       </div>
-      <Records kind={tab} key={tab} w={w} />
+      {tab === 'hardware' ? (
+        <HardwareMap w={w} />
+      ) : tab === 'inspection' ? (
+        <InspectionChecklist w={w} />
+      ) : tab === 'limits' ? (
+        <LimitPanel w={w} />
+      ) : (
+        <Records kind="robot" w={w} />
+      )}
     </>
   );
 }

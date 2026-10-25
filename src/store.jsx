@@ -4,6 +4,7 @@ import { seed, demoTeam } from './seed';
 import { entities } from './schema';
 import { uid, canEdit, canDelete } from './domain';
 import { removeTeamFiles } from './delete-team';
+import { validateCadFile } from './cad';
 const EMPTY = () => Object.fromEntries(Object.keys(entities).map((k) => [k, []]));
 function readDemo() {
   try {
@@ -310,9 +311,13 @@ export function useWorkspace() {
       remove_member: removeMember,
     });
   }
-  async function upload(file) {
-    if (file.size > 10485760) throw Error('Maximum file size is 10 MB.');
+  async function upload(file, options = {}) {
+    const extension = options.cad
+      ? validateCadFile(file)
+      : file.name.split('.').pop().toLowerCase();
+    if (!options.cad && file.size > 10485760) throw Error('Maximum file size is 10 MB.');
     if (
+      !options.cad &&
       !['image/png', 'image/jpeg', 'image/webp', 'application/pdf', 'text/plain'].includes(
         file.type,
       )
@@ -322,14 +327,25 @@ export function useWorkspace() {
       throw Error(
         'Connect Supabase to upload shared files. You can use a receipt link in demo mode.',
       );
-    const path = `${team.id}/${user.id}/${uid()}.${file.name.split('.').pop()}`;
-    checked(await supabase.storage.from('team-files').upload(path, file));
+    const path = `${team.id}/${user.id}/${uid()}.${extension}`;
+    checked(
+      await supabase.storage.from('team-files').upload(path, file, {
+        contentType: options.cad ? 'application/octet-stream' : file.type,
+      }),
+    );
     return `storage:${path}`;
   }
-  async function fileUrl(value) {
+  async function fileUrl(value, downloadName) {
     if (value.startsWith('storage:'))
-      return checked(await supabase.storage.from('team-files').createSignedUrl(value.slice(8), 60))
-        .signedUrl;
+      return checked(
+        await supabase.storage
+          .from('team-files')
+          .createSignedUrl(
+            value.slice(8),
+            60,
+            downloadName ? { download: downloadName } : undefined,
+          ),
+      ).signedUrl;
     if (/^https?:\/\//i.test(value)) return value;
     throw Error('Invalid file link');
   }

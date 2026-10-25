@@ -15,7 +15,7 @@ export function canDelete(role) {
 export function canView(role, type) {
   return (
     role !== 'Parent/Sponsor' ||
-    ['dashboard', 'announcements', 'finance', 'resources'].includes(type)
+    ['dashboard', 'announcements', 'finance', 'resources', 'outreach'].includes(type)
   );
 }
 export function finance(data) {
@@ -40,9 +40,15 @@ export function attendance(person, sessions) {
 export function legality(robot = {}, hardware = [], rules = {}) {
   if (!rules.verified) return { verified: false, checks: [] };
   const n = (v) => (v === undefined || v === null || v === '' ? NaN : Number(v));
+  const used = (field, kind) =>
+    Number.isFinite(n(robot[field]))
+      ? n(robot[field])
+      : hardware.length
+        ? hardware.filter((h) => h.kind === kind && h.name).length
+        : NaN;
   const checks = [
-    ['DC motors', hardware.filter((h) => h.kind === 'DC motor').length, n(rules.motors)],
-    ['Servos', hardware.filter((h) => h.kind === 'Servo').length, n(rules.servos)],
+    ['DC motors', used('motorsUsed', 'DC motor'), n(rules.motors)],
+    ['Servos', used('servosUsed', 'Servo'), n(rules.servos)],
     [
       'Starting size',
       Math.max(...['length', 'width', 'height'].map((k) => n(robot[k]))),
@@ -51,14 +57,8 @@ export function legality(robot = {}, hardware = [], rules = {}) {
     ['Horizontal envelope', n(robot.horizontal), n(rules.horizontal)],
     ['Vertical envelope', n(robot.vertical), n(rules.vertical)],
   ];
-  if (rules.horizontalAllowance !== undefined)
-    checks.push([
-      'Horizontal allowance',
-      n(robot.horizontalExtension),
-      n(rules.horizontalAllowance),
-    ]);
-  if (rules.verticalAllowance !== undefined)
-    checks.push(['Vertical allowance', n(robot.verticalExtension), n(rules.verticalAllowance)]);
+  if (rules.horizontalShort !== undefined)
+    checks.push(['Horizontal short side', n(robot.horizontalShort), n(rules.horizontalShort)]);
   if (Number(rules.weight) > 0) checks.push(['Weight', n(robot.weight), n(rules.weight)]);
   const result = checks.map(([name, actual, max]) => ({
     name,

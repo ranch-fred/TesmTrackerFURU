@@ -435,7 +435,10 @@ export default function Settings({ w }) {
             <select value={kind} onChange={(e) => setKind(e.target.value)}>
               {Object.entries(entities)
                 .filter(
-                  ([k]) => !['outreach', 'judging', 'portfolio', 'reports', 'parts'].includes(k),
+                  ([k]) =>
+                    !['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts'].includes(
+                      k,
+                    ),
                 )
                 .map(([k, e]) => (
                   <option key={k} value={k}>

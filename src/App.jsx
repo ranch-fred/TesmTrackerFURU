@@ -13,6 +13,7 @@ import {
   BookOpen,
   Wallet,
   ShoppingCart,
+  HeartHandshake,
   FileText,
   Settings as SettingsIcon,
   Activity,
@@ -34,6 +35,8 @@ import { canView } from './domain';
 import Records, { Modal, Badge } from './Records';
 import { Dashboard, Finance, Robot } from './Views';
 import { AttendanceHub, CompetitionHub } from './Hubs';
+import OutreachLog from './OutreachLog';
+import DesignLibrary from './DesignLibrary';
 import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
@@ -50,13 +53,14 @@ const icons = {
   resources: BookOpen,
   finance: Wallet,
   purchases: ShoppingCart,
+  outreach: HeartHandshake,
 };
-const hiddenKinds = new Set(['outreach', 'judging', 'portfolio', 'reports', 'parts']);
+const hiddenKinds = new Set(['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts']);
 function pageForKind(kind) {
   if (['sessions', 'roster'].includes(kind)) return 'attendance';
   if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
   if (['expenses', 'income', 'budgets'].includes(kind)) return 'finance';
-  if (['subsystems', 'hardware', 'inspection', 'rules'].includes(kind)) return 'robot';
+  if (['hardware', 'inspection'].includes(kind)) return 'robot';
   return kind;
 }
 export default function App() {
@@ -138,6 +142,8 @@ export default function App() {
   else if (page === 'competition')
     view = <CompetitionHub key={innerPage || 'matches'} w={w} initial={innerPage || 'matches'} />;
   else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
+  else if (page === 'outreach') view = <OutreachLog w={w} />;
+  else if (page === 'designs') view = <DesignLibrary w={w} />;
   else if (page === 'settings') view = <Settings w={w} />;
   else if (page === 'activity')
     view = (

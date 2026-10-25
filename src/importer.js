@@ -66,6 +66,9 @@ export function validateImport(entries) {
         } else if (['multi', 'members', 'parts', 'hardware'].includes(f.type)) {
           if (!Array.isArray(v) || v.some((x) => typeof x !== 'string'))
             throw Error(`Invalid list ${f.label}`);
+        } else if (kind === 'hardware' && f.key === 'port' && typeof v === 'number') {
+          clean[f.key] = String(v);
+          continue;
         } else if (typeof v !== 'string') throw Error(`Invalid text ${f.label}`);
         if (f.type === 'select' && !f.options.includes(v)) throw Error(`Invalid option ${f.label}`);
         clean[f.key] = v;

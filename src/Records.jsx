@@ -105,7 +105,9 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
             return (
               <label
                 className={
-                  ['textarea', 'multi', 'members', 'file', 'parts', 'hardware'].includes(f.type)
+                  ['textarea', 'multi', 'members', 'file', 'cad', 'parts', 'hardware'].includes(
+                    f.type,
+                  )
                     ? 'span-2'
                     : ''
                 }
@@ -181,7 +183,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                       <option key={o}>{o}</option>
                     ))}
                   </select>
-                ) : f.type === 'file' ? (
+                ) : f.type === 'file' || f.type === 'cad' ? (
                   <>
                     <input
                       placeholder="https://… or upload below"
@@ -191,14 +193,23 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                     <input
                       aria-label={`Upload ${f.label}`}
                       type="file"
-                      accept="image/png,image/jpeg,image/webp,application/pdf,text/plain"
+                      accept={
+                        f.type === 'cad'
+                          ? '.step,.stp,.sldprt,.sldasm,.slddrw,.zip'
+                          : 'image/png,image/jpeg,image/webp,application/pdf,text/plain'
+                      }
                       disabled={busy}
                       onChange={async (e) => {
                         const file = e.target.files[0];
                         if (!file) return;
                         setBusy(true);
                         try {
-                          set(f.key, await w.upload(file));
+                          const location = await w.upload(file, { cad: f.type === 'cad' });
+                          setForm((previous) => ({
+                            ...previous,
+                            [f.key]: location,
+                            ...(f.type === 'cad' ? { cadName: file.name } : {}),
+                          }));
                         } catch (ex) {
                           setError(ex.message);
                         } finally {
@@ -433,19 +444,24 @@ export default function Records({ kind, w, compact = false }) {
     const v = r[f.key];
     if (f.type === 'checkbox')
       return <span className={v ? 'success' : 'muted'}>{v ? '✓ Yes' : '—'}</span>;
-    if (f.type === 'file' && v)
+    if (['file', 'cad'].includes(f.type) && v)
       return (
         <button
           className="text-button"
           onClick={async () => {
             try {
-              window.open(await w.fileUrl(v), '_blank', 'noopener,noreferrer');
+              const url = await w.fileUrl(
+                v,
+                f.type === 'cad' ? r.cadName || 'team-cad-file' : undefined,
+              );
+              if (f.type === 'cad') window.location.assign(url);
+              else window.open(url, '_blank', 'noopener,noreferrer');
             } catch (e) {
               setErr(e.message);
             }
           }}
         >
-          Open file <ExternalLink size={13} />
+          {f.type === 'cad' ? 'Download CAD' : 'Open file'} <ExternalLink size={13} />
         </button>
       );
     if (f.type === 'url' && v)
