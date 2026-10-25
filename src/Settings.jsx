@@ -87,14 +87,7 @@ export default function Settings({ w }) {
       </div>
       <div className="tabs page-tabs">
         {(admin
-          ? [
-              'profile',
-              'members',
-              'invites',
-              'preferences',
-              'data',
-              ...(owner ? ['delete team'] : []),
-            ]
+          ? ['profile', 'members', 'invites', 'preferences', 'data', 'delete team']
           : ['preferences', ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : [])]
         ).map((t) => (
           <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
@@ -395,7 +388,7 @@ export default function Settings({ w }) {
           </p>
         </section>
       )}
-      {tab === 'delete team' && owner && (
+      {tab === 'delete team' && admin && (
         <section className="panel settings-panel delete-team-panel">
           <div className="eyebrow">TEAM SETTINGS / DANGER ZONE</div>
           <h2>Delete this team</h2>
@@ -403,16 +396,23 @@ export default function Settings({ w }) {
             Permanently remove <strong>{w.team.name}</strong>, its members, records, activity, and
             uploaded files. Everyone on the team will lose access. Your Google account will stay.
           </p>
-          <button
-            className="primary danger-button"
-            onClick={() => {
-              setDeleteName('');
-              setDeleteError('');
-              setDeleteOpen(true);
-            }}
-          >
-            <Trash2 size={16} /> Delete team
-          </button>
+          {owner ? (
+            <button
+              className="primary danger-button"
+              onClick={() => {
+                setDeleteName('');
+                setDeleteError('');
+                setDeleteOpen(true);
+              }}
+            >
+              <Trash2 size={16} /> Delete team
+            </button>
+          ) : (
+            <p className="note" role="status">
+              Only the team owner can delete it. Ask the current owner to transfer ownership to you
+              from the Members tab first.
+            </p>
+          )}
         </section>
       )}
       {deleteOpen && (
