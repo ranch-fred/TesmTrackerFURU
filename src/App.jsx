@@ -51,6 +51,7 @@ import {
   Stat,
 } from './Views';
 import Settings from './Settings';
+import { MotionScene, MotionToggle } from './Motion';
 const icons = {
   dashboard: LayoutDashboard,
   announcements: Radio,
@@ -335,6 +336,7 @@ export default function App() {
             <strong>{labels[page]}</strong>
           </div>
           <div className="top-actions">
+            <MotionToggle />
             <button className="global-search" onClick={() => setShowSearch(true)}>
               <Search size={16} />
               <span>Search anything</span>
@@ -400,7 +402,7 @@ export default function App() {
               <RefreshCw size={12} className="spin" /> Syncing team data
             </div>
           )}
-          {view}
+          <MotionScene>{view}</MotionScene>
           <footer className="workspace-footer">
             <span>
               COOL NAME PENDING <b>#{w.team.number}</b>

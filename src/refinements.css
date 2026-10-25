@@ -1,0 +1,1017 @@
+/* Readable, spacious console layout and a shared motion language. */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+.main-content {
+  padding-top: 36px;
+}
+.main-content > .motion-scene {
+  max-width: 1480px;
+  margin-inline: auto;
+}
+.panel {
+  border-radius: 14px;
+  border-color: #30302e;
+  background: linear-gradient(150deg, #1a1a19, #131313 75%);
+}
+.panel-heading {
+  padding: 26px 28px 18px;
+  align-items: flex-start;
+}
+.panel-heading h2 {
+  font-size: 21px;
+  line-height: 1.35;
+}
+.eyebrow.subtle {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: #a59a90;
+  margin-bottom: 10px;
+}
+.page-intro {
+  padding: 8px 0 27px;
+  margin-bottom: 30px;
+  border-bottom: 1px solid #31302d;
+}
+.page-intro h1 {
+  font-size: clamp(44px, 4.5vw, 68px);
+  letter-spacing: -0.5px;
+}
+.page-intro p {
+  font-size: 14px;
+  max-width: 650px;
+  line-height: 1.8;
+}
+.page-intro .eyebrow {
+  font-size: 10px;
+}
+.welcome-banner {
+  min-height: 215px;
+  padding: 34px 38px;
+  border-radius: 16px;
+  background:
+    radial-gradient(ellipse at 85% 50%, #60341540, transparent 55%),
+    linear-gradient(110deg, #211d18, #131313 75%);
+}
+.welcome-banner:before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 34px;
+  bottom: 34px;
+  width: 3px;
+  background: var(--orange);
+  box-shadow: 0 0 24px #ff6b0055;
+}
+.welcome-banner h1 {
+  font-size: clamp(48px, 4.5vw, 72px);
+  margin: 18px 0 14px;
+}
+.welcome-banner p {
+  font-size: 13px;
+  color: #bcb0a3;
+}
+.welcome-banner .eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+}
+.season-mark strong {
+  font-size: 64px;
+}
+.season-mark small {
+  font-size: 10px;
+}
+.command-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 6px;
+  border-bottom: 1px solid #2c2b28;
+  margin-bottom: 30px;
+}
+.command-label {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+.command-label > .dot {
+  background: #c7b393;
+  width: 5px;
+  height: 5px;
+}
+.command-label > span:last-child {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.3px;
+  color: #cfb591;
+}
+.command-label small {
+  display: block;
+  font-family: Inter, sans-serif;
+  letter-spacing: 0;
+  font-size: 12px;
+  color: #95918b;
+  margin-top: 6px;
+}
+.command-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+.command-actions button {
+  min-height: 42px;
+  border: 1px solid #39352f;
+  border-radius: 8px;
+  color: #d3c6b5;
+  background: #211d17;
+  padding: 10px 13px;
+  font-size: 11px;
+}
+.command-actions button > svg:first-child {
+  color: #d78446;
+}
+.command-actions button > svg:last-child {
+  color: #776b5a;
+  margin-left: 5px;
+}
+.dashboard-heading {
+  margin: 0 0 22px;
+}
+.dashboard-heading h2 {
+  font-size: 20px;
+}
+.dashboard-heading p {
+  font-size: 12px;
+  margin-top: 6px;
+}
+.mini-status {
+  font-family: var(--mono);
+  font-size: 9px;
+}
+.stats-grid {
+  gap: 18px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  border-radius: 12px;
+  padding: 24px 22px;
+  min-height: 155px;
+  background: linear-gradient(150deg, #1b1b1a, #141414);
+}
+.stat-top {
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  line-height: 1.6;
+}
+.stat-top svg {
+  padding: 7px;
+  box-sizing: content-box;
+  border: 1px solid #383632;
+  border-radius: 9px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff03;
+}
+.stat-card strong {
+  font-size: clamp(28px, 2.8vw, 39px);
+  margin: 15px 0 8px;
+  font-variant-numeric: tabular-nums;
+}
+.stat-card small {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #a09b95;
+}
+.stat-card.accent {
+  background: radial-gradient(ellipse at 100% 0%, #ff6b0018, transparent 75%), #201913;
+}
+.dashboard-grid {
+  gap: 24px;
+  grid-template-columns: 1fr;
+}
+.finance-numbers {
+  padding: 10px 28px 20px;
+  gap: 45px;
+}
+.finance-numbers > div > span {
+  font-size: 12px;
+}
+.finance-numbers b {
+  font-size: 27px;
+}
+.finance-numbers .badge {
+  font-size: 9px;
+}
+.panel-link {
+  font-size: 12px;
+  padding: 18px 28px;
+  min-height: 50px;
+}
+.priority-row {
+  padding: 21px 28px;
+  gap: 15px;
+  align-items: center;
+}
+.priority-row strong,
+.event-row strong {
+  font-size: 13px;
+}
+.priority-row small,
+.event-row small {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.priority-row .badge {
+  font-size: 10px;
+}
+.event-row {
+  padding: 22px 28px;
+}
+.date-tile {
+  min-width: 48px;
+  padding: 8px;
+  border-radius: 8px;
+}
+.date-tile b {
+  font-size: 20px;
+}
+.announcement-preview {
+  margin-inline: 28px;
+  padding: 20px 0;
+}
+.announcement-preview h3 {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.announcement-preview p {
+  font-size: 12px;
+  line-height: 1.85;
+}
+.announcement-preview > small,
+.announcement-preview .inline small {
+  font-size: 10px;
+}
+.announcement-preview .badge {
+  font-size: 9px;
+}
+.bottom-grid {
+  gap: 24px;
+  margin-top: 24px;
+}
+.bottom-grid .panel-heading h3 {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.bottom-grid .panel > p {
+  font-size: 12px;
+}
+.member-row {
+  padding: 12px 28px;
+}
+.member-row > span {
+  font-size: 12px;
+}
+.member-row small {
+  font-size: 10px;
+}
+.vitals-stats {
+  padding: 24px 28px;
+}
+.vitals-stats small {
+  font-size: 9px;
+}
+.vitals-stats .badge {
+  font-size: 9px;
+}
+.robot-schematic {
+  min-height: 220px;
+}
+.schematic-caption {
+  font-size: 8px;
+}
+.section-toolbar {
+  padding: 27px 28px 22px;
+}
+.section-toolbar h2 {
+  font-size: 23px;
+}
+.section-toolbar small {
+  font-size: 12px;
+}
+.list-controls {
+  padding: 0 28px 24px;
+  gap: 12px;
+}
+.list-controls select,
+.list-controls > .outline {
+  font-size: 12px;
+  min-height: 42px;
+}
+.list-controls .search {
+  min-height: 42px;
+}
+.table-scroll th {
+  font-size: 11px;
+  padding: 17px 24px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.table-scroll td {
+  font-size: 13px;
+  padding: 20px 24px;
+  line-height: 1.7;
+}
+.table-scroll td strong {
+  font-size: 13px;
+}
+.table-scroll tbody tr:nth-child(even) {
+  background: #ffffff02;
+}
+.badge {
+  font-size: 10px;
+  border-radius: 5px;
+  padding: 5px 8px;
+}
+.primary,
+.outline {
+  min-height: 42px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+label {
+  font-size: 12px;
+  margin: 16px 0;
+}
+input,
+select,
+textarea {
+  min-height: 44px;
+  padding: 12px 14px;
+  border-radius: 7px;
+}
+.form-grid {
+  column-gap: 24px;
+}
+.form-grid > label {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ffffff07;
+}
+.form-grid > .span-2 {
+  background: #ffffff02;
+  padding: 15px;
+  border: 1px solid #ffffff07;
+  border-radius: 8px;
+}
+dialog {
+  padding: 32px;
+  border-radius: 16px;
+  width: min(740px, calc(100vw - 30px));
+}
+.modal-head {
+  padding-bottom: 22px;
+  margin-bottom: 20px;
+}
+.modal-head h2 {
+  font-size: 25px;
+}
+.kanban-column {
+  border-radius: 12px;
+  padding: 16px;
+  background: #10101080;
+}
+.kanban-column > h3 {
+  font-size: 13px;
+  padding-bottom: 20px;
+}
+.task-card {
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+.task-card h3 {
+  font-size: 14px;
+}
+.task-card > p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.task-meta > span {
+  font-size: 11px;
+}
+.task-card select {
+  min-height: 36px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+.roster-grid {
+  gap: 22px;
+}
+.profile-card {
+  border-radius: 12px;
+  padding: 24px;
+}
+.tabs {
+  gap: 8px;
+}
+.tabs button {
+  font-size: 12px;
+  padding: 14px 18px;
+}
+.nav-item {
+  min-height: 38px;
+  font-size: 11px;
+  padding: 10px;
+  border-radius: 7px;
+}
+.nav-heading {
+  font-size: 9px;
+}
+.team-switch {
+  border-radius: 10px;
+  padding: 15px 10px;
+}
+.team-switch strong {
+  font-size: 11px;
+}
+.team-switch small {
+  font-size: 9px;
+}
+.topbar {
+  height: 76px;
+}
+.breadcrumbs {
+  font-size: 12px;
+}
+.global-search {
+  border: 1px solid #333;
+  background: #181818;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+.motion-toggle {
+  color: #ad8868;
+  border: 1px solid #514030;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+}
+.entry-nav .motion-toggle {
+  flex-shrink: 0;
+}
+.hero-copy h1 {
+  letter-spacing: -1.5px;
+}
+.landing-bottom > div {
+  padding-right: 30px;
+}
+.landing-bottom h3 {
+  font-size: 18px;
+}
+.landing-bottom p {
+  font-size: 13px;
+}
+
+/* Motion uses transforms/opacity; real values remain available to assistive technology. */
+html[data-motion='on'] .motion-ready {
+  transition:
+    opacity 0.7s var(--ease-out) var(--reveal-delay, 0ms),
+    transform 0.7s var(--ease-out) var(--reveal-delay, 0ms),
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+html[data-motion='on'] .motion-ready:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(22px);
+}
+html[data-motion='on'] .motion-ready.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+html[data-motion='on'] .main-content {
+  animation: page-arrive 0.5s var(--ease-out);
+}
+html[data-motion='on'] dialog[open] {
+  animation: dialog-arrive 0.35s var(--ease-out);
+}
+html[data-motion='on'] dialog[open]::backdrop {
+  animation: backdrop-arrive 0.25s ease-out;
+}
+html[data-motion='on'] .welcome-banner .banner-grid {
+  animation: grid-drift 18s linear infinite;
+}
+html[data-motion='on'] .orbit-one {
+  animation: orbit-one 24s linear infinite;
+}
+html[data-motion='on'] .orbit-two {
+  animation: orbit-two 32s linear infinite;
+}
+html[data-motion='on'] .blueprint-core {
+  animation: core-float 6s ease-in-out infinite;
+}
+html[data-motion='on'] .crosshair {
+  animation: signal-pulse 4s ease-in-out infinite;
+}
+html[data-motion='on'] .crosshair.c2 {
+  animation-delay: 2s;
+}
+html[data-motion='on'] .notification-button i {
+  animation: signal-pulse 2.5s ease-in-out infinite;
+}
+html[data-motion='on'] .entry .hero-copy {
+  animation: page-arrive 0.8s var(--ease-out);
+}
+html[data-motion='on'] .hero-art {
+  animation: blueprint-arrive 1.1s var(--ease-out);
+}
+html[data-motion='on'] .stat-card strong {
+  animation: none;
+}
+html[data-motion='on'] button {
+  transition:
+    transform 0.25s var(--ease-out),
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+html[data-motion='on'] .primary {
+  position: relative;
+  overflow: hidden;
+}
+html[data-motion='on'] .primary:after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: -100% auto -100% -50%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, #ffffff55, transparent);
+  transform: rotate(22deg) translateX(-200%);
+}
+html[data-motion='on'] .primary:hover:after {
+  animation: button-sheen 0.65s ease-out;
+}
+html[data-motion='on'] button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+html[data-motion='on'] .nav-item.active svg {
+  animation: nav-pop 0.45s var(--ease-out);
+}
+html[data-motion='on'] .task-card[draggable='true']:active {
+  transform: rotate(-1deg) scale(1.02);
+  cursor: grabbing;
+}
+html[data-motion='on'] .panel-link svg,
+html[data-motion='on'] .text-button svg,
+html[data-motion='on'] .command-actions svg:last-child {
+  transition: transform 0.25s var(--ease-out);
+}
+html[data-motion='on'] .panel-link:hover svg,
+html[data-motion='on'] .text-button:hover svg {
+  transform: translateX(4px);
+}
+html[data-motion='on'] .command-actions button:hover svg:last-child {
+  transform: translate(2px, -2px);
+}
+@media (hover: hover) {
+  html[data-motion='on'] .stat-card:hover,
+  html[data-motion='on'] .profile-card:hover,
+  html[data-motion='on'] .task-card:hover {
+    transform: translateY(-4px);
+    border-color: #745035;
+    box-shadow: 0 10px 30px #0003;
+  }
+  .command-actions button:hover {
+    background: #34261b;
+    border-color: #8a542c;
+  }
+  .table-scroll tbody tr:hover {
+    background: #ff6b0007;
+  }
+  html[data-motion='on'] .primary:hover {
+    transform: translateY(-2px);
+  }
+}
+@keyframes page-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes dialog-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes backdrop-arrive {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes grid-drift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 40px 20px;
+  }
+}
+@keyframes orbit-one {
+  from {
+    transform: rotate(-25deg) scaleY(0.7);
+  }
+  to {
+    transform: rotate(335deg) scaleY(0.7);
+  }
+}
+@keyframes orbit-two {
+  from {
+    transform: rotate(55deg) scaleY(0.6);
+  }
+  to {
+    transform: rotate(-305deg) scaleY(0.6);
+  }
+}
+@keyframes core-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+@keyframes signal-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@keyframes blueprint-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes button-sheen {
+  from {
+    left: -50%;
+    transform: rotate(22deg);
+  }
+  to {
+    left: 140%;
+    transform: rotate(22deg);
+  }
+}
+@keyframes nav-pop {
+  0% {
+    transform: scale(0.8);
+  }
+  55% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (min-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .dashboard-grid > .finance-panel {
+    grid-column: span 8;
+  }
+  .dashboard-grid > .robot-vitals {
+    grid-column: span 4;
+  }
+  .dashboard-grid > .priorities {
+    grid-column: span 7;
+  }
+  .dashboard-grid > .panel:last-child {
+    grid-column: span 5;
+  }
+  .robot-vitals .panel-heading h2 {
+    font-size: 20px;
+  }
+  .robot-vitals .vitals-stats {
+    gap: 8px;
+    padding-inline: 22px;
+  }
+}
+@media (min-width: 1600px) {
+  .dashboard-grid > .finance-panel {
+    grid-column: span 7;
+  }
+  .dashboard-grid > .robot-vitals {
+    grid-column: span 5;
+  }
+}
+@media (max-width: 1199px) {
+  .command-strip {
+    align-items: flex-start;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .top-actions {
+    gap: 10px;
+  }
+  .welcome-banner {
+    padding: 30px;
+  }
+}
+@media (max-width: 850px) {
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+  .stat-card strong {
+    font-size: 32px;
+  }
+  .section-toolbar {
+    padding: 24px 20px;
+  }
+  .list-controls {
+    padding: 0 20px 22px;
+  }
+  .welcome-banner {
+    min-height: 200px;
+  }
+  .welcome-banner .season-mark {
+    display: none;
+  }
+}
+@media (max-width: 680px) {
+  .main-content {
+    padding: 24px 16px 0;
+  }
+  .topbar {
+    height: 64px;
+  }
+  .top-actions {
+    gap: 6px;
+  }
+  .top-actions .global-search {
+    border: 0;
+    padding: 6px;
+    background: none;
+  }
+  .top-actions .motion-toggle {
+    width: 30px;
+    height: 30px;
+  }
+  .welcome-banner {
+    padding: 28px 24px;
+    min-height: 205px;
+    border-radius: 14px;
+  }
+  .welcome-banner h1 {
+    font-size: clamp(43px, 9vw, 61px);
+    margin: 20px 0 15px;
+  }
+  .welcome-banner p {
+    max-width: 300px;
+    font-size: 12px;
+    line-height: 1.9;
+  }
+  .welcome-banner .eyebrow {
+    font-size: 8px;
+    letter-spacing: 1.4px;
+  }
+  .command-strip {
+    padding: 22px 0;
+    gap: 18px;
+    margin-bottom: 26px;
+  }
+  .command-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    gap: 7px;
+  }
+  .command-actions button {
+    min-height: 58px;
+    flex-direction: column;
+    gap: 7px;
+    padding: 10px 6px;
+    font-size: 10px;
+  }
+  .command-actions button > svg:last-child {
+    display: none;
+  }
+  .command-label small {
+    font-size: 11px;
+  }
+  .dashboard-heading h2 {
+    font-size: 19px;
+  }
+  .dashboard-heading p {
+    font-size: 11px;
+  }
+  .stats-grid {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    min-height: 165px;
+    padding: 19px 16px;
+    border-radius: 12px;
+  }
+  .stat-top {
+    font-size: 8px;
+    letter-spacing: 0.6px;
+  }
+  .stat-top svg {
+    width: 13px;
+    height: 13px;
+    padding: 5px;
+    border-radius: 7px;
+  }
+  .stat-card strong {
+    font-size: clamp(25px, 6.5vw, 36px);
+    margin-top: 17px;
+  }
+  .stat-card small {
+    font-size: 10px;
+  }
+  .dashboard-grid,
+  .bottom-grid {
+    gap: 20px;
+  }
+  .panel-heading {
+    padding: 24px 22px 16px;
+  }
+  .panel-heading h2 {
+    font-size: 20px;
+  }
+  .eyebrow.subtle {
+    font-size: 9px;
+  }
+  .finance-numbers {
+    padding: 8px 22px 20px;
+    gap: 35px;
+  }
+  .finance-numbers b {
+    font-size: 26px;
+  }
+  .finance-numbers > div > span {
+    font-size: 11px;
+  }
+  .panel-link {
+    padding: 18px 22px;
+    font-size: 12px;
+  }
+  .priority-row {
+    padding: 20px 22px;
+    gap: 11px;
+  }
+  .priority-row strong {
+    font-size: 13px;
+  }
+  .priority-row small {
+    font-size: 10px;
+  }
+  .priority-row .badge {
+    font-size: 8px;
+  }
+  .announcement-preview {
+    margin-inline: 22px;
+  }
+  .page-intro {
+    padding-bottom: 24px;
+  }
+  .page-intro h1 {
+    font-size: 43px;
+  }
+  .page-intro p {
+    font-size: 12px;
+  }
+  .section-toolbar {
+    padding: 24px 18px 20px;
+  }
+  .section-toolbar h2 {
+    font-size: 22px;
+  }
+  .list-controls {
+    padding: 0 18px 22px;
+  }
+  .list-controls select {
+    max-width: 45%;
+    font-size: 11px;
+  }
+  .list-controls > .outline {
+    font-size: 10px;
+  }
+  .table-scroll th {
+    font-size: 10px;
+    padding: 16px 18px;
+  }
+  .table-scroll td {
+    font-size: 12px;
+    padding: 18px;
+  }
+  dialog {
+    padding: 24px;
+  }
+  .modal-head h2 {
+    font-size: 23px;
+  }
+  .form-grid {
+    gap: 0;
+  }
+  .form-grid > .span-2 {
+    padding: 12px;
+  }
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  .tabs button {
+    font-size: 12px;
+    min-height: 46px;
+    padding-inline: 14px;
+  }
+  .entry-nav > div:last-child {
+    gap: 12px;
+  }
+  .entry-nav .motion-toggle {
+    width: 30px;
+    height: 30px;
+  }
+  .landing-bottom > div {
+    padding-right: 0;
+  }
+}
+@media (max-width: 380px) {
+  .stat-top svg {
+    display: none;
+  }
+  .stat-card {
+    padding: 18px 13px;
+  }
+  .welcome-banner h1 {
+    font-size: 40px;
+  }
+}
+html[data-motion='off'] *,
+html[data-motion='off'] *:before,
+html[data-motion='off'] *:after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+html[data-motion='off'] .motion-ready {
+  opacity: 1 !important;
+  transform: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *:before,
+  *:after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .motion-ready {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+@media print {
+  .motion-toggle,
+  .command-strip {
+    display: none !important;
+  }
+  .motion-ready {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .panel {
+    background: white;
+    border-radius: 0;
+  }
+}

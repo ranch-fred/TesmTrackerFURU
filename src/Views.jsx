@@ -44,6 +44,7 @@ import { finance, money, sum, trend, attendance, legality, canEdit } from './dom
 import Records, { Badge, RecordForm } from './Records';
 import { entities } from './schema';
 import { pdf, csv } from './exports';
+import { AnimatedValue, useMotion } from './Motion';
 const palette = ['#ff6b00', '#ff9d55', '#ffbf87', '#9a633e', '#5a4635', '#39332e'];
 export function Stat({ label, value, note, icon: Icon, tone = '' }) {
   return (
@@ -52,12 +53,15 @@ export function Stat({ label, value, note, icon: Icon, tone = '' }) {
         <span>{label}</span>
         {Icon && <Icon size={17} />}
       </div>
-      <strong>{value}</strong>
+      <strong>
+        <AnimatedValue value={value} />
+      </strong>
       <small>{note}</small>
     </article>
   );
 }
 export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
+  const { enabled } = useMotion();
   return data.length ? (
     <div style={{ height, width: '100%' }}>
       <ResponsiveContainer>
@@ -90,6 +94,7 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
           {series.map((key, i) => (
             <Area
               key={key}
+              isAnimationActive={enabled}
               type="monotone"
               dataKey={key}
               name={key === 'raised' ? 'Money in' : key === 'spent' ? 'Money out' : 'Balance'}
@@ -145,6 +150,34 @@ export function Dashboard({ w, navigate }) {
         </div>
         <div className="banner-grid" />
       </section>
+      <div className="command-strip">
+        <div className="command-label">
+          <span className="dot" />
+          <span>
+            YOUR NEXT MOVE
+            <small>
+              {next ? `${next.name} · ${next.date}` : 'Make progress, one step at a time.'}
+            </small>
+          </span>
+        </div>
+        {!parent && canEdit(w.member.role, w.member.mentor_edit) ? (
+          <div className="command-actions">
+            <button onClick={() => setForm('tasks')}>
+              <Plus size={15} /> Add task <ArrowUpRight size={14} />
+            </button>
+            <button onClick={() => setForm('expenses')}>
+              <Wallet size={15} /> Log expense <ArrowUpRight size={14} />
+            </button>
+            <button onClick={() => setForm('outreach')}>
+              <Users size={15} /> Log outreach <ArrowUpRight size={14} />
+            </button>
+          </div>
+        ) : (
+          <button className="text-button" onClick={() => navigate('announcements')}>
+            Latest announcements <ArrowRight size={15} />
+          </button>
+        )}
+      </div>
       <div className="dashboard-heading">
         <div>
           <h2>Team at a glance</h2>
@@ -461,6 +494,7 @@ export function Dashboard({ w, navigate }) {
   );
 }
 export function Finance({ w }) {
+  const { enabled } = useMotion();
   const [tab, setTab] = useState('overview'),
     [form, setForm] = useState(null);
   const d = w.data,
@@ -609,6 +643,7 @@ export function Finance({ w }) {
                       <ResponsiveContainer>
                         <PieChart>
                           <Pie
+                            isAnimationActive={enabled}
                             data={split}
                             dataKey="value"
                             innerRadius={60}
@@ -675,8 +710,18 @@ export function Finance({ w }) {
                           contentStyle={{ background: '#222', border: '1px solid #555' }}
                           formatter={money}
                         />
-                        <Bar dataKey="budget" fill="#414141" radius={[3, 3, 0, 0]} />
-                        <Bar dataKey="actual" fill="#ff6b00" radius={[3, 3, 0, 0]} />
+                        <Bar
+                          isAnimationActive={enabled}
+                          dataKey="budget"
+                          fill="#414141"
+                          radius={[3, 3, 0, 0]}
+                        />
+                        <Bar
+                          isAnimationActive={enabled}
+                          dataKey="actual"
+                          fill="#ff6b00"
+                          radius={[3, 3, 0, 0]}
+                        />
                         <Legend />
                       </BarChart>
                     </ResponsiveContainer>
@@ -841,6 +886,7 @@ export function Robot({ w }) {
   );
 }
 export function Matches({ w }) {
+  const { enabled } = useMotion();
   const d = w.data.matches,
     [tab, setTab] = useState('matches'),
     best = d.length ? Math.max(...d.map((m) => Number(m.points) || 0)) : 0,
@@ -895,6 +941,7 @@ export function Matches({ w }) {
               <YAxis tick={{ fill: '#888' }} />
               <Tooltip contentStyle={{ background: '#222', border: '1px solid #555' }} />
               <Line
+                isAnimationActive={enabled}
                 type="monotone"
                 dataKey="points"
                 stroke="#ff6b00"

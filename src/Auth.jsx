@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { supabase } from './client';
 import { roles, subteams } from './schema';
+import { MotionToggle } from './Motion';
 export function Brand() {
   return (
     <div className="brand">
@@ -123,6 +124,7 @@ export default function Auth({ w }) {
         <Brand />
         <div>
           <span className="season-label">2026—27 / BIOBUZZ</span>
+          <MotionToggle />
           <button className="outline" onClick={() => setMode('login')}>
             Team sign in <ArrowUpRight size={15} />
           </button>

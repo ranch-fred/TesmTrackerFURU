@@ -1,7 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
+import { MotionProvider } from './Motion';
 import './styles.css';
+import './refinements.css';
 class ErrorBoundary extends React.Component {
   state = { error: null };
   static getDerivedStateFromError(error) {
@@ -21,6 +23,8 @@ class ErrorBoundary extends React.Component {
 }
 createRoot(document.getElementById('root')).render(
   <ErrorBoundary>
-    <App />
+    <MotionProvider>
+      <App />
+    </MotionProvider>
   </ErrorBoundary>,
 );

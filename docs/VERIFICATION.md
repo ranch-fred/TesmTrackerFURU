@@ -1,5 +1,14 @@
 # Verification record
 
+## Layout and motion revision
+
+- Production build and all ten application tests passed after the visual changes.
+- Browser reviewed the updated dashboard, larger typography, action strip and form layout.
+- Verified the pause control changes to Play animations, and resumes on the next click.
+- Verified the dashboard Log outreach shortcut opens the complete outreach entry form.
+- Motion respects system reduced-motion preferences, and the pause control also disables chart animation.
+- Database and permission behavior was unchanged; the original database verification below still describes the backend checks performed.
+
 ## Passed
 
 - Production Vite build.

@@ -4,6 +4,10 @@ A black-and-orange, mobile-friendly FTC team workspace for the team-provided 202
 
 No generated robot images are included, as requested. The interface uses typography, blueprint grids and a simple CSS dimensional schematic. The requested Higgsfield video submission was rejected for insufficient workspace video credits; no video is included or claimed complete.
 
+## Layout and motion update
+
+The console now uses larger type, roomier forms and tables, clearer section headings, and a dashboard shortcut bar for tasks, expenses and outreach. Cards reveal as they enter the viewport; stat totals count up; the landing blueprint and header grid move subtly; buttons, navigation, dialogs and charts have coordinated transitions. Use the pause/play control in the header to turn motion off or on. The preference is saved on the device, and the app respects the system's reduced-motion setting. This update adds no generated robot imagery and does not change the database schema.
+
 ## Run locally
 
 Use Node.js 22.12 or later.
