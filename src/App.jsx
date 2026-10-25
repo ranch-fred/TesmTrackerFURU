@@ -9,18 +9,11 @@ import {
   Bot,
   Code2,
   Lightbulb,
-  Package,
   Flag,
-  ClipboardList,
   BookOpen,
   Wallet,
-  Receipt,
-  HandCoins,
   ShoppingCart,
-  HeartHandshake,
-  Mic,
   FileText,
-  BarChart3,
   Settings as SettingsIcon,
   Activity,
   Search,
@@ -39,54 +32,46 @@ import { useWorkspace } from './store';
 import { sections, labels, entities } from './schema';
 import { canView } from './domain';
 import Records, { Modal, Badge } from './Records';
-import {
-  Dashboard,
-  Finance,
-  Robot,
-  Matches,
-  Events,
-  Judging,
-  Portfolio,
-  Reports,
-  Stat,
-} from './Views';
+import { Dashboard, Finance, Robot } from './Views';
+import { AttendanceHub, CompetitionHub } from './Hubs';
+import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
 const icons = {
   dashboard: LayoutDashboard,
   announcements: Radio,
   tasks: KanbanSquare,
-  roster: Users,
-  sessions: CalendarDays,
+  attendance: Users,
   meetings: NotebookPen,
   robot: Bot,
   programming: Code2,
   designs: Lightbulb,
-  parts: Package,
-  matches: Flag,
-  events: CalendarDays,
-  packing: ClipboardList,
+  competition: Flag,
   resources: BookOpen,
   finance: Wallet,
-  expenses: Receipt,
-  income: HandCoins,
   purchases: ShoppingCart,
-  outreach: HeartHandshake,
-  judging: Mic,
-  portfolio: FileText,
-  reports: BarChart3,
 };
+const hiddenKinds = new Set(['outreach', 'judging', 'portfolio', 'reports', 'parts']);
+function pageForKind(kind) {
+  if (['sessions', 'roster'].includes(kind)) return 'attendance';
+  if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
+  if (['expenses', 'income', 'budgets'].includes(kind)) return 'finance';
+  if (['subsystems', 'hardware', 'inspection', 'rules'].includes(kind)) return 'robot';
+  return kind;
+}
 export default function App() {
   const w = useWorkspace(),
     [page, setPage] = useState('dashboard'),
+    [innerPage, setInnerPage] = useState(null),
     [menu, setMenu] = useState(false),
     [search, setSearch] = useState(''),
     [showSearch, setShowSearch] = useState(false),
     [showNotifications, setShowNotifications] = useState(false),
     [help, setHelp] = useState(false),
     [seen, setSeen] = useState(() => localStorage.getItem('cnp-notifications-seen') || '');
-  function navigate(p) {
+  function navigate(p, inner = null) {
     setPage(p);
+    setInnerPage(inner);
     setMenu(false);
     setShowSearch(false);
     setSearch('');
@@ -137,7 +122,7 @@ export default function App() {
       ? w.notifications.filter((n) => n.created_at > seen)
       : [];
   const results = Object.entries(w.data)
-    .filter(([k]) => canView(role, k))
+    .filter(([k]) => !hiddenKinds.has(k) && canView(role, k) && canView(role, pageForKind(k)))
     .flatMap(([kind, rows]) =>
       rows
         .filter((r) => Object.values(r).join(' ').toLowerCase().includes(search.toLowerCase()))
@@ -146,13 +131,13 @@ export default function App() {
     .slice(0, 20);
   let view;
   if (page === 'dashboard') view = <Dashboard w={w} navigate={navigate} />;
-  else if (page === 'finance') view = <Finance w={w} />;
-  else if (page === 'robot') view = <Robot w={w} />;
-  else if (page === 'matches') view = <Matches w={w} />;
-  else if (page === 'events') view = <Events w={w} />;
-  else if (page === 'judging') view = <Judging w={w} />;
-  else if (page === 'portfolio') view = <Portfolio w={w} />;
-  else if (page === 'reports') view = <Reports w={w} />;
+  else if (page === 'finance') view = <Finance w={w} initial={innerPage || 'overview'} />;
+  else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
+  else if (page === 'attendance')
+    view = <AttendanceHub key={innerPage || 'sessions'} w={w} initial={innerPage || 'sessions'} />;
+  else if (page === 'competition')
+    view = <CompetitionHub key={innerPage || 'matches'} w={w} initial={innerPage || 'matches'} />;
+  else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
   else if (page === 'settings') view = <Settings w={w} />;
   else if (page === 'activity')
     view = (
@@ -189,32 +174,6 @@ export default function App() {
           {!w.activity.length && <p className="muted">Your first change will appear here.</p>}
         </div>
       </section>
-    );
-  else if (page === 'outreach')
-    view = (
-      <>
-        <div className="page-intro">
-          <div className="eyebrow">OUTREACH / ENGINEERING CONNECTIONS</div>
-          <h1>
-            BUILD BEYOND <span>THE FIELD.</span>
-          </h1>
-        </div>
-        <div className="stats-grid">
-          {[
-            ['HOURS', 'hours'],
-            ['PEOPLE REACHED', 'reached'],
-            ['STEM CONNECTIONS', 'professionals'],
-          ].map(([label, key]) => (
-            <Stat
-              key={key}
-              label={label}
-              value={w.data.outreach.reduce((n, r) => n + (Number(r[key]) || 0), 0)}
-              note="Recorded team impact"
-            />
-          ))}
-        </div>
-        <Records kind="outreach" w={w} />
-      </>
     );
   else
     view = (
@@ -273,7 +232,6 @@ export default function App() {
                   const Icon = icons[p] || FileText;
                   const highlight =
                     (p === 'programming' && w.member.subteams?.includes('Programming')) ||
-                    (p === 'outreach' && w.member.subteams?.includes('Outreach')) ||
                     (p === 'designs' && w.member.subteams?.includes('CAD')) ||
                     (p === 'robot' && w.member.subteams?.includes('Mechanical'));
                   return (
@@ -390,7 +348,7 @@ export default function App() {
             </button>
           </div>
         )}
-        <main id="main-content" className="main-content" key={page}>
+        <main id="main-content" className="main-content" key={`${page}:${innerPage || ''}`}>
           {w.error && (
             <div className="error notice" role="alert">
               {w.error}
@@ -420,7 +378,7 @@ export default function App() {
             <Search size={18} />
             <input
               autoFocus
-              placeholder="Search records, people, parts…"
+              placeholder="Search records and people…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -428,20 +386,7 @@ export default function App() {
           <div className="search-results">
             {search ? (
               results.map(({ kind, r }) => (
-                <button
-                  key={r.id}
-                  onClick={() =>
-                    navigate(
-                      ['subsystems', 'hardware', 'inspection', 'rules'].includes(kind)
-                        ? 'robot'
-                        : ['milestones', 'risks'].includes(kind)
-                          ? 'events'
-                          : kind === 'budgets'
-                            ? 'finance'
-                            : kind,
-                    )
-                  }
-                >
+                <button key={r.id} onClick={() => navigate(pageForKind(kind), kind)}>
                   <Badge>{labels[kind]}</Badge>
                   <span>
                     {r.title ||
@@ -495,8 +440,8 @@ export default function App() {
           <div className="guide">
             <h3>1 / Start your team</h3>
             <p>
-              Create an account, confirm your email, then choose Create team. Enter the team
-              profile. You become the first captain and owner.
+              Sign in with Google, then choose Create team. Enter the team profile. You become the
+              first captain and owner.
             </p>
             <h3>2 / Bring the crew</h3>
             <p>
@@ -505,18 +450,18 @@ export default function App() {
             </p>
             <h3>3 / Keep the books</h3>
             <p>
-              Business & finance → Log expense. Enter date, amount, category, paid by, reimbursement
+              Finance & expenses → Log expense. Enter date, amount, category, paid by, reimbursement
               status and a receipt link or upload.
             </p>
             <h3>4 / Learn from every match</h3>
             <p>
-              Match analytics → Add record. Enter match details, the BIOBUZZ metrics, recorded
+              Competition → Matches → Add record. Enter match details, the BIOBUZZ metrics, recorded
               points, and mechanism issues.
             </p>
-            <h3>5 / Record your impact</h3>
+            <h3>5 / Keep everyone organized</h3>
             <p>
-              Outreach & connect → Add record. Log hours, audience, people reached, STEM
-              connections, impact, and follow-up.
+              Attendance & roster holds meeting attendance and people. FTC resources holds official
+              season links and your team’s saved references.
             </p>
             <p className="note">
               Demo mode stores only on this device. Live accounts, files and shared data require the

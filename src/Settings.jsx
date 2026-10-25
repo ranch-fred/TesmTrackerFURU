@@ -14,6 +14,7 @@ import { canDelete, canEdit, uid } from './domain';
 import { download, csv } from './exports';
 import { Modal, Badge } from './Records';
 import { parseCSV, validateImport } from './importer';
+import { presets, parseCustomTheme, readTheme, saveTheme } from './theme';
 export default function Settings({ w }) {
   const [tab, setTab] = useState(canDelete(w.member.role) ? 'profile' : 'preferences'),
     [note, setNote] = useState(''),
@@ -24,7 +25,8 @@ export default function Settings({ w }) {
     [busy, setBusy] = useState(false),
     [deleteOpen, setDeleteOpen] = useState(false),
     [deleteName, setDeleteName] = useState(''),
-    [deleteError, setDeleteError] = useState('');
+    [deleteError, setDeleteError] = useState(''),
+    [theme, setTheme] = useState(readTheme);
   const admin = canDelete(w.member.role);
   const owner = w.team.owner_id === w.user.id;
   const [profile, setProfile] = useState({
@@ -76,6 +78,24 @@ export default function Settings({ w }) {
     });
     setBusy(false);
   }
+  function chooseTheme(selection) {
+    saveTheme(selection);
+    setTheme(selection);
+    setError('');
+    setNote(
+      `${selection.custom?.name || presets[selection.preset]?.name} theme applied on this device.`,
+    );
+  }
+  async function uploadTheme(file) {
+    setError('');
+    try {
+      if (!file.name.toLowerCase().endsWith('.json')) throw Error('Choose a .json theme file.');
+      if (file.size > 16384) throw Error('Theme file must be 16 KB or smaller.');
+      chooseTheme({ custom: parseCustomTheme(await file.text()) });
+    } catch (e) {
+      setError(e.message);
+    }
+  }
   return (
     <>
       <div className="page-intro">
@@ -87,8 +107,12 @@ export default function Settings({ w }) {
       </div>
       <div className="tabs page-tabs">
         {(admin
-          ? ['profile', 'members', 'invites', 'preferences', 'data', 'delete team']
-          : ['preferences', ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : [])]
+          ? ['profile', 'members', 'invites', 'preferences', 'theme', 'data', 'delete team']
+          : [
+              'preferences',
+              'theme',
+              ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : []),
+            ]
         ).map((t) => (
           <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
             {t[0].toUpperCase() + t.slice(1)}
@@ -321,6 +345,62 @@ export default function Settings({ w }) {
           </p>
         </section>
       )}
+      {tab === 'theme' && (
+        <section className="panel settings-panel">
+          <div className="eyebrow">SETTINGS / APPEARANCE</div>
+          <h2>Choose your look</h2>
+          <p>Theme changes apply to this browser. Other team members can choose their own look.</p>
+          <div className="theme-options">
+            {Object.entries(presets).map(([key, item]) => (
+              <button
+                key={key}
+                type="button"
+                className={`theme-option ${theme.preset === key ? 'selected' : ''}`}
+                aria-pressed={theme.preset === key}
+                onClick={() => chooseTheme({ preset: key })}
+              >
+                <span className="theme-swatches">
+                  <i style={{ background: item.colors.background }} />
+                  <i style={{ background: item.colors.surface }} />
+                  <i style={{ background: item.colors.accent }} />
+                </span>
+                <strong>{item.name}</strong>
+                <small>{item.mode === 'light' ? 'Light' : 'Dark'} theme</small>
+              </button>
+            ))}
+          </div>
+          <div className="theme-upload">
+            <h3>Upload a custom theme</h3>
+            <p>
+              Use a <strong>.json</strong> file, 16 KB or smaller. Include a name, a mode of{' '}
+              <strong>dark</strong> or <strong>light</strong>, and seven colors written as six-digit
+              hex codes (#RRGGBB): background, surface, surfaceRaised, text, muted, accent, and
+              border. Text colors must be readable against the background and panels. The file
+              contains colors only; no images, fonts, CSS, or scripts.
+            </p>
+            <a className="outline" href="/theme-template.json" download="team-theme-template.json">
+              <Download size={16} /> Download example file
+            </a>
+            <label>
+              Choose your theme file
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={(e) => {
+                  if (e.target.files[0]) uploadTheme(e.target.files[0]);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+            {theme.custom && (
+              <p className="note">
+                Current custom theme: <strong>{theme.custom.name}</strong>. Your uploaded file stays
+                in this browser.
+              </p>
+            )}
+          </div>
+        </section>
+      )}
       {tab === 'data' && canEdit(w.member.role, w.member.mentor_edit) && (
         <section className="panel settings-panel">
           <h2>Your team’s data, in your hands.</h2>
@@ -353,11 +433,15 @@ export default function Settings({ w }) {
           <label>
             Section for CSV export / import
             <select value={kind} onChange={(e) => setKind(e.target.value)}>
-              {Object.entries(entities).map(([k, e]) => (
-                <option key={k} value={k}>
-                  {e.title}
-                </option>
-              ))}
+              {Object.entries(entities)
+                .filter(
+                  ([k]) => !['outreach', 'judging', 'portfolio', 'reports', 'parts'].includes(k),
+                )
+                .map(([k, e]) => (
+                  <option key={k} value={k}>
+                    {e.title}
+                  </option>
+                ))}
             </select>
           </label>
           <button

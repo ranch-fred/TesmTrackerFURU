@@ -14,12 +14,12 @@ export function seed() {
         targets: ['Whole team'],
       }),
       row('a2', {
-        title: 'Outreach crew, you made an impact.',
+        title: 'Competition checklist is ready.',
         message:
-          'Our library demo reached 86 future engineers. Photos and reflections are ready for the portfolio.',
+          'Check the event plan and packing list before our next scrimmage. Add missing gear to the checklist.',
         author: 'Jordan Patel',
         date: '2026-10-22',
-        targets: ['Outreach', 'Media'],
+        targets: ['Whole team'],
       }),
     ],
     tasks: [

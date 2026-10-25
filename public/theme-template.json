@@ -1,0 +1,13 @@
+{
+  "name": "My Team Theme",
+  "mode": "dark",
+  "colors": {
+    "background": "#0B0F14",
+    "surface": "#151D26",
+    "surfaceRaised": "#202B38",
+    "text": "#F4F7FA",
+    "muted": "#AAB8C5",
+    "accent": "#48C0FF",
+    "border": "#344456"
+  }
+}

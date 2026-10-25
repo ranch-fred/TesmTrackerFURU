@@ -351,8 +351,8 @@ export const entities = {
     ],
   },
   resources: {
-    title: 'Manual & resources',
-    group: 'COMPETITION',
+    title: 'Team resource links',
+    group: 'RESOURCES',
     fields: [
       f('title', 'Title / term'),
       f('section', 'Section', 'select', [
@@ -384,17 +384,20 @@ export const entities = {
   },
 };
 export const sections = [
-  ['TEAM', ['dashboard', 'announcements', 'tasks', 'roster', 'sessions', 'meetings']],
-  ['ROBOT', ['robot', 'programming', 'designs', 'parts']],
-  ['COMPETITION', ['matches', 'events', 'packing', 'resources']],
-  ['BUSINESS', ['finance', 'expenses', 'income', 'purchases']],
-  ['OUTREACH', ['outreach', 'judging', 'portfolio', 'reports']],
+  ['TEAM', ['dashboard', 'announcements', 'tasks', 'attendance', 'meetings']],
+  ['ROBOT', ['robot', 'programming', 'designs']],
+  ['COMPETITION', ['competition']],
+  ['BUSINESS', ['finance', 'purchases']],
+  ['RESOURCES', ['resources']],
 ];
 export const labels = {
+  ...Object.fromEntries(Object.entries(entities).map(([k, v]) => [k, v.title])),
   dashboard: 'Mission control',
-  finance: 'Business & finance',
+  attendance: 'Attendance & roster',
+  competition: 'Competition',
+  finance: 'Finance & expenses',
+  resources: 'FTC resources',
   reports: 'Reports',
   settings: 'Team settings',
   activity: 'Activity log',
-  ...Object.fromEntries(Object.entries(entities).map(([k, v]) => [k, v.title])),
 };

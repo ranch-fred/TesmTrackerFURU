@@ -100,10 +100,8 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
           {schema.fields.map((f, index) => {
             let options = f.options || [];
             if (f.type === 'members') options = w.data.roster.map((x) => x.name);
-            if (f.type === 'parts' || f.type === 'partOrGear')
-              options = w.data.parts.map((x) => x.component);
             if (f.type === 'hardware') options = w.data.hardware.map((x) => x.name);
-            const multi = ['multi', 'members', 'parts', 'hardware'].includes(f.type);
+            const multi = ['multi', 'members', 'hardware'].includes(f.type);
             return (
               <label
                 className={
@@ -114,7 +112,22 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                 key={f.key}
               >
                 {f.label}
-                {f.type === 'textarea' ? (
+                {f.type === 'parts' ? (
+                  <textarea
+                    rows={3}
+                    placeholder="One item per line"
+                    value={(form[f.key] || []).join('\n')}
+                    onChange={(e) =>
+                      set(
+                        f.key,
+                        e.target.value
+                          .split('\n')
+                          .map((v) => v.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                  />
+                ) : f.type === 'textarea' ? (
                   <textarea
                     rows={4}
                     value={form[f.key] || ''}
@@ -196,7 +209,6 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                   </>
                 ) : (
                   <input
-                    list={f.type === 'partOrGear' ? 'gear-options' : undefined}
                     required={index === 0}
                     type={
                       ['number', 'percent', 'score'].includes(f.type)
@@ -229,11 +241,6 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
             );
           })}
         </div>
-        <datalist id="gear-options">
-          {w.data.parts.map((p) => (
-            <option key={p.id}>{p.component}</option>
-          ))}
-        </datalist>
         {kind === 'roster' && (
           <p className="note">
             Roster roles describe the team. Change account permissions in Team settings.
@@ -842,28 +849,6 @@ export default function Records({ kind, w, compact = false }) {
           <button className="outline" onClick={() => window.print()}>
             Print checklist
           </button>
-          {editAllowed && (
-            <button
-              className="outline"
-              onClick={async () => {
-                const event = prompt('Event name');
-                if (!event?.trim()) return;
-                try {
-                  for (const p of w.data.parts)
-                    await w.save('packing', {
-                      event,
-                      component: p.component,
-                      quantity: 1,
-                      packed: false,
-                    });
-                } catch (e) {
-                  setErr(e.message);
-                }
-              }}
-            >
-              Build from inventory
-            </button>
-          )}
         </div>
       )}
       {kind === 'sessions' && (
