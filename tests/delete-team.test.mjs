@@ -49,3 +49,29 @@ test('stops when storage cannot list files', async () => {
   };
   await assert.rejects(removeTeamFiles(client, 'team1'), /Storage unavailable/);
 });
+
+test('lists and removes every page of a larger team folder', async () => {
+  const entries = Array.from({ length: 101 }, (_, i) => ({ name: `${i}.pdf`, id: `${i}` }));
+  const removed = [];
+  const client = {
+    storage: {
+      from() {
+        return {
+          async list(_folder, { limit, offset }) {
+            return { data: entries.slice(offset, offset + limit), error: null };
+          },
+          async remove(paths) {
+            removed.push(paths);
+            return { data: paths, error: null };
+          },
+        };
+      },
+    },
+  };
+  await removeTeamFiles(client, 'team1');
+  assert.deepEqual(
+    removed.map((batch) => batch.length),
+    [100, 1],
+  );
+  assert.equal(removed.flat().length, 101);
+});
