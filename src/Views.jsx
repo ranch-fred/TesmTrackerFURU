@@ -45,6 +45,7 @@ import { entities } from './schema';
 import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
 import { loggedToday } from './logs';
+import { seasonBadge } from './branding';
 import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
 import { officialRules } from './robot-rules';
 const palette = [
@@ -138,6 +139,7 @@ export function Dashboard({ w, navigate }) {
       ? Math.max(0, Math.ceil((new Date(next.date + 'T12:00:00') - new Date()) / 86400000))
       : null;
   const parent = w.member.role === 'Parent/Sponsor';
+  const season = seasonBadge(w.team.season);
   return (
     <>
       <section className="welcome-banner">
@@ -153,9 +155,11 @@ export function Dashboard({ w, navigate }) {
         <div className="season-mark">
           <span>SEASON</span>
           <strong>
-            26<span>/</span>27
+            {season.years.split('/')[0]}
+            {season.years.includes('/') && <span>/</span>}
+            {season.years.split('/')[1] || ''}
           </strong>
-          <small>{w.team.season.replace('2026–27 ', '')}</small>
+          <small>{season.label}</small>
         </div>
         <div className="banner-grid" />
       </section>
@@ -325,7 +329,7 @@ export function Dashboard({ w, navigate }) {
               <div className="wheel w2" />
               <div className="wheel w3" />
               <div className="wheel w4" />
-              <span className="schematic-core">30439</span>
+              <span className="schematic-core">{w.team.number}</span>
               <span className="schematic-line" />
             </div>
             <div className="dimension side">{robot.width || '—'} IN</div>
@@ -881,7 +885,7 @@ export function Robot({ w, initial = 'robot' }) {
         <section className="panel robot-detail">
           <div className="blueprint-grid">
             <div className="technical-title">{r?.name || 'NO ROBOT CONFIGURED'}</div>
-            <div className="technical-number">30439</div>
+            <div className="technical-number">{w.team.number}</div>
             <div className="technical-dims">
               L {r?.length || '—'}″ / W {r?.width || '—'}″ / H {r?.height || '—'}″
             </div>

@@ -1,6 +1,8 @@
-# Cool Name Pending #30439 — Team Console
+# FTC Team Tracker — Team Console
 
 A black-and-orange, mobile-friendly FTC team workspace for the team-provided 2026–27 BIOBUZZ season. Built for **GitHub → Vercel**, with **Supabase** accounts, shared Postgres data, private file uploads and role-based access.
+
+The sign-in page uses generic FTC Team Tracker branding. Once a member signs in, the sidebar, footer, robot panels, and browser title use that team's name, number, and season. The fictional demo still uses Cool Name Pending #30439 as sample data.
 
 No generated robot images are included, as requested. The interface uses typography, blueprint grids and a simple CSS dimensional schematic. The requested Higgsfield video submission was rejected for insufficient workspace video credits; no video is included or claimed complete.
 
