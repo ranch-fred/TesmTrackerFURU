@@ -1,0 +1,125 @@
+.google-login-block {
+  margin: 28px 0 10px;
+}
+.google-signin {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 8px;
+  background: #fff;
+  color: #202124;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 550;
+  padding: 13px 20px;
+  box-shadow: 0 2px 8px #0002;
+}
+.google-signin:hover:not(:disabled) {
+  background: #f1f5ff;
+  border-color: #b7c9ee;
+  box-shadow: 0 4px 20px #0003;
+}
+.google-login-caption {
+  text-align: center;
+  font-size: 11px;
+  color: #939393;
+  margin-top: 12px;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #858585;
+  font-size: 10px;
+  margin: 26px 0 16px;
+}
+.auth-divider span {
+  height: 1px;
+  background: #383838;
+  flex: 1;
+}
+.join-intent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #efae7b;
+  padding: 15px;
+  background: #ff6b000a;
+  border: 1px solid #ff6b0030;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 20px;
+}
+.join-intent small {
+  display: block;
+  color: #ac9b89;
+  font-size: 10px;
+  margin-top: 5px;
+  line-height: 1.7;
+}
+.join-intent b {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.shared-team-promise {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 22px 0;
+  padding: 20px 0;
+  border-top: 1px solid #383026;
+}
+.shared-team-promise > svg {
+  color: #be8d61;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.shared-team-promise p {
+  color: #d0c2b4;
+  font-size: 12px;
+}
+.shared-team-promise small {
+  display: block;
+  color: #857d74;
+  font-size: 11px;
+  margin-top: 5px;
+}
+.auth-checking {
+  text-align: center;
+  padding: 45px 0;
+}
+.auth-checking > svg {
+  color: var(--orange);
+}
+.auth-checking h2 {
+  font-size: 22px;
+  margin: 22px 0 10px;
+}
+.auth-checking p {
+  font-size: 12px;
+}
+.hero-copy .demo-entry {
+  display: flex;
+  font-size: 11px;
+  color: #969089;
+  margin-top: 12px;
+}
+.auth-card form > .google-login-block + label {
+  margin-top: 8px;
+}
+@media (max-width: 680px) {
+  .google-signin {
+    min-height: 52px;
+    font-size: 14px;
+  }
+  .auth-main {
+    padding-top: 28px;
+  }
+  .auth-divider {
+    font-size: 10px;
+  }
+}

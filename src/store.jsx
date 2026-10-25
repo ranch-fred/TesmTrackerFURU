@@ -24,6 +24,7 @@ export function useWorkspace() {
     [summary, setSummary] = useState(null),
     [dashboard, setDashboard] = useState(null),
     [busy, setBusy] = useState(false),
+    [authLoading, setAuthLoading] = useState(!!supabase),
     [error, setError] = useState('');
   const checked = (r) => {
     if (r.error) throw r.error;
@@ -33,6 +34,14 @@ export function useWorkspace() {
     if (!supabase || demo) return;
     setBusy(true);
     try {
+      const session = checked(await supabase.auth.getSession());
+      if (!session?.session) {
+        setUser(null);
+        setTeam(null);
+        setMember(null);
+        setData(EMPTY());
+        return;
+      }
       const u = checked(await supabase.auth.getUser())?.user;
       if (!u) {
         setUser(null);
@@ -99,6 +108,7 @@ export function useWorkspace() {
       setError(e.message);
     } finally {
       setBusy(false);
+      setAuthLoading(false);
     }
   }, [demo]);
   useEffect(() => {
@@ -328,6 +338,7 @@ export function useWorkspace() {
     summary,
     dashboard,
     busy,
+    authLoading,
     error,
     setError,
     refresh,
