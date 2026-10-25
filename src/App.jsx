@@ -8,6 +8,7 @@ import {
   NotebookPen,
   Bot,
   Code2,
+  Hammer,
   Lightbulb,
   Flag,
   BookOpen,
@@ -37,6 +38,7 @@ import { Dashboard, Finance, Robot } from './Views';
 import { AttendanceHub, CompetitionHub } from './Hubs';
 import OutreachLog from './OutreachLog';
 import DesignLibrary from './DesignLibrary';
+import { LogPage } from './LogEntry';
 import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
@@ -48,6 +50,7 @@ const icons = {
   meetings: NotebookPen,
   robot: Bot,
   programming: Code2,
+  build: Hammer,
   designs: Lightbulb,
   competition: Flag,
   resources: BookOpen,
@@ -143,6 +146,7 @@ export default function App() {
     view = <CompetitionHub key={innerPage || 'matches'} w={w} initial={innerPage || 'matches'} />;
   else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
   else if (page === 'outreach') view = <OutreachLog w={w} />;
+  else if (page === 'programming' || page === 'build') view = <LogPage kind={page} w={w} />;
   else if (page === 'designs') view = <DesignLibrary w={w} />;
   else if (page === 'settings') view = <Settings w={w} />;
   else if (page === 'activity')

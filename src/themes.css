@@ -460,7 +460,57 @@ html[data-theme-mode='light'] .demo-bar b {
 .cad-upload-form .primary {
   justify-self: start;
 }
+.daily-log-reminder {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  margin: 20px 0 28px;
+  border-color: var(--accent, #f47721);
+}
+.daily-log-reminder h2 {
+  margin: 7px 0 5px;
+}
+.daily-log-reminder p,
+.daily-log-panel p {
+  margin: 0 0 16px;
+  color: var(--muted, #9d9d9d);
+}
+.daily-log-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.daily-log-links button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border, #333);
+  border-radius: 9px;
+  padding: 9px 12px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.daily-log-panel {
+  margin-bottom: 22px;
+}
+.daily-log-panel form {
+  display: grid;
+  gap: 14px;
+}
+.daily-log-panel label {
+  display: grid;
+  gap: 7px;
+}
+.daily-log-panel .primary {
+  justify-self: start;
+}
 @media (max-width: 780px) {
+  .daily-log-reminder {
+    align-items: flex-start;
+    flex-direction: column;
+  }
   .hub-grid {
     grid-template-columns: 1fr;
   }

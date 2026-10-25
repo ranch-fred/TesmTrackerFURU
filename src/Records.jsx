@@ -132,6 +132,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                 ) : f.type === 'textarea' ? (
                   <textarea
                     rows={4}
+                    required={!record && f.key === 'whatDone'}
                     value={form[f.key] || ''}
                     onChange={(e) => set(f.key, e.target.value)}
                   />
