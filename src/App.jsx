@@ -42,6 +42,7 @@ import { LogPage } from './LogEntry';
 import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
+import { teamMonogram, teamPageTitle } from './branding';
 const icons = {
   dashboard: LayoutDashboard,
   announcements: Radio,
@@ -87,6 +88,9 @@ export default function App() {
   useEffect(() => {
     if (w.member && !canView(w.member.role, page)) setPage('dashboard');
   }, [w.member?.role, page]);
+  useEffect(() => {
+    document.title = teamPageTitle(w.member?.status === 'approved' ? w.team : null);
+  }, [w.team?.name, w.team?.number, w.member?.status]);
   if (!w.user || !w.team || !w.member || w.member.status !== 'approved')
     return (
       <>
@@ -102,7 +106,7 @@ export default function App() {
   if (!w.member.onboarded)
     return (
       <div className="welcome-screen">
-        <Brand />
+        <Brand team={w.team} />
         <div className="panel">
           <div className="eyebrow">YOU’RE PART OF THE CREW</div>
           <h1>
@@ -189,7 +193,9 @@ export default function App() {
     view = (
       <>
         <div className="page-intro compact-intro">
-          <div className="eyebrow">{entities[page]?.group} / TEAM 30439</div>
+          <div className="eyebrow">
+            {entities[page]?.group} / TEAM {w.team.number}
+          </div>
           <h1>
             {labels[page]?.toUpperCase()}
             <span>.</span>
@@ -212,7 +218,7 @@ export default function App() {
       )}
       <aside className={`sidebar ${menu ? 'open' : ''}`}>
         <div className="sidebar-brand">
-          <Brand />
+          <Brand team={w.team} />
           <button
             className="mobile-only icon-button"
             onClick={() => setMenu(false)}
@@ -222,7 +228,7 @@ export default function App() {
           </button>
         </div>
         <div className="team-switch">
-          <span className="team-monogram">CNP</span>
+          <span className="team-monogram">{teamMonogram(w.team.name)}</span>
           <div>
             <strong>{w.team.name}</strong>
             <small>
@@ -373,7 +379,7 @@ export default function App() {
           <MotionScene>{view}</MotionScene>
           <footer className="workspace-footer">
             <span>
-              COOL NAME PENDING <b>#{w.team.number}</b>
+              {w.team.name} <b>#{w.team.number}</b>
             </span>
             <span>BUILD. TEST. ITERATE. REPEAT.</span>
             <button onClick={() => setHelp(true)}>

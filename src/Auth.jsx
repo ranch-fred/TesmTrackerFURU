@@ -12,6 +12,7 @@ import { supabase } from './client';
 import { roles, subteams } from './schema';
 import { MotionToggle } from './Motion';
 import { readInvite, clearInvite, callbackError, signInWithGoogle } from './auth-flow';
+import { teamMonogram } from './branding';
 function GoogleMark() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
@@ -34,18 +35,21 @@ function GoogleMark() {
     </svg>
   );
 }
-export function Brand() {
+export function Brand({ team }) {
   return (
     <div className="brand">
       <span className="brand-icon">
         <Hexagon size={26} />
-        <b>C</b>
+        <b>{team ? teamMonogram(team.name).slice(0, 1) : 'T'}</b>
       </span>
       <div>
         <strong>
-          COOL NAME PENDING<span className="orange">.</span>
+          {team?.name || 'FTC TEAM TRACKER'}
+          <span className="orange">.</span>
         </strong>
-        <small>FTC #30439 / TEAM CONSOLE</small>
+        <small>
+          {team ? `FTC #${team.number} / TEAM WORKSPACE` : 'SIGN IN OR SIGN UP TO TRACK YOUR TEAM'}
+        </small>
       </div>
     </div>
   );
@@ -57,7 +61,7 @@ export function Blueprint() {
       <div className="orbital orbit-two" />
       <div className="blueprint-core">
         <Hexagon size={145} strokeWidth={0.7} />
-        <strong>30439</strong>
+        <strong>FTC</strong>
         <small>BUILT TOGETHER</small>
       </div>
       <span className="crosshair c1">+</span>
@@ -188,7 +192,7 @@ export default function Auth({ w }) {
       <nav className="entry-nav">
         <Brand />
         <div>
-          <span className="season-label">2026—27 / BIOBUZZ</span>
+          <span className="season-label">FTC / TEAM TRACKER</span>
           <MotionToggle />
           <button className="outline" onClick={() => setMode('login')}>
             Team sign in <ArrowUpRight size={15} />
@@ -208,18 +212,18 @@ export default function Auth({ w }) {
                 MAKE <em>MOVES.</em>
               </h1>
               <p>
-                One crew. Every moving part.
+                Sign in or sign up to start tracking your team.
                 <br />
-                The command center for everything we build,
+                Keep your work, people, and progress together,
                 <br />
-                learn, and bring to the field.
+                from the workshop to the field.
               </p>
               <div className="hero-actions">
                 <button className="primary" onClick={() => setMode('login')}>
-                  Sign in to team console <ArrowUpRight size={18} />
+                  Sign in to track your team <ArrowUpRight size={18} />
                 </button>
                 <button className="text-button" onClick={() => setMode('signup')}>
-                  Create your team <ArrowRight size={16} />
+                  Sign up to start a team <ArrowRight size={16} />
                 </button>
               </div>
               <small className="muted">Interactive demo · Sample data · No account needed</small>
@@ -229,11 +233,11 @@ export default function Auth({ w }) {
             </div>
             <div className="hero-art">
               <Blueprint />
-              <span className="art-tag">TEAM 30439 / BUILD TOGETHER</span>
+              <span className="art-tag">YOUR TEAM / BUILD TOGETHER</span>
               <div className="art-coordinates">
-                17.5 × 17.5 × 16.8 IN
+                PLAN / BUILD / TRACK
                 <br />
-                ENGINEERED TO EVOLVE
+                MADE FOR EVERY TEAM
               </div>
             </div>
           </section>
@@ -256,13 +260,13 @@ export default function Auth({ w }) {
             </div>
           </section>
           <footer>
-            COOL NAME PENDING #30439 <span>BUILD. TEST. ITERATE. REPEAT.</span>
+            FTC TEAM TRACKER <span>BUILD. TEST. ITERATE. REPEAT.</span>
           </footer>
         </>
       ) : (
         <main className="auth-main">
           <div className="auth-aside">
-            <div className="eyebrow">TEAM ACCESS / 30439</div>
+            <div className="eyebrow">TEAM ACCESS / SIGN IN OR SIGN UP</div>
             <h1>
               GREAT ROBOTS.
               <br />
@@ -388,12 +392,12 @@ export default function Auth({ w }) {
                       <>
                         <label>
                           Team name
-                          <input required name="name" defaultValue="Cool Name Pending" />
+                          <input required name="name" placeholder="Your team name" />
                         </label>
                         <div className="form-grid">
                           <label>
                             Team number
-                            <input required name="number" defaultValue="30439" />
+                            <input required name="number" placeholder="Your FTC team number" />
                           </label>
                           <label>
                             Season

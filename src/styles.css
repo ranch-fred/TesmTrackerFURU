@@ -283,6 +283,9 @@ small {
   align-items: center;
   gap: 10px;
 }
+.brand > div {
+  min-width: 0;
+}
 .brand-icon {
   position: relative;
   display: grid;
@@ -301,12 +304,15 @@ small {
   font-size: 19px;
 }
 .brand strong {
+  display: block;
   font-family: var(--heading);
   font-size: 20px;
   font-weight: 600;
   line-height: 1.1;
   letter-spacing: 0.6px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .brand small {
   display: block;
@@ -339,6 +345,10 @@ small {
   padding: 28px 5%;
   margin: auto;
   border-bottom: 1px solid #242424;
+}
+.entry-nav .brand strong {
+  color: #f0f0ef;
+  max-width: 240px;
 }
 .entry-nav > div:last-child {
   display: flex;
@@ -596,6 +606,7 @@ small {
 .sidebar .brand strong {
   font-size: 17px;
   letter-spacing: 0.3px;
+  max-width: 172px;
 }
 .sidebar .brand small {
   font-size: 7px;
@@ -627,6 +638,9 @@ small {
   display: block;
   font-size: 10px;
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .team-switch small {
   display: block;
@@ -634,6 +648,8 @@ small {
   color: #8b8b8b;
   margin-top: 5px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .team-switch svg {
   color: #888;
@@ -2260,10 +2276,11 @@ dialog::backdrop {
 }
 .technical-number {
   font-family: var(--heading);
-  font-size: 100px;
+  font-size: clamp(42px, 7vw, 100px);
   color: #e48e4c;
   line-height: 1.2;
   letter-spacing: 3px;
+  overflow-wrap: anywhere;
 }
 .technical-dims {
   font-family: var(--mono);
