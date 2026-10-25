@@ -107,8 +107,28 @@ create function public.rotate_invite(t uuid) returns text language plpgsql secur
 create function public.update_preferences(t uuid,notify boolean,welcome boolean) returns void language plpgsql security definer set search_path=public as $$ begin update memberships set notification_preferences=notify,onboarded=welcome where team_id=t and user_id=auth.uid();end $$;
 create function public.finance_summary(t uuid) returns jsonb language plpgsql security definer set search_path=public as $$ declare received numeric;spent numeric;pledged numeric;begin if public.team_role(t) is null then raise exception 'Approved member required';end if;select coalesce(sum((data->>'received')::numeric),0),coalesce(sum((data->>'pledged')::numeric),0) into received,pledged from records where team_id=t and kind='income';select coalesce(sum((data->>'amount')::numeric),0) into spent from records where team_id=t and kind='expenses';return jsonb_build_object('received',received,'spent',spent,'balance',received-spent,'pledged',pledged);end $$;
 create function public.dashboard_summary(t uuid) returns jsonb language plpgsql security definer set search_path=public as $$ begin if public.team_role(t) is null then raise exception 'Approved member required';end if;return jsonb_build_object('robot',(select data from records where team_id=t and kind='robot' order by created_at limit 1),'events',(select coalesce(jsonb_agg(jsonb_build_object('id',id,'name',data->>'name','date',data->>'date')),'[]') from records where team_id=t and kind='events'));end $$;
+create function public.delete_team(t uuid, expected_name text, check_only boolean default false) returns void language plpgsql security definer set search_path='' as $$
+declare current_name text; current_owner uuid;
+begin
+ if auth.uid() is null then raise exception 'Sign in first'; end if;
+ select name,owner_id into current_name,current_owner from public.teams where id=t for update;
+ if not found then raise exception 'Team not found'; end if;
+ if current_owner<>auth.uid() then raise exception 'Only the team owner can delete the team'; end if;
+ if expected_name is distinct from current_name then raise exception 'Team name did not match'; end if;
+ if check_only then return; end if;
+ if exists(select 1 from storage.objects where bucket_id='team-files' and name like t::text||'/%') then
+  raise exception 'Remove team files before deleting the team';
+ end if;
+ -- Clear children before the parent so audit triggers cannot write new rows for a deleted team.
+ delete from public.comments where team_id=t;
+ delete from public.records where team_id=t;
+ delete from public.memberships where team_id=t;
+ delete from public.notifications where team_id=t;
+ delete from public.activity where team_id=t;
+ delete from public.teams where id=t;
+end $$;
 revoke execute on all functions in schema public from public,anon;
-grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.rotate_invite(uuid),public.update_preferences(uuid,boolean,boolean),public.finance_summary(uuid),public.dashboard_summary(uuid) to authenticated;
+grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.rotate_invite(uuid),public.update_preferences(uuid,boolean,boolean),public.finance_summary(uuid),public.dashboard_summary(uuid),public.delete_team(uuid,text,boolean) to authenticated;
 grant select on public.memberships,public.notifications,public.activity to authenticated;
 grant select,insert,update,delete on public.records to authenticated;
 grant select,insert on public.comments to authenticated;

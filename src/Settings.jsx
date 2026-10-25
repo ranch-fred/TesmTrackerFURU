@@ -7,6 +7,7 @@ import {
   ShieldCheck,
   UserCheck,
   ArrowRight,
+  Trash2,
 } from 'lucide-react';
 import { roles, entities, subteams } from './schema';
 import { canDelete, canEdit, uid } from './domain';
@@ -20,8 +21,12 @@ export default function Settings({ w }) {
     [confirm, setConfirm] = useState(null),
     [pending, setPending] = useState(null),
     [kind, setKind] = useState('expenses'),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [deleteOpen, setDeleteOpen] = useState(false),
+    [deleteName, setDeleteName] = useState(''),
+    [deleteError, setDeleteError] = useState('');
   const admin = canDelete(w.member.role);
+  const owner = w.team.owner_id === w.user.id;
   const [profile, setProfile] = useState({
     name: w.team.name,
     number: w.team.number,
@@ -82,7 +87,7 @@ export default function Settings({ w }) {
       </div>
       <div className="tabs page-tabs">
         {(admin
-          ? ['profile', 'members', 'invites', 'preferences', 'data']
+          ? ['profile', 'members', 'invites', 'preferences', 'data', 'delete team']
           : ['preferences', ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : [])]
         ).map((t) => (
           <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
@@ -382,6 +387,83 @@ export default function Settings({ w }) {
             be imported.
           </p>
         </section>
+      )}
+      {tab === 'delete team' && admin && (
+        <section className="panel settings-panel delete-team-panel">
+          <div className="eyebrow">TEAM SETTINGS / DANGER ZONE</div>
+          <h2>Delete this team</h2>
+          <p>
+            Permanently remove <strong>{w.team.name}</strong>, its members, records, activity, and
+            uploaded files. Everyone on the team will lose access. Your Google account will stay.
+          </p>
+          {owner ? (
+            <button
+              className="primary danger-button"
+              onClick={() => {
+                setDeleteName('');
+                setDeleteError('');
+                setDeleteOpen(true);
+              }}
+            >
+              <Trash2 size={16} /> Delete team
+            </button>
+          ) : (
+            <p className="note" role="status">
+              Only the team owner can delete it. Ask the current owner to transfer ownership to you
+              from the Members tab first.
+            </p>
+          )}
+        </section>
+      )}
+      {deleteOpen && (
+        <Modal
+          title="Delete this team permanently?"
+          onClose={(event) => {
+            if (busy) return event?.preventDefault();
+            setDeleteOpen(false);
+          }}
+        >
+          <p>
+            This removes the team and its shared data for everyone. This action cannot be undone.
+          </p>
+          <label>
+            Type <strong>{w.team.name}</strong> to confirm
+            <input
+              value={deleteName}
+              onChange={(event) => setDeleteName(event.target.value)}
+              autoComplete="off"
+              spellCheck="false"
+            />
+          </label>
+          {deleteError && (
+            <p role="alert" className="error notice">
+              {deleteError}
+            </p>
+          )}
+          <div className="modal-actions">
+            <button className="outline" disabled={busy} onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </button>
+            <button
+              className="primary danger-button"
+              disabled={busy || deleteName !== w.team.name}
+              onClick={async () => {
+                setBusy(true);
+                setDeleteError('');
+                try {
+                  await w.deleteTeam();
+                  setDeleteOpen(false);
+                } catch (e) {
+                  setDeleteError(e.message);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              {busy ? 'Deleting team…' : 'Delete team permanently'}
+            </button>
+          </div>
+        </Modal>
       )}
       {confirm && (
         <Modal title={confirm.title} onClose={() => setConfirm(null)}>

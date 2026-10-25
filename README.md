@@ -23,6 +23,10 @@ Open the printed localhost address and choose **Explore team console**. Demo mod
 
 For Google login and Vercel's existing Supabase integration, follow [the Google sign-in setup guide](docs/GOOGLE_SIGN_IN.md). The login screen now supports Google alongside email/password, and new members default to joining an existing team.
 
+### Add team deletion to an existing project
+
+Run [`supabase/migrations/20261025_delete_team.sql`](supabase/migrations/20261025_delete_team.sql) once in the existing project's Supabase SQL Editor before deploying the updated site. The script only installs an owner-checked function; it does not delete a team. The team owner can then use **Team Settings → Delete team**, type the exact team name, and confirm. The site removes that team's private uploads first, then the function removes the team and its linked data. Google accounts remain. If file removal fails, the team remains so the owner can retry. Export records and download files beforehand if they need a copy.
+
 1. Create a Supabase project you control.
 2. In its SQL editor, run **supabase/schema.sql** once in a new project. It creates the application tables, private storage bucket, guarded administration functions, audit triggers, Realtime policies and row-level permissions. It is an initial migration, not an idempotent reset script.
 3. In Supabase Authentication settings, enable email/password and email confirmation. Set the Site URL to the production Vercel URL. Add localhost and your actual Vercel production/preview URLs to the allowed redirect URLs. Configure your own SMTP provider for reliable confirmation email delivery. The app sends in-app announcement notifications, not announcement emails.
@@ -71,8 +75,9 @@ Repository: [ranch-fred/TesmTrackerFURU](https://github.com/ranch-fred/TesmTrack
 - `src/store.jsx`: demo storage, Supabase record operations, private uploads, refresh and presence.
 - `src/Views.jsx`: dashboard, finance, robot checks, match charts, judging practice, portfolio and reports.
 - `src/Records.jsx`: searchable/filterable/sortable lists, forms, comments, CSV, Kanban, attendance and calendar.
-- `src/Settings.jsx`: profile, member management, invites, preferences and import/export.
+- `src/Settings.jsx`: profile, member management, invites, preferences, import/export and owner-only team deletion.
 - `supabase/schema.sql`: full database migration and security boundary.
+- `supabase/migrations/20261025_delete_team.sql`: upgrade for existing Supabase projects.
 - `docs/PLAN.md`: site map, data model and role matrix.
 - `docs/VERIFICATION.md`: checks performed and remaining deployment verification.
 

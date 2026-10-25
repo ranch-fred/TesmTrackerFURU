@@ -3,6 +3,7 @@ import { supabase } from './client';
 import { seed, demoTeam } from './seed';
 import { entities } from './schema';
 import { uid, canEdit, canDelete } from './domain';
+import { removeTeamFiles } from './delete-team';
 const EMPTY = () => Object.fromEntries(Object.keys(entities).map((k) => [k, []]));
 function readDemo() {
   try {
@@ -61,6 +62,12 @@ export function useWorkspace() {
       if (!m) {
         setTeam(null);
         setMember(null);
+        setMembers([]);
+        setData(EMPTY());
+        setActivity([]);
+        setNotifications([]);
+        setSummary(null);
+        setDashboard(null);
         return;
       }
       setMember(m);
@@ -264,6 +271,25 @@ export function useWorkspace() {
     checked(await supabase.from('teams').update(profile).eq('id', team.id));
     await refresh();
   }
+  async function deleteTeam() {
+    if (!team || !user || team.owner_id !== user.id)
+      throw Error('Only the team owner can delete the team.');
+    if (demo) {
+      localStorage.removeItem('cnp-demo-v1');
+      setDemo(false);
+      setUser(null);
+      setTeam(null);
+      setMember(null);
+      setMembers([]);
+      setData(EMPTY());
+      return;
+    }
+    const args = { t: team.id, expected_name: team.name };
+    checked(await supabase.rpc('delete_team', { ...args, check_only: true }));
+    await removeTeamFiles(supabase, team.id);
+    checked(await supabase.rpc('delete_team', { ...args, check_only: false }));
+    await refresh();
+  }
   async function manage(m, changes, removeMember = false) {
     if (demo) {
       if (m.user_id === team.owner_id && (removeMember || changes.role !== 'Captain'))
@@ -347,6 +373,7 @@ export function useWorkspace() {
     remove,
     rpc,
     updateTeam,
+    deleteTeam,
     manage,
     upload,
     fileUrl,

@@ -2410,6 +2410,28 @@ dialog::backdrop {
 .settings-panel > .eyebrow {
   margin-bottom: 18px;
 }
+.delete-team-panel {
+  border-color: #8a3a35;
+  background: linear-gradient(135deg, #321d1d, #1b1b1b 62%);
+}
+.delete-team-panel .eyebrow {
+  color: #f19183;
+}
+.delete-team-panel .danger-button,
+.modal-actions .danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #c14235;
+  border-color: #c14235;
+  color: #fff;
+}
+.delete-team-panel .danger-button:hover,
+.modal-actions .danger-button:hover {
+  background: #d45043;
+  box-shadow: 0 0 18px #c1423533;
+}
 .invite-code {
   font-family: var(--mono);
   font-size: 38px;
