@@ -1,5 +1,12 @@
 # Verification record
 
+## Google sign-in revision
+
+- Connected the local preview to the user-supplied public Supabase configuration in ignored `.env.local`.
+- A read-only request to Auth settings succeeded and reported Google disabled. The REST API reported the `teams` table missing. Live Google login and team creation remain blocked on provider setup and the initial migration.
+- Added automated checks for OAuth request parameters, invitation persistence/expiry, safe callback errors, public Vercel environment aliases, rejection of browser-secret keys, and actual login/invite/pending/join screen rendering.
+- Chrome inspection was stopped because its current URL could not be verified. No browser-based Google flow was performed.
+
 ## Layout and motion revision
 
 - Production build and all ten application tests passed after the visual changes.

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ArrowUpRight,
   ArrowRight,
@@ -11,6 +11,29 @@ import {
 import { supabase } from './client';
 import { roles, subteams } from './schema';
 import { MotionToggle } from './Motion';
+import { readInvite, clearInvite, callbackError, signInWithGoogle } from './auth-flow';
+function GoogleMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+      <path
+        fill="#4285F4"
+        d="M21.6 12.23c0-.71-.06-1.39-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.51h3.24c1.9-1.75 2.98-4.33 2.98-7.36Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 22c2.7 0 4.96-.9 6.62-2.41l-3.24-2.51c-.9.6-2.05.96-3.38.96-2.61 0-4.82-1.76-5.61-4.12H3.04v2.59A10 10 0 0 0 12 22Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M6.39 13.92A6 6 0 0 1 6.08 12c0-.67.11-1.32.31-1.92V7.49H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.51l3.35-2.59Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.96c1.47 0 2.79.51 3.83 1.51l2.87-2.87A9.62 9.62 0 0 0 12 2a10 10 0 0 0-8.96 5.49l3.35 2.59C7.18 7.72 9.39 5.96 12 5.96Z"
+      />
+    </svg>
+  );
+}
 export function Brand() {
   return (
     <div className="brand">
@@ -44,11 +67,50 @@ export function Blueprint() {
   );
 }
 export default function Auth({ w }) {
-  const [mode, setMode] = useState('landing'),
+  const [joinCode, setJoinCode] = useState(() => {
+    try {
+      return readInvite(location.search, sessionStorage);
+    } catch {
+      return readInvite(location.search);
+    }
+  });
+  const [mode, setMode] = useState(() =>
+      joinCode ||
+      new URLSearchParams(location.search).has('auth') ||
+      callbackError(location.search, location.hash)
+        ? 'login'
+        : 'landing',
+    ),
     [loading, setLoading] = useState(false),
     [note, setNote] = useState(''),
-    [err, setErr] = useState('');
+    [err, setErr] = useState(() => callbackError(location.search, location.hash));
   const [choices, setChoices] = useState([]);
+  useEffect(() => {
+    if (!w.demo && w.member?.team_id) {
+      try {
+        clearInvite(sessionStorage);
+      } catch {}
+      const url = new URL(location.href);
+      url.searchParams.delete('invite');
+      url.searchParams.delete('auth');
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+  }, [w.member?.team_id, w.demo]);
+  async function googleLogin() {
+    setErr('');
+    setNote('');
+    setLoading(true);
+    try {
+      let storage;
+      try {
+        storage = sessionStorage;
+      } catch {}
+      await signInWithGoogle(supabase, { origin: location.origin, invite: joinCode, storage });
+    } catch (error) {
+      setErr(error.message);
+      setLoading(false);
+    }
+  }
   const step =
     w.user && !w.team
       ? 'team'
@@ -74,7 +136,12 @@ export default function Auth({ w }) {
         const { error } = await supabase.auth.signUp({
           email: v.email,
           password: v.password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: new URL(
+              `/?auth=login${joinCode ? `&invite=${encodeURIComponent(joinCode)}` : ''}`,
+              location.origin,
+            ).toString(),
+          },
         });
         if (error) throw error;
         setNote('Account created. Check your inbox to confirm your email, then sign in.');
@@ -115,9 +182,7 @@ export default function Auth({ w }) {
       setLoading(false);
     }
   }
-  const [flow, setFlow] = useState(
-    new URLSearchParams(location.search).has('invite') ? 'join' : 'create',
-  );
+  const [flow, setFlow] = useState('join');
   return (
     <div className="entry">
       <nav className="entry-nav">
@@ -150,14 +215,17 @@ export default function Auth({ w }) {
                 learn, and bring to the field.
               </p>
               <div className="hero-actions">
-                <button className="primary" onClick={w.enterDemo}>
-                  Explore team console <ArrowUpRight size={18} />
+                <button className="primary" onClick={() => setMode('login')}>
+                  Sign in to team console <ArrowUpRight size={18} />
                 </button>
                 <button className="text-button" onClick={() => setMode('signup')}>
                   Create your team <ArrowRight size={16} />
                 </button>
               </div>
               <small className="muted">Interactive demo · Sample data · No account needed</small>
+              <button className="text-button demo-entry" onClick={w.enterDemo}>
+                Explore demo workspace <ArrowRight size={15} />
+              </button>
             </div>
             <div className="hero-art">
               <Blueprint />
@@ -201,12 +269,25 @@ export default function Auth({ w }) {
               <em>BETTER TEAMS.</em>
             </h1>
             <Blueprint />
+            <div className="shared-team-promise">
+              <ShieldCheck size={18} />
+              <p>
+                Your Google account. Your team’s shared workspace.
+                <small>Sign in, join with an invite, and build together.</small>
+              </p>
+            </div>
             <button className="text-button" onClick={w.enterDemo}>
               Just looking? Explore the demo <ArrowRight size={16} />
             </button>
           </div>
           <section className="auth-card panel">
-            {['pending', 'denied'].includes(step) ? (
+            {w.authLoading ? (
+              <div className="auth-checking" role="status">
+                <LoaderCircle className="spin" size={26} />
+                <h2>Opening your workspace…</h2>
+                <p>Checking your sign-in and team membership.</p>
+              </div>
+            ) : ['pending', 'denied'].includes(step) ? (
               <>
                 <div className="eyebrow">MEMBERSHIP REQUEST</div>
                 <h2>{step === 'pending' ? 'You’re on the list.' : 'Request not approved.'}</h2>
@@ -237,6 +318,38 @@ export default function Auth({ w }) {
                     ? 'Create a team or request access with an invite.'
                     : 'Your team’s work, all in one place.'}
                 </p>
+                {step !== 'team' && (
+                  <div className="google-login-block">
+                    {joinCode && (
+                      <div className="join-intent">
+                        <Users size={17} />
+                        <span>
+                          You have a team invite.
+                          <small>
+                            Sign in to join with code <b>{joinCode}</b>.
+                          </small>
+                        </span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      className="google-signin"
+                      disabled={loading}
+                      onClick={googleLogin}
+                    >
+                      {loading ? <LoaderCircle className="spin" size={20} /> : <GoogleMark />}
+                      <span>{loading ? 'Connecting…' : 'Continue with Google'}</span>
+                    </button>
+                    <p className="google-login-caption">
+                      Use your own Google account to access your team.
+                    </p>
+                    <div className="auth-divider">
+                      <span />
+                      or continue with email
+                      <span />
+                    </div>
+                  </div>
+                )}
                 {step === 'team' ? (
                   <>
                     <div className="tabs">
@@ -258,7 +371,14 @@ export default function Auth({ w }) {
                     <input type="hidden" name="flow" value={flow} />
                     <label>
                       Full name
-                      <input required name="fullName" autoComplete="name" />
+                      <input
+                        required
+                        name="fullName"
+                        autoComplete="name"
+                        defaultValue={
+                          w.user?.user_metadata?.full_name || w.user?.user_metadata?.name || ''
+                        }
+                      />
                     </label>
                     <label>
                       Grade
@@ -300,7 +420,8 @@ export default function Auth({ w }) {
                           <input
                             required
                             name="code"
-                            defaultValue={new URLSearchParams(location.search).get('invite') || ''}
+                            value={joinCode}
+                            onChange={(event) => setJoinCode(event.target.value)}
                           />
                         </label>
                         <label>
@@ -329,6 +450,10 @@ export default function Auth({ w }) {
                               </label>
                             ))}
                           </div>
+                          <p className="note">
+                            Joining an existing team? Ask your captain for the invite code. Everyone
+                            joins the same shared workspace after approval.
+                          </p>
                         </fieldset>
                       </>
                     )}

@@ -21,6 +21,8 @@ Open the printed localhost address and choose **Explore team console**. Demo mod
 
 ## Connect the real backend
 
+For Google login and Vercel's existing Supabase integration, follow [the Google sign-in setup guide](docs/GOOGLE_SIGN_IN.md). The login screen now supports Google alongside email/password, and new members default to joining an existing team.
+
 1. Create a Supabase project you control.
 2. In its SQL editor, run **supabase/schema.sql** once in a new project. It creates the application tables, private storage bucket, guarded administration functions, audit triggers, Realtime policies and row-level permissions. It is an initial migration, not an idempotent reset script.
 3. In Supabase Authentication settings, enable email/password and email confirmation. Set the Site URL to the production Vercel URL. Add localhost and your actual Vercel production/preview URLs to the allowed redirect URLs. Configure your own SMTP provider for reliable confirmation email delivery. The app sends in-app announcement notifications, not announcement emails.

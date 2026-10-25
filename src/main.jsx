@@ -4,6 +4,7 @@ import App from './App';
 import { MotionProvider } from './Motion';
 import './styles.css';
 import './refinements.css';
+import './auth.css';
 class ErrorBoundary extends React.Component {
   state = { error: null };
   static getDerivedStateFromError(error) {
