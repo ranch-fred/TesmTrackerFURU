@@ -5,6 +5,9 @@ import { MotionProvider } from './Motion';
 import './styles.css';
 import './refinements.css';
 import './auth.css';
+import './themes.css';
+import { applyTheme, readTheme } from './theme';
+applyTheme(readTheme());
 class ErrorBoundary extends React.Component {
   state = { error: null };
   static getDerivedStateFromError(error) {

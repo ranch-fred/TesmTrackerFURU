@@ -6,7 +6,7 @@ No generated robot images are included, as requested. The interface uses typogra
 
 ## Layout and motion update
 
-The console now uses larger type, roomier forms and tables, clearer section headings, and a dashboard shortcut bar for tasks, expenses and outreach. Cards reveal as they enter the viewport; stat totals count up; the landing blueprint and header grid move subtly; buttons, navigation, dialogs and charts have coordinated transitions. Use the pause/play control in the header to turn motion off or on. The preference is saved on the device, and the app respects the system's reduced-motion setting. This update adds no generated robot imagery and does not change the database schema.
+The console now uses larger type, roomier forms and tables, clearer section headings, and a dashboard shortcut bar for tasks, expenses and attendance. Cards reveal as they enter the viewport; stat totals count up; the landing blueprint and header grid move subtly; buttons, navigation, dialogs and charts have coordinated transitions. Use the pause/play control in the header to turn motion off or on. The preference is saved on the device, and the app respects the system's reduced-motion setting. This update adds no generated robot imagery and does not change the database schema.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ npm ci
 npm run dev
 ```
 
-Open the printed localhost address and choose **Explore team console**. Demo mode has fictional sample data, stores edits on the current device, and deliberately does not impersonate live accounts or shared uploads. Demo is always available even after Supabase is connected.
+Open the printed localhost address and choose **Explore demo workspace**. Demo mode has fictional sample data, stores edits on the current device, and deliberately does not impersonate live accounts or shared uploads. Demo is always available even after Supabase is connected.
 
 ## Connect the real backend
 
@@ -56,24 +56,24 @@ Repository: [ranch-fred/TesmTrackerFURU](https://github.com/ranch-fred/TesmTrack
 
 ## Captain and member guide
 
-- **Create a team:** Sign up → confirm email → sign in → Create team. Enter full name, grade, team name/number, school, season, location and logo URL. A private logo upload can be added in Team settings after team creation. The creator becomes an approved captain and owner.
-- **Invite and approve:** Team settings → Invites → Copy invite link. Members sign up and submit name, grade, requested role and multiple sub-teams. Captains/coaches approve or deny under Members. Approval grants the requested role; check it before approving. Members see onboarding after approval.
-- **Expense:** Business & finance → Log expense. Enter date, description, amount, category, paid by, receipt URL/upload, and reimbursement status. Files must be PNG, JPEG, WebP, PDF or plain text up to 10 MB. Receipts remain in a private bucket and are opened using short-lived signed URLs.
-- **Match:** Match analytics → Add record. Log match identity, alliance/partner, drive team, all supplied game metrics, points, notes and issues. Points are entered from the official result; no speculative automatic scoring is applied.
-- **Outreach:** Outreach & connect → Add record. Enter date, event type, hours, audience, reach, professional connections, lead speaker, impact and follow-up. Totals update from the records.
-- **Tasks:** Drag between the four columns, or use each task’s status selector with a keyboard. Search, filter, sort, edit and export are available. Overdue dates are highlighted.
-- **Attendance:** Tap member names in a session to toggle presence. Use the calendar tab and per-person attendance/hours summary. Sessions must start and finish on the same date.
-- **Meeting actions:** Put one action per line, then Create tasks. The conversion avoids repeating the same meeting/title pair.
-- **Portfolio:** Pull source entries from designs, code, outreach, funding and robot specs. Existing draft edits are preserved; edit sections and ordering before PDF export.
-- **Reports:** Export season, finance, outreach and attendance PDFs/CSVs. Packing lists have an inventory-based builder and a print stylesheet.
-- **Team access:** Roster roles are descriptive. Account roles are managed only in Team settings. Multiple captains/coaches are supported. Only the current owner can transfer ownership; transfer before removing or demoting the owner.
+- **Join or create:** Sign in with Google, then create a team or enter an invite code. Captains and coaches approve membership requests in Team settings.
+- **Finance:** Finance & expenses combines the overview, expenses, income, and budgets. Purchase requests is the second business tab.
+- **Competition:** Matches, Events & plans, and Packing checklist are together under Competition. Event plans include milestones and risks.
+- **Attendance:** Attendance & roster combines sessions, calendar and member summaries with the roster.
+- **FTC resources:** The Resources tab links to official FIRST season, field, event, robot and programming hubs. Operational members can add their own team links.
+- **Themes:** Team settings → Theme offers Forge, Ocean, Forest, Violet and Paper. The selection is saved in each person's browser. To use custom colors, download the example JSON file from that tab, edit its name, dark/light mode, and seven six-digit hex colors, then upload it. The file must be 16 KB or smaller and pass text contrast checks. Images, fonts, CSS and scripts are unsupported.
+- **Records:** The outreach, judging prep, portfolio, reports and parts inventory pages have been removed from navigation. Historical records remain in JSON exports and in the database so this update does not erase team work.
+- **Team access:** Roster roles describe the team; account permissions are managed in Team settings. Only the current owner can transfer ownership or delete the team.
 
 ## Records and source map
 
 - `src/schema.js`: all requested record fields, including extra robot, hardware, budget, milestone and risk sections.
 - `src/Auth.jsx`: landing, account and membership request screens.
 - `src/store.jsx`: demo storage, Supabase record operations, private uploads, refresh and presence.
-- `src/Views.jsx`: dashboard, finance, robot checks, match charts, judging practice, portfolio and reports.
+- `src/Views.jsx`: dashboard, finance, robot checks and match charts.
+- `src/Hubs.jsx`: combined attendance and competition pages.
+- `src/ResourcesCenter.jsx`: official FTC directory and editable team links.
+- `src/theme.js` and `src/themes.css`: theme presets, validation and appearance.
 - `src/Records.jsx`: searchable/filterable/sortable lists, forms, comments, CSV, Kanban, attendance and calendar.
 - `src/Settings.jsx`: profile, member management, invites, preferences, import/export and owner-only team deletion.
 - `supabase/schema.sql`: full database migration and security boundary.
@@ -83,7 +83,7 @@ Repository: [ranch-fred/TesmTrackerFURU](https://github.com/ranch-fred/TesmTrack
 
 ## Scope and current limitations
 
-- A real Supabase project and Vercel deployment have not been provisioned by this build. Authentication, confirmation email, production uploads and hosted Realtime still need live verification after you connect your project. Demo mode works without these credentials.
+- The connected Supabase project and Vercel site are used for production. Live account, upload and Realtime behavior should be checked after each deployment. Demo mode works without credentials.
 - Team creation and joining support one active team per account in the UI. The database supports multiple memberships; no team switcher is implemented.
 - Presence means an active connection to the console, not a permanent record of everyone signed into Supabase. Presence payloads are self-reported; access permissions always come from the database membership.
 - Rule thresholds start **unverified**. The supplied season title and game fields have not been asserted to be official. Add the official manual, enter verified limits, and physically inspect the robot. The checker only evaluates recorded dimensions, motor/servo counts and configured envelopes.

@@ -18,7 +18,6 @@ import {
   Flame,
   ChevronRight,
   Download,
-  Shuffle,
   FileText,
   Check,
   ShieldCheck,
@@ -45,7 +44,14 @@ import Records, { Badge, RecordForm } from './Records';
 import { entities } from './schema';
 import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
-const palette = ['#ff6b00', '#ff9d55', '#ffbf87', '#9a633e', '#5a4635', '#39332e'];
+const palette = [
+  'var(--orange)',
+  'color-mix(in srgb, var(--orange) 78%, white)',
+  'color-mix(in srgb, var(--orange) 58%, white)',
+  'color-mix(in srgb, var(--orange) 72%, black)',
+  'color-mix(in srgb, var(--orange) 50%, black)',
+  'color-mix(in srgb, var(--orange) 30%, black)',
+];
 export function Stat({ label, value, note, icon: Icon, tone = '' }) {
   return (
     <article className={`stat-card ${tone}`}>
@@ -68,8 +74,8 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
         <AreaChart data={data} margin={{ left: 0, right: 12, top: 10, bottom: 0 }}>
           <defs>
             <linearGradient id="orangeFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ff6b00" stopOpacity={0.25} />
-              <stop offset="100%" stopColor="#ff6b00" stopOpacity={0} />
+              <stop offset="0%" stopColor="var(--orange)" stopOpacity={0.25} />
+              <stop offset="100%" stopColor="var(--orange)" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="#2b2b2b" vertical={false} strokeDasharray="3 5" />
@@ -98,7 +104,7 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
               type="monotone"
               dataKey={key}
               name={key === 'raised' ? 'Money in' : key === 'spent' ? 'Money out' : 'Balance'}
-              stroke={i ? '#929292' : '#ff6b00'}
+              stroke={i ? '#929292' : 'var(--orange)'}
               strokeWidth={2.5}
               fill={i ? 'transparent' : 'url(#orangeFill)'}
               strokeDasharray={i ? '4 4' : undefined}
@@ -168,8 +174,8 @@ export function Dashboard({ w, navigate }) {
             <button onClick={() => setForm('expenses')}>
               <Wallet size={15} /> Log expense <ArrowUpRight size={14} />
             </button>
-            <button onClick={() => setForm('outreach')}>
-              <Users size={15} /> Log outreach <ArrowUpRight size={14} />
+            <button onClick={() => setForm('sessions')}>
+              <Users size={15} /> Log session <ArrowUpRight size={14} />
             </button>
           </div>
         ) : (
@@ -214,10 +220,12 @@ export function Dashboard({ w, navigate }) {
           icon={CheckCircle2}
         />
         <Stat
-          label="OUTREACH HOURS"
-          value={sum(d.outreach, 'hours').toString().padStart(2, '0')}
-          note={`${sum(d.outreach, 'reached')} people reached`}
-          icon={Users}
+          label="TEAM SESSIONS"
+          value={parent ? '—' : d.sessions.length.toString().padStart(2, '0')}
+          note={
+            parent ? 'Visible to operational members' : `${d.roster.length} people on the roster`
+          }
+          icon={CalendarDays}
         />
         <Stat
           label="NEXT COMPETITION"
@@ -447,8 +455,8 @@ export function Dashboard({ w, navigate }) {
               </h3>
               <button
                 className="icon-button"
-                aria-label="Open match analytics"
-                onClick={() => navigate('matches')}
+                aria-label="Open competition"
+                onClick={() => navigate('competition')}
               >
                 <ArrowUpRight size={17} />
               </button>
@@ -493,9 +501,9 @@ export function Dashboard({ w, navigate }) {
     </>
   );
 }
-export function Finance({ w }) {
+export function Finance({ w, initial = 'overview' }) {
   const { enabled } = useMotion();
-  const [tab, setTab] = useState('overview'),
+  const [tab, setTab] = useState(initial),
     [form, setForm] = useState(null);
   const d = w.data,
     parent = w.member.role === 'Parent/Sponsor',
@@ -571,13 +579,11 @@ export function Finance({ w }) {
       </div>
       <div className="page-actions">
         <div className="tabs">
-          {(parent ? ['overview'] : ['overview', 'expenses', 'income', 'purchases', 'budgets']).map(
-            (t) => (
-              <button key={t} className={t === tab ? 'active' : ''} onClick={() => setTab(t)}>
-                {t === 'overview' ? 'Overview' : entities[t].title}
-              </button>
-            ),
-          )}
+          {(parent ? ['overview'] : ['overview', 'expenses', 'income', 'budgets']).map((t) => (
+            <button key={t} className={t === tab ? 'active' : ''} onClick={() => setTab(t)}>
+              {t === 'overview' ? 'Overview' : entities[t].title}
+            </button>
+          ))}
         </div>
         <div className="inline">
           <button className="outline" onClick={report}>
@@ -719,7 +725,7 @@ export function Finance({ w }) {
                         <Bar
                           isAnimationActive={enabled}
                           dataKey="actual"
-                          fill="#ff6b00"
+                          fill="var(--orange)"
                           radius={[3, 3, 0, 0]}
                         />
                         <Legend />
@@ -816,8 +822,8 @@ export function Finance({ w }) {
     </>
   );
 }
-export function Robot({ w }) {
-  const [tab, setTab] = useState('robot'),
+export function Robot({ w, initial = 'robot' }) {
+  const [tab, setTab] = useState(initial),
     r = w.data.robot[0],
     check = legality(r, w.data.hardware, w.data.rules[0]);
   return (
@@ -885,7 +891,7 @@ export function Robot({ w }) {
     </>
   );
 }
-export function Matches({ w }) {
+export function Matches({ w, embedded = false }) {
   const { enabled } = useMotion();
   const d = w.data.matches,
     [tab, setTab] = useState('matches'),
@@ -894,13 +900,15 @@ export function Matches({ w }) {
   const avg = (k) => (d.length ? (sum(d, k) / d.length).toFixed(1) : '—');
   return (
     <>
-      <div className="page-intro">
-        <div className="eyebrow">COMPETITION / FIND YOUR EDGE</div>
-        <h1>
-          BUILT. TESTED. <span>BETTER.</span>
-        </h1>
-        <p>Turn each match into the next improvement.</p>
-      </div>
+      {!embedded && (
+        <div className="page-intro">
+          <div className="eyebrow">COMPETITION / FIND YOUR EDGE</div>
+          <h1>
+            BUILT. TESTED. <span>BETTER.</span>
+          </h1>
+          <p>Turn each match into the next improvement.</p>
+        </div>
+      )}
       <div className="stats-grid">
         <Stat
           label="AVERAGE POINTS"
@@ -944,9 +952,9 @@ export function Matches({ w }) {
                 isAnimationActive={enabled}
                 type="monotone"
                 dataKey="points"
-                stroke="#ff6b00"
+                stroke="var(--orange)"
                 strokeWidth={3}
-                dot={{ fill: '#ff6b00', r: 4 }}
+                dot={{ fill: 'var(--orange)', r: 4 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -969,8 +977,8 @@ export function Matches({ w }) {
     </>
   );
 }
-export function Events({ w }) {
-  const [tab, setTab] = useState('events');
+export function Events({ w, initial = 'events' }) {
+  const [tab, setTab] = useState(initial);
   return (
     <>
       <div className="tabs page-tabs">
@@ -995,201 +1003,6 @@ export function Events({ w }) {
         </section>
       )}
       <Records key={tab} kind={tab} w={w} />
-    </>
-  );
-}
-export function Judging({ w }) {
-  const [question, setQuestion] = useState(null),
-    [answer, setAnswer] = useState(false);
-  return (
-    <>
-      <section className="panel judging-practice">
-        <div className="eyebrow">PRACTICE MAKES PREPARED</div>
-        <h2>{question ? question.question : 'Tell the story behind the build.'}</h2>
-        {question && (
-          <>
-            <Badge>{question.category}</Badge>
-            <p className="muted">Lead speaker: {question.speaker}</p>
-            {answer && <p className="practice-answer">{question.answer}</p>}
-          </>
-        )}
-        <div className="inline">
-          <button
-            className="primary"
-            disabled={!w.data.judging.length}
-            onClick={() => {
-              const questions = w.data.judging.filter((q) => q.id !== question?.id);
-              setQuestion(
-                (questions.length ? questions : w.data.judging)[
-                  Math.floor(Math.random() * (questions.length || w.data.judging.length))
-                ],
-              );
-              setAnswer(false);
-            }}
-          >
-            <Shuffle size={16} /> Random question
-          </button>
-          {question && (
-            <button className="outline" onClick={() => setAnswer((a) => !a)}>
-              {answer ? 'Hide' : 'Show'} talking points
-            </button>
-          )}
-        </div>
-      </section>
-      <Records kind="judging" w={w} />
-    </>
-  );
-}
-export function Portfolio({ w }) {
-  const [busy, setBusy] = useState(false),
-    [note, setNote] = useState('');
-  async function pull() {
-    setBusy(true);
-    try {
-      let count = 0;
-      for (const kind of ['designs', 'programming', 'outreach', 'income', 'robot'])
-        for (const r of w.data[kind]) {
-          const source = kind + ':' + r.id;
-          if (w.data.portfolio.some((p) => p.source === source)) continue;
-          await w.save('portfolio', {
-            title: r.title || r.name || r.company || r.subsystem || kind,
-            body: entities[kind].fields
-              .filter((f) => !['id', 'images', 'receipt'].includes(f.key))
-              .map(
-                (f) =>
-                  `${f.label}: ${Array.isArray(r[f.key]) ? r[f.key].join(', ') : (r[f.key] ?? '')}`,
-              )
-              .join('\n'),
-            source,
-            order: ++count + w.data.portfolio.length,
-          });
-        }
-      setNote(`${count} source entries added. Existing draft edits preserved.`);
-    } catch (e) {
-      setNote(e.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <>
-      <section className="panel portfolio-intro">
-        <div>
-          <div className="eyebrow">FROM WORKSHOP TO STORY</div>
-          <h2>The evidence is already here.</h2>
-          <p>
-            Pull your team’s work into an editable draft. Refine the story, then take it to judging.
-          </p>
-        </div>
-        <div className="inline">
-          {canEdit(w.member.role, w.member.mentor_edit) && (
-            <button disabled={busy} className="primary" onClick={pull}>
-              <Plus size={16} />
-              {busy ? 'Pulling entries…' : 'Pull source entries'}
-            </button>
-          )}
-          <button
-            className="outline"
-            onClick={() =>
-              pdf(
-                'Engineering portfolio',
-                [...w.data.portfolio]
-                  .sort((a, b) => a.order - b.order)
-                  .map((p) => ({ title: p.title, lines: [p.body] })),
-                w.team,
-              )
-            }
-          >
-            <FileText size={16} /> Export PDF
-          </button>
-        </div>
-        {note && <p role="status">{note}</p>}
-      </section>
-      <Records kind="portfolio" w={w} />
-    </>
-  );
-}
-export function Reports({ w }) {
-  const d = w.data,
-    f = finance(d);
-  const reports = {
-    season: [
-      { title: 'Team', lines: [w.team.name + ' #' + w.team.number, w.team.season] },
-      {
-        title: 'Summary',
-        lines: [
-          `${d.matches.length} matches; ${d.tasks.filter((t) => t.status === 'Done').length} tasks completed`,
-          `${sum(d.outreach, 'hours')} outreach hours; ${sum(d.outreach, 'reached')} people reached`,
-          `Balance: ${money(f.balance)}`,
-        ],
-      },
-    ],
-    finance: [
-      {
-        title: 'Finances',
-        lines: [
-          `Received ${money(f.received)}`,
-          `Spent ${money(f.spent)}`,
-          `Balance ${money(f.balance)}`,
-          ...d.budgets.map(
-            (b) =>
-              `${b.category}: budget ${money(b.amount)}, actual ${money(
-                sum(
-                  d.expenses.filter((e) => e.category === b.category),
-                  'amount',
-                ),
-              )}`,
-          ),
-        ],
-      },
-    ],
-    outreach: d.outreach.map((o) => ({
-      title: o.name,
-      lines: [`${o.date} / ${o.hours} hours / ${o.reached} people`, o.impact, o.followUp],
-    })),
-    attendance: d.roster.map((p) => {
-      const a = attendance(p.name, d.sessions);
-      return { title: p.name, lines: [`${a.percent}% attendance; ${a.hours.toFixed(1)} hours`] };
-    }),
-  };
-  return (
-    <>
-      <div className="page-intro">
-        <div className="eyebrow">REPORTS / READY WHEN YOU ARE</div>
-        <h1>
-          LET THE <span>WORK SPEAK.</span>
-        </h1>
-        <p>Clean reports for your team, sponsors, and judges.</p>
-      </div>
-      <div className="report-grid">
-        {Object.entries(reports).map(([key, sections]) => (
-          <section className="panel" key={key}>
-            <FileText size={28} className="orange" />
-            <h2>{key[0].toUpperCase() + key.slice(1)} report</h2>
-            <p>Export the current team records in a shareable format.</p>
-            <div className="inline">
-              <button className="primary" onClick={() => pdf(key + ' report', sections, w.team)}>
-                Download PDF <Download size={16} />
-              </button>
-              <button
-                className="outline"
-                onClick={() =>
-                  csv(
-                    key + '-report',
-                    sections.map((s) => ({ title: s.title, summary: s.lines.join('\n') })),
-                    [
-                      { key: 'title', label: 'Section' },
-                      { key: 'summary', label: 'Summary' },
-                    ],
-                  )
-                }
-              >
-                CSV
-              </button>
-            </div>
-          </section>
-        ))}
-      </div>
     </>
   );
 }

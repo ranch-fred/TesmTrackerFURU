@@ -15,7 +15,7 @@ export function canDelete(role) {
 export function canView(role, type) {
   return (
     role !== 'Parent/Sponsor' ||
-    ['dashboard', 'announcements', 'outreach', 'finance'].includes(type)
+    ['dashboard', 'announcements', 'finance', 'resources'].includes(type)
   );
 }
 export function finance(data) {
