@@ -1,4 +1,5 @@
 import { entities } from './schema';
+import { officialRules } from './robot-rules';
 const row = (id, data) => ({ id, ...data });
 export function seed() {
   return {
@@ -288,6 +289,9 @@ export function seed() {
         height: 16.8,
         weight: 26.4,
         drivetrain: '4-wheel mecanum',
+        motorsUsed: 5,
+        servosUsed: 1,
+        horizontalShort: 18,
         horizontal: 24,
         vertical: 36,
       }),
@@ -316,27 +320,22 @@ export function seed() {
       row('h5', { name: 'claw', kind: 'Servo', hub: 'Control Hub', port: 0, subsystem: 'Intake' }),
     ],
     inspection: [
-      'Grounding strap installed',
-      'Main power switch on robot and connected',
-      'Battery secured',
-      'Wiring insulated and strain-relieved',
-      'Team number visible',
-      'Sharp edges covered',
-      'Emergency stop tested',
-    ].map((item, i) => row('in' + i, { item, checked: i < 3, notes: '' })),
-    rules: [
-      row('rules1', {
-        name: 'Draft limits — verify with official manual',
-        motors: 8,
-        servos: 12,
-        cube: 18,
-        horizontal: 42,
-        vertical: 48,
-        weight: 0,
-        verified: false,
-        source: '',
+      row('in1', {
+        checkKey: 'ready',
+        item: 'Robot present and ready',
+        status: 'pass',
+        checked: true,
+        rule: 'I301, E117',
+      }),
+      row('in2', {
+        checkKey: 'signs-both',
+        item: 'Signs for both alliance colors',
+        status: 'pass',
+        checked: true,
+        rule: 'R401',
       }),
     ],
+    rules: [row('rules1', { ...officialRules })],
     programming: [
       row('pr1', {
         date: '2026-10-24',
@@ -453,6 +452,7 @@ export function seed() {
       row('o1', {
         name: 'Build something that moves',
         type: 'Library demo',
+        place: 'Community library',
         date: '2026-10-18',
         hours: 6,
         audience: 'Students ages 8–13',
@@ -460,11 +460,13 @@ export function seed() {
         professionals: 2,
         speaker: 'Jordan Patel',
         impact: 'Hands-on driving and introductory engineering challenge.',
+        gained: 'Learned which activities helped younger students understand sensors.',
         followUp: 'Share activity plans with library staff.',
       }),
       row('o2', {
         name: 'Meet the engineers',
         type: 'Industry visit',
+        place: 'Local engineering firm',
         date: '2026-10-11',
         hours: 4,
         audience: 'Team members',
@@ -472,6 +474,7 @@ export function seed() {
         professionals: 5,
         speaker: 'Avery Chen',
         impact: 'Learned design-for-manufacture techniques.',
+        gained: 'New mentor contacts and a better prototype review process.',
         followUp: 'Invite mentors to design review.',
       }),
     ],
@@ -493,9 +496,8 @@ export function seed() {
       row('res1', {
         title: 'BIOBUZZ rule verification',
         section: 'Game',
-        notes:
-          'Team-provided season label and conceptual metrics. Add the official manual before enabling legality checks or using scores for competition decisions.',
-        link: '',
+        notes: 'Current FIRST competition manual and team updates for the 2026–27 season.',
+        link: 'https://ftc-resources.firstinspires.org/ftc/game',
       }),
       row('res2', {
         title: 'FTC resources',

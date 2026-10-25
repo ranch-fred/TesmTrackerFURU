@@ -4,12 +4,27 @@ import Records from './Records';
 
 const groups = [
   {
-    title: 'Current season',
+    title: 'BIOBUZZ 2026–27 · official rules',
     links: [
       [
-        'Game & season hub',
+        'Competition manual (current HTML)',
+        'https://ftc-resources.firstinspires.org/ftc/game/cm-html',
+        'Read the current rules, including inspection and robot construction',
+      ],
+      [
+        'Game & season updates',
         'https://ftc-resources.firstinspires.org/ftc/game',
-        'Official manuals, updates, and season links',
+        'Manual revisions, team updates, Q&A, and season materials',
+      ],
+      [
+        'Inspection checklist (PDF)',
+        'https://ftc-resources.firstinspires.org/ftc/archive/2027/event/inspection-check',
+        'The 2026–27 FIRST self-inspection sheet',
+      ],
+      [
+        'Inspection quick reference (PDF)',
+        'https://ftc-resources.firstinspires.org/ftc/archive/2027/event/inspection-reference',
+        'Motor, servo, battery, and control system references',
       ],
       [
         'Official Q&A',
@@ -24,7 +39,7 @@ const groups = [
     ],
   },
   {
-    title: 'Build and program',
+    title: 'Build, CAD, and hardware',
     links: [
       [
         'Team resources',
@@ -32,14 +47,44 @@ const groups = [
         'Inspection, robot, and team materials',
       ],
       [
-        'FTC documentation',
+        'Control & Expansion Hub wiring',
+        'https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/connecting_devices/index.html',
+        'How to connect motors, servos, and sensors',
+      ],
+      [
+        'REV Control Hub specifications',
+        'https://docs.revrobotics.com/duo-control/control-system-overview/control-hub-basics',
+        'Port types and electrical details from REV',
+      ],
+      [
+        'Playing field CAD & drawings',
+        'https://ftc-resources.firstinspires.org/ftc/archive/2027/field',
+        'Official field models for design and testing',
+      ],
+    ],
+  },
+  {
+    title: 'Programming and autonomous',
+    links: [
+      [
+        'Pedro Pathing documentation',
+        'https://pedropathing.com/docs',
+        'Community-built FTC path planning and following library',
+      ],
+      [
+        'FTC Robot Controller SDK',
+        'https://github.com/FIRST-Tech-Challenge/FtcRobotController',
+        'Official source and releases for the FTC SDK',
+      ],
+      [
+        'FTC Docs',
         'https://ftc-docs.firstinspires.org/en/latest/',
-        'Control system and software documentation',
+        'Programming and control system documentation',
       ],
       [
         'Programming resources',
         'https://www.firstinspires.org/resources/library/ftc/programming-resources',
-        'Official programming library',
+        'FIRST programming resource library',
       ],
     ],
   },
