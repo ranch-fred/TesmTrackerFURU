@@ -339,12 +339,20 @@ export function seed() {
     programming: [
       row('pr1', {
         date: '2026-10-24',
+        whatDone: 'Tuned autonomous heading control and ran ten test drives.',
         author: 'Maya Brooks',
         subsystem: 'Drivetrain',
         hardware: ['frontLeft', 'frontRight'],
         constants: 'kP = 0.025; heading tolerance = 1.5°',
         result: 'Pass',
         notes: '9/10 successful runs; retest with a charged battery.',
+      }),
+    ],
+    build: [
+      row('bl1', {
+        date: '2026-10-23',
+        whatDone: 'Assembled and aligned the intake rollers.',
+        author: 'Sam Rivera',
       }),
     ],
     designs: [
@@ -454,6 +462,7 @@ export function seed() {
         type: 'Library demo',
         place: 'Community library',
         date: '2026-10-18',
+        whatDone: 'Ran a hands-on robot driving and engineering activity.',
         hours: 6,
         audience: 'Students ages 8–13',
         reached: 86,
@@ -468,6 +477,7 @@ export function seed() {
         type: 'Industry visit',
         place: 'Local engineering firm',
         date: '2026-10-11',
+        whatDone: 'Visited engineers and discussed design for manufacture.',
         hours: 4,
         audience: 'Team members',
         reached: 18,

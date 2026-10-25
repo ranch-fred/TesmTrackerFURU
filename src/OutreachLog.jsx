@@ -3,13 +3,14 @@ import { HeartHandshake, CalendarDays, Users } from 'lucide-react';
 import Records from './Records';
 import { Stat } from './Views';
 import { sum } from './domain';
+import { LogEntry } from './LogEntry';
 
 export default function OutreachLog({ w }) {
   const rows = w.data.outreach || [];
   return (
     <>
       <div className="page-intro">
-        <div className="eyebrow">COMMUNITY / OUTREACH LOG</div>
+        <div className="eyebrow">LOG / OUTREACH LOG</div>
         <h1>
           MAKE AN <span>IMPACT.</span>
         </h1>
@@ -38,6 +39,7 @@ export default function OutreachLog({ w }) {
           icon={Users}
         />
       </div>
+      <LogEntry kind="outreach" w={w} />
       <Records kind="outreach" w={w} />
     </>
   );

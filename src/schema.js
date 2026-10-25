@@ -238,10 +238,11 @@ export const entities = {
     ],
   },
   programming: {
-    title: 'Programming log',
-    group: 'ROBOT',
+    title: 'Program log',
+    group: 'LOG',
     fields: [
       f('date', 'Date', 'date'),
+      f('whatDone', 'What did you do?', 'textarea'),
       f('author', 'Author'),
       f('subsystem', 'Mechanism / subsystem'),
       f('hardware', 'Hardware touched', 'hardware'),
@@ -332,12 +333,13 @@ export const entities = {
   },
   outreach: {
     title: 'Outreach log',
-    group: 'COMMUNITY',
+    group: 'LOG',
     fields: [
       f('name', 'Event name'),
       f('type', 'Event type'),
       f('place', 'Place / venue'),
       f('date', 'Date', 'date'),
+      f('whatDone', 'What did you do?', 'textarea'),
       f('hours', 'Hours', 'number'),
       f('audience', 'Audience'),
       f('reached', 'People reached', 'number'),
@@ -346,6 +348,16 @@ export const entities = {
       f('impact', 'What happened / community impact', 'textarea'),
       f('gained', 'What we gained / learned', 'textarea'),
       f('followUp', 'Follow-up planned', 'textarea'),
+    ],
+  },
+  build: {
+    title: 'Build log',
+    group: 'LOG',
+    fields: [
+      f('date', 'Date', 'date'),
+      f('whatDone', 'What did you do?', 'textarea'),
+      f('author', 'Member'),
+      f('notes', 'Extra notes', 'textarea'),
     ],
   },
   judging: {
@@ -393,10 +405,10 @@ export const entities = {
 };
 export const sections = [
   ['TEAM', ['dashboard', 'announcements', 'tasks', 'attendance', 'meetings']],
-  ['ROBOT', ['robot', 'programming', 'designs']],
+  ['ROBOT', ['robot', 'designs']],
   ['COMPETITION', ['competition']],
   ['BUSINESS', ['finance', 'purchases']],
-  ['COMMUNITY', ['outreach']],
+  ['LOG', ['programming', 'build', 'outreach']],
   ['RESOURCES', ['resources']],
 ];
 export const labels = {

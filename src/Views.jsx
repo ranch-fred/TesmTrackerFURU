@@ -44,6 +44,7 @@ import Records, { Badge, RecordForm } from './Records';
 import { entities } from './schema';
 import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
+import { loggedToday } from './logs';
 import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
 import { officialRules } from './robot-rules';
 const palette = [
@@ -186,6 +187,30 @@ export function Dashboard({ w, navigate }) {
           </button>
         )}
       </div>
+      {!parent && canEdit(w.member.role, w.member.mentor_edit) && (
+        <section className="panel daily-log-reminder">
+          <div>
+            <div className="eyebrow">YOUR DAILY LOG</div>
+            <h2>
+              {loggedToday(d, w.member, w.user.id)
+                ? 'Today’s work is logged.'
+                : 'What did you do today?'}
+            </h2>
+            <p>Each time you come in, add a dated entry for the work you did.</p>
+          </div>
+          <div className="daily-log-links">
+            <button onClick={() => navigate('programming')}>
+              Program log <ArrowRight size={14} />
+            </button>
+            <button onClick={() => navigate('build')}>
+              Build log <ArrowRight size={14} />
+            </button>
+            <button onClick={() => navigate('outreach')}>
+              Outreach log <ArrowRight size={14} />
+            </button>
+          </div>
+        </section>
+      )}
       <div className="dashboard-heading">
         <div>
           <h2>Team at a glance</h2>

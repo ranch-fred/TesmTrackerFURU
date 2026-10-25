@@ -179,7 +179,7 @@ export function useWorkspace() {
     setTeam(saved?.team || demoTeam);
     setMember(m);
     setMembers(saved?.members || [m]);
-    setData(saved?.data || seed());
+    setData(saved?.data ? { ...EMPTY(), ...saved.data } : seed());
     setActivity(saved?.activity || []);
     setNotifications(saved?.notifications || []);
     setUser({ id: 'demo-user' });

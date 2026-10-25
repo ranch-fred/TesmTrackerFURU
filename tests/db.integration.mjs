@@ -32,6 +32,9 @@ await db.exec(
 await db.exec(
   await readFile(new URL('../supabase/migrations/20261025_cad_files.sql', import.meta.url), 'utf8'),
 );
+await db.exec(
+  await readFile(new URL('../supabase/migrations/20261025_build_log.sql', import.meta.url), 'utf8'),
+);
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
   parent = '10000000-0000-0000-0000-000000000003',
@@ -149,6 +152,14 @@ await db.query(
 ok(
   (await db.query("select * from records where kind='tasks'")).rows.length === 1,
   'Approved member can create task',
+);
+await db.query("insert into records(team_id,kind,data) values ($1,'build',$2)", [
+  t,
+  { date: '2026-10-25', whatDone: 'Assembled intake', author: 'Member Two' },
+]);
+ok(
+  (await db.query("select * from records where kind='build'")).rows.length === 1,
+  'Approved member can create a shared build log entry',
 );
 ok(
   (await db.query("delete from records where kind='tasks' returning id")).rows.length === 0,

@@ -31,6 +31,10 @@ Run [`supabase/migrations/20261025_delete_team.sql`](supabase/migrations/2026102
 
 Run [`supabase/migrations/20261025_cad_files.sql`](supabase/migrations/20261025_cad_files.sql) in the existing project's Supabase SQL Editor. It raises the existing private bucket's per-file limit to 50 MB and permits binary CAD uploads. The existing membership-based storage policies remain in place. The site's Engineering design page then accepts `.step`, `.stp`, `.sldprt`, `.sldasm`, `.slddrw`, and `.zip` files. Use a STEP file for interoperability, or a ZIP containing the SolidWorks assembly and referenced parts. Team members can download the original file through a short-lived signed link; the site does not render or edit CAD in-browser. Supabase's project-wide upload limit must also be at least 50 MB if the team needs that full size.
 
+### Enable the Build log in an existing project
+
+Run [`supabase/migrations/20261025_build_log.sql`](supabase/migrations/20261025_build_log.sql) in the existing project's Supabase SQL Editor. It adds `build` as an allowed team record type while preserving the existing entries and team permissions.
+
 1. Create a Supabase project you control.
 2. In its SQL editor, run **supabase/schema.sql** once in a new project. It creates the application tables, private storage bucket, guarded administration functions, audit triggers, Realtime policies and row-level permissions. It is an initial migration, not an idempotent reset script.
 3. In Supabase Authentication settings, enable email/password and email confirmation. Set the Site URL to the production Vercel URL. Add localhost and your actual Vercel production/preview URLs to the allowed redirect URLs. Configure your own SMTP provider for reliable confirmation email delivery. The app sends in-app announcement notifications, not announcement emails.
@@ -65,6 +69,7 @@ Repository: [ranch-fred/TesmTrackerFURU](https://github.com/ranch-fred/TesmTrack
 - **Competition:** Matches, Events & plans, and Packing checklist are together under Competition. Event plans include milestones and risks.
 - **Attendance:** Attendance & roster combines sessions, calendar and member summaries with the roster.
 - **Outreach:** The Outreach log records the place, date, participants, activity, impact, and what the team gained or learned.
+- **Daily logs:** The Log section contains Program, Build, and Outreach logs. Each has a short form asking for the date and what the member did; the member name is filled automatically. Outreach also asks for a place and can capture what the team gained. The dashboard reminds members to log their work each day.
 - **Robot:** Click a Control Hub or Expansion Hub motor, servo, or I²C port to give it a configuration name. Use the inspection checklist to track preparations against the official 2026–27 sheet. Limits & capacity shows the current manual's limits and calculates remaining motors and servos from the counts your team enters.
 - **Engineering design:** Upload STEP, SolidWorks, or ZIP CAD files so approved team members can download the originals. Files remain in private team storage.
 - **FTC resources:** The Resources tab links to the current FIRST competition manual, inspection sheet, FTC Docs, Pedro Pathing, REV hub information, and other specific references. Operational members can add their own team links.
