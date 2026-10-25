@@ -18,6 +18,11 @@ sql = sql
   .replace('create extension if not exists pgcrypto;', '')
   .replace('alter publication supabase_realtime add table public.records;', '');
 await db.exec(sql);
+// Reapply the upgrade against an existing schema, as the live project will do.
+await db.exec('drop function public.delete_team(uuid,text,boolean)');
+await db.exec(
+  await readFile(new URL('../supabase/migrations/20261025_delete_team.sql', import.meta.url), 'utf8'),
+);
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
   parent = '10000000-0000-0000-0000-000000000003',
@@ -201,6 +206,55 @@ await db.query('select transfer_ownership($1,$2)', [t, member]);
 ok(
   (await db.query('select owner_id from teams where id=$1', [t])).rows[0].owner_id === member,
   'Owner transfer updates team and promotes recipient',
+);
+await rejects(
+  () => db.query('select delete_team($1,$2,false)', [t, 'Test team']),
+  'Former owner cannot delete the team',
+);
+await as(member);
+await rejects(
+  () => db.query('select delete_team($1,$2,false)', [t, 'Wrong team']),
+  'Team deletion requires the exact name',
+);
+await db.query('select delete_team($1,$2,true)', [t, 'Test team']);
+ok(
+  (await db.query('select id from teams where id=$1', [t])).rows.length === 1,
+  'Deletion preflight does not remove team data',
+);
+await db.exec('reset role');
+await db.query('insert into storage.objects(bucket_id,name) values ($1,$2)', [
+  'team-files',
+  `${t}/${member}/receipt.pdf`,
+]);
+await as(member);
+await rejects(
+  () => db.query('select delete_team($1,$2,false)', [t, 'Test team']),
+  'Team deletion refuses to orphan uploaded files',
+);
+await db.exec('reset role');
+await db.query('delete from storage.objects where bucket_id=$1 and name=$2', [
+  'team-files',
+  `${t}/${member}/receipt.pdf`,
+]);
+await as(member);
+await db.query('select delete_team($1,$2,false)', [t, 'Test team']);
+await db.exec('reset role');
+for (const table of ['teams', 'memberships', 'records', 'comments', 'notifications', 'activity'])
+  ok(
+    (
+      await db.query(
+        `select id from public.${table} where team_id=$1`.replace(
+          'teams where team_id',
+          'teams where id',
+        ),
+        [t],
+      )
+    ).rows.length === 0,
+    `Team deletion removes ${table}`,
+  );
+ok(
+  (await db.query('select id from auth.users where id=$1', [member])).rows.length === 1,
+  'Team deletion keeps the owner account',
 );
 console.log(`${count} database checks passed`);
 await db.close();
