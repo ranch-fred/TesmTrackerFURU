@@ -59,7 +59,7 @@ const icons = {
   purchases: ShoppingCart,
   outreach: HeartHandshake,
 };
-const hiddenKinds = new Set(['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts']);
+const hiddenKinds = new Set(['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts', 'roster', 'sessions']);
 function pageForKind(kind) {
   if (['sessions', 'roster'].includes(kind)) return 'attendance';
   if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
@@ -476,8 +476,8 @@ export default function App() {
             </p>
             <h3>5 / Keep everyone organized</h3>
             <p>
-              Attendance & roster holds meeting attendance and people. FTC resources holds official
-              season links and your team’s saved references.
+              Attendance & roster shows the team calendar and everyone who joined through the app.
+              Check in when you arrive on Saturday, Sunday, or an extra weekday.
             </p>
             <p className="note">
               Demo mode stores only on this device. Live accounts, files and shared data require the

@@ -39,13 +39,14 @@ import {
   Line,
   Legend,
 } from 'recharts';
-import { finance, money, sum, trend, attendance, legality, canEdit } from './domain';
+import { finance, money, sum, trend, legality, canEdit } from './domain';
 import Records, { Badge, RecordForm } from './Records';
 import { entities } from './schema';
 import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
 import { loggedToday } from './logs';
 import { seasonBadge } from './branding';
+import { approvedMembers } from './attendance';
 import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
 import { officialRules } from './robot-rules';
 const palette = [
@@ -181,8 +182,8 @@ export function Dashboard({ w, navigate }) {
             <button onClick={() => setForm('expenses')}>
               <Wallet size={15} /> Log expense <ArrowUpRight size={14} />
             </button>
-            <button onClick={() => setForm('sessions')}>
-              <Users size={15} /> Log session <ArrowUpRight size={14} />
+            <button onClick={() => navigate('attendance')}>
+              <Users size={15} /> Attendance <ArrowUpRight size={14} />
             </button>
           </div>
         ) : (
@@ -251,11 +252,9 @@ export function Dashboard({ w, navigate }) {
           icon={CheckCircle2}
         />
         <Stat
-          label="TEAM SESSIONS"
-          value={parent ? '—' : d.sessions.length.toString().padStart(2, '0')}
-          note={
-            parent ? 'Visible to operational members' : `${d.roster.length} people on the roster`
-          }
+          label="TEAM MEMBERS"
+          value={parent ? '—' : approvedMembers(w.members).length.toString().padStart(2, '0')}
+          note={parent ? 'Visible to operational members' : 'Approved app accounts'}
           icon={CalendarDays}
         />
         <Stat
@@ -465,13 +464,11 @@ export function Dashboard({ w, navigate }) {
           <section className="panel">
             <div className="panel-heading">
               <h3>
-                <Flame size={16} className="orange" /> Showing up matters.
+                <Flame size={16} className="orange" /> Your crew.
               </h3>
-              <span className="muted">ATTENDANCE</span>
+              <span className="muted">TEAM ROSTER</span>
             </div>
-            {d.roster.slice(0, 3).map((p) => {
-              const a = attendance(p.name, d.sessions);
-              return (
+            {approvedMembers(w.members).slice(0, 3).map((p) => (
                 <div className="member-row" key={p.id}>
                   <div className="avatar">
                     {p.name
@@ -481,15 +478,14 @@ export function Dashboard({ w, navigate }) {
                   </div>
                   <span>
                     {p.name}
-                    <small>
-                      {a.hours.toFixed(1)} team hours ·{' '}
-                      {a.streak === -1 ? d.sessions.length : a.streak} session streak
-                    </small>
+                    <small>{p.role} · {p.subteams?.join(', ') || 'Team member'}</small>
                   </span>
-                  <b>{a.percent}%</b>
+                  <b>Joined</b>
                 </div>
-              );
-            })}
+            ))}
+            <button className="panel-link" onClick={() => navigate('attendance', 'roster')}>
+              View team roster <ArrowRight size={16} />
+            </button>
           </section>
           <section className="panel">
             <div className="panel-heading">

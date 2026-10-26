@@ -69,7 +69,7 @@ Repository: [ranch-fred/TesmTrackerFURU](https://github.com/ranch-fred/TesmTrack
 - **Join or create:** Sign in with Google, then create a team or enter an invite code. Captains and coaches approve membership requests in Team settings.
 - **Finance:** Finance & expenses combines the overview, expenses, income, and budgets. Purchase requests is the second business tab.
 - **Competition:** Matches, Events & plans, and Packing checklist are together under Competition. Event plans include milestones and risks.
-- **Attendance:** Attendance & roster combines sessions, calendar and member summaries with the roster.
+- **Attendance & roster:** Approved app accounts populate the roster automatically. Accounts with team editing access can check in for today; the calendar marks Saturday and Sunday as required, past missed required days red, required-day check-ins green, and optional weekday check-ins blue. Existing session attendance remains visible in the calendar.
 - **Outreach:** The Outreach log records the place, date, participants, activity, impact, and what the team gained or learned.
 - **Daily logs:** The Log section contains Program, Build, and Outreach logs. Each has a short form asking for the date and what the member did; the member name is filled automatically. Outreach also asks for a place and can capture what the team gained. The dashboard reminds members to log their work each day.
 - **Robot:** Click a Control Hub or Expansion Hub motor, servo, or I²C port to give it a configuration name. Use the inspection checklist to track preparations against the official 2026–27 sheet. Limits & capacity shows the current manual's limits and calculates remaining motors and servos from the counts your team enters.
