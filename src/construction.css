@@ -846,11 +846,54 @@ table tbody tr:hover {
 .iso-loop {
   display: block;
   width: 100%;
-  max-width: 320px;
+  max-width: 220px;
   aspect-ratio: 1;
-  margin: 0 auto 12px;
+  margin: 0 auto 14px;
   border-radius: 12px;
-  background: transparent;
+  background: #101014;
+  object-fit: cover;
+}
+.iso-loop-sm {
+  max-width: 112px;
+  margin: 0;
+  flex: none;
+}
+.iso-empty {
+  display: flex !important;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 22px !important;
+  margin-bottom: 16px;
+}
+.iso-empty .iso-loop {
+  max-width: 140px;
+  margin: 0;
+  flex: none;
+}
+.iso-empty h2 {
+  font-family: var(--sub);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.daily-log-reminder {
+  display: flex !important;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.daily-log-reminder > div:first-of-type {
+  flex: 1;
+  min-width: 200px;
+}
+.welcome-screen .panel .iso-loop {
+  margin: 0 0 18px;
+}
+@media (max-width: 560px) {
+  .iso-empty {
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 /* ---------- motion ---------- */

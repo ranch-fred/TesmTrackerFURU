@@ -43,6 +43,7 @@ import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
 import { teamMonogram, teamPageTitle } from './branding';
+import IsoLoop from './IsoLoop';
 const icons = {
   dashboard: LayoutDashboard,
   announcements: Radio,
@@ -123,6 +124,7 @@ export default function App() {
       <div className="welcome-screen">
         <Brand team={w.team} />
         <div className="panel">
+          <IsoLoop name="field" />
           <div className="eyebrow">YOU’RE PART OF THE CREW</div>
           <h1>
             WELCOME <span>ABOARD.</span>

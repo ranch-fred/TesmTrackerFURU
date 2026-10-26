@@ -460,7 +460,9 @@ function build(container, { onScore, onProgress, onBeat, accent = '#FF6B00', tit
     shake.v *= Math.pow(0.02, dt);
     camera.position.set(cam.x + (rnd() - 0.5) * shake.v, cam.y + (rnd() - 0.5) * shake.v, cam.z + (rnd() - 0.5) * shake.v * 0.5);
     look.set(cam.lx, cam.ly, cam.lz); camera.lookAt(look); camera.rotateZ(cam.roll);
-    if (camera.fov !== cam.fov) { camera.fov = cam.fov; camera.updateProjectionMatrix() }
+    // tall, narrow containers (the landing column) need a wider lens to frame the hive
+    const fov = Math.min(75, cam.fov * (camera.aspect < 1.25 ? 1 + (1.25 - camera.aspect) * 0.8 : 1));
+    if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix() }
     if (line1?.userData.w) {
       const dist = Math.max(1, camera.position.z - titleG.position.z);
       const vis = 2 * dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;

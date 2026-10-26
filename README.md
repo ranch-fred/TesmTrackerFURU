@@ -14,6 +14,7 @@ No generated robot images are included, as requested. The interface uses typogra
 - **FTC Scout live:** Competition → FTC Scout live shows the team's official events, rank, W-L-T and matches from api.ftcscout.org for the team number in the profile. Editors can import played matches into the Matches log; already-imported matches are skipped.
 - **Dashboard:** a live countdown to the next competition. The robot panel shows a size envelope instead of a drawing.
 - **Search shortcut:** Ctrl/Cmd+K or / opens search.
+- **Isometric loops:** three short muted loops in a dark isometric line style with one orange accent, made with the /animate skill (no robot). A hive pod filling with nectar shows when there are no matches or practice runs, a log book being written sits in the dashboard's daily-log reminder, and field tiles with a flower welcome new members. They live in `public/assets/animations/` (about 60 KB each) and hold on a still frame when motion is paused or reduced.
 
 ## Layout and motion update
 

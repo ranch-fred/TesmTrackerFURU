@@ -50,6 +50,7 @@ import { approvedMembers } from './attendance';
 import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
 import { officialRules } from './robot-rules';
 import PillTabs from './PillTabs';
+import IsoLoop from './IsoLoop';
 const palette = [
   'var(--orange)',
   'color-mix(in srgb, var(--orange) 78%, white)',
@@ -229,6 +230,7 @@ export function Dashboard({ w, navigate }) {
       </div>
       {!parent && canEdit(w.member.role, w.member.mentor_edit) && (
         <section className="panel daily-log-reminder">
+          <IsoLoop name="log" size="sm" />
           <div>
             <div className="eyebrow">YOUR DAILY LOG</div>
             <h2>
@@ -991,6 +993,15 @@ export function Matches({ w, embedded = false }) {
           </h1>
           <p>Turn each match into the next improvement.</p>
         </div>
+      )}
+      {!d.length && (
+        <section className="panel iso-empty">
+          <IsoLoop name="hive" />
+          <div>
+            <h2>No matches yet</h2>
+            <p>Log a match below, or pull official results from the FTC Scout live tab.</p>
+          </div>
+        </section>
       )}
       <div className="stats-grid">
         <Stat
