@@ -439,11 +439,11 @@ function build(container, { onScore, onProgress, onBeat, accent = '#FF6B00', tit
 
   /* ================= render loop ================= */
   const clock = new THREE.Clock();
-  let raf = 0, visible = true, t0 = 0;
+  let raf = 0, t0 = 0;
   const look = new THREE.Vector3();
   function frame() {
     raf = requestAnimationFrame(frame);
-    if (!visible) return;
+    if (document.hidden || !container.isConnected) return;
     const dt = Math.min(clock.getDelta(), 1 / 30), time = (t0 += dt);
     grade.uniforms.uTime.value = time;
     syncTiles();
@@ -475,7 +475,6 @@ function build(container, { onScore, onProgress, onBeat, accent = '#FF6B00', tit
     camera.aspect = w / h; camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(resize); ro.observe(container);
-  const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) clock.getDelta() }, { threshold: 0.01 }); io.observe(container);
   resize(); frame();
   if (reduced) fontReady.then(() => { tl.progress(1, true); tl.pause(); titleG.visible = true; line1?.scale.set(1, 1, 1); line2?.scale.set(1, 1, 1) });
   else fontReady.finally(() => tl.play());
@@ -485,7 +484,7 @@ function build(container, { onScore, onProgress, onBeat, accent = '#FF6B00', tit
     toggle() { if (tl.paused()) tl.play(); else tl.pause(); return !tl.paused() },
     seek(t) { tl.pause(); tl.seek(t, false) },
     dispose() {
-      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); tl.kill();
+      cancelAnimationFrame(raf); ro.disconnect(); tl.kill();
       shots.forEach((s) => gsap.killTweensOf(s)); gsap.killTweensOf([warm, ring.scale, ring.material, grade.uniforms.uFlash]);
       gsap.ticker.lagSmoothing(500, 33); void prevLag;
       renderer.dispose(); pmrem.dispose();

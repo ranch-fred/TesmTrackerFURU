@@ -17,27 +17,35 @@ export default function HeroReel({ fallback = null }) {
 
   useEffect(() => {
     let disposed = false;
+    let reel = null;
+    // each mount renders into its own holder, so a remount can never leave
+    // a running instance attached to a canvas that is no longer on screen
+    const holder = document.createElement('div');
+    holder.style.cssText = 'position:absolute;inset:0';
+    host.current.appendChild(holder);
     const accent =
       getComputedStyle(document.documentElement).getPropertyValue('--theme-accent').trim() || '#FF6B00';
     import('./fieldReel')
       .then(({ createFieldReel }) =>
-        createFieldReel(host.current, {
+        createFieldReel(holder, {
           accent: /^#[0-9a-f]{6}$/i.test(accent) ? accent : '#FF6B00',
-          onProgress: setP,
-          onBeat: setBeat,
-          onScore: (n) => setScore((s) => s + n),
+          onProgress: (v) => !disposed && setP(v),
+          onBeat: (v) => !disposed && setBeat(v),
+          onScore: (n) => !disposed && setScore((s) => s + n),
         }),
       )
-      .then((reel) => {
-        if (disposed) return reel.dispose();
-        api.current = reel;
+      .then((created) => {
+        reel = created;
+        if (disposed) return created.dispose();
+        api.current = created;
         setState('ready');
       })
       .catch(() => !disposed && setState('failed'));
     return () => {
       disposed = true;
-      api.current?.dispose();
-      api.current = null;
+      reel?.dispose();
+      if (api.current === reel) api.current = null;
+      holder.remove();
     };
   }, []);
 
