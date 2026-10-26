@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Records from './Records';
 import { Matches, Events } from './Views';
+import PracticeMatches from './PracticeMatches';
 
 export function AttendanceHub({ w, initial = 'sessions' }) {
   const [tab, setTab] = useState(initial);
@@ -50,6 +51,7 @@ export function CompetitionHub({ w, initial = 'matches' }) {
       <div className="tabs page-tabs" role="tablist" aria-label="Competition sections">
         {[
           ['matches', 'Matches'],
+          ['practice', 'Practice matches'],
           ['events', 'Events & plans'],
           ['packing', 'Packing checklist'],
         ].map(([key, label]) => (
@@ -66,6 +68,8 @@ export function CompetitionHub({ w, initial = 'matches' }) {
       </div>
       {tab === 'matches' ? (
         <Matches w={w} embedded />
+      ) : tab === 'practice' ? (
+        <PracticeMatches w={w} />
       ) : tab === 'events' ? (
         <Events w={w} initial={['milestones', 'risks'].includes(initial) ? initial : 'events'} />
       ) : (

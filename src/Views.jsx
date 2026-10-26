@@ -974,7 +974,7 @@ export function Matches({ w, embedded = false }) {
         <Stat
           label="BEST / WORST MATCH"
           value={`${best} / ${worst}`}
-          note="Official recorded totals"
+          note="Recorded and practice totals"
         />
         <Stat
           label="HIVE / FLOWER HIT RATE"
@@ -988,8 +988,7 @@ export function Matches({ w, embedded = false }) {
         />
       </div>
       <p className="note">
-        BIOBUZZ metrics follow your brief. Points are recorded manually; scoring rules have not been
-        verified.
+        Use Practice matches for point-by-point BIOBUZZ scoring. Other match totals are entered manually.
       </p>
       <section className="panel">
         <div className="panel-heading">
