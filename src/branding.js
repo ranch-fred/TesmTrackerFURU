@@ -25,6 +25,6 @@ export function seasonBadge(season) {
 
 export function teamPageTitle(team) {
   return team?.name && team?.number
-    ? `${team.name} #${team.number} • Team Tracker`
-    : 'FTC Team Tracker • Sign in or sign up';
+    ? `${team.name} #${team.number} • FTC Manager`
+    : 'FTC Manager • Sign in or sign up';
 }
