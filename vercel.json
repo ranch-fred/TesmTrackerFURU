@@ -2,5 +2,5 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "rewrites": [{ "source": "/((?!assets/|ftc-manager\\.png$|manifest\\.webmanifest$).*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!assets/|ftc-manager-icon\\.png$|manifest\\.webmanifest$).*)", "destination": "/index.html" }]
 }
