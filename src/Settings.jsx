@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PillTabs from './PillTabs';
 import {
   Copy,
   RefreshCw,
@@ -105,20 +106,19 @@ export default function Settings({ w }) {
         </h1>
         <p>Keep the workspace ready for the work.</p>
       </div>
-      <div className="tabs page-tabs">
-        {(admin
+      <PillTabs
+        label="Settings sections"
+        value={tab}
+        onChange={setTab}
+        tabs={(admin
           ? ['profile', 'members', 'invites', 'preferences', 'theme', 'data', 'delete team']
           : [
               'preferences',
               'theme',
               ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : []),
             ]
-        ).map((t) => (
-          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
-            {t[0].toUpperCase() + t.slice(1)}
-          </button>
-        ))}
-      </div>
+        ).map((t) => [t, t[0].toUpperCase() + t.slice(1)])}
+      />
       {error && (
         <p role="alert" className="error notice">
           {error}

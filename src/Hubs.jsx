@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Records from './Records';
 import { Matches, Events } from './Views';
 import PracticeMatches from './PracticeMatches';
+import PillTabs from './PillTabs';
+import FtcScout from './FtcScout';
 import { AttendanceCalendar, TeamRoster } from './AttendanceCalendar';
 
 export function AttendanceHub({ w, initial = 'sessions' }) {
@@ -49,25 +51,21 @@ export function CompetitionHub({ w, initial = 'matches' }) {
         </h1>
         <p>Matches, event plans, and packing belong together.</p>
       </div>
-      <div className="tabs page-tabs" role="tablist" aria-label="Competition sections">
-        {[
-          ['matches', 'Matches'],
+      <PillTabs
+        label="Competition sections"
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          ['matches', 'Matches', w.data.matches.length],
+          ['scout', 'FTC Scout live'],
           ['practice', 'Practice matches'],
-          ['events', 'Events & plans'],
-          ['packing', 'Packing checklist'],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            role="tab"
-            aria-selected={tab === key}
-            className={tab === key ? 'active' : ''}
-            onClick={() => setTab(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {tab === 'matches' ? (
+          ['events', 'Events & plans', w.data.events.length],
+          ['packing', 'Packing checklist', w.data.packing.length],
+        ]}
+      />
+      {tab === 'scout' ? (
+        <FtcScout w={w} />
+      ) : tab === 'matches' ? (
         <Matches w={w} embedded />
       ) : tab === 'practice' ? (
         <PracticeMatches w={w} />

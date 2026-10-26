@@ -86,6 +86,21 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   useEffect(() => {
+    // Ctrl/Cmd+K or / opens search from anywhere outside a text field
+    const onKey = (e) => {
+      const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowSearch(true);
+      } else if (e.key === '/' && !typing) {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  useEffect(() => {
     if (w.member && !canView(w.member.role, page)) setPage('dashboard');
   }, [w.member?.role, page]);
   useEffect(() => {
@@ -314,7 +329,7 @@ export default function App() {
             <button className="global-search" onClick={() => setShowSearch(true)}>
               <Search size={16} />
               <span>Search anything</span>
-              <kbd>⌕</kbd>
+              <kbd>Ctrl K</kbd>
             </button>
             <button
               className="notification-button icon-button"

@@ -522,11 +522,11 @@ export function seed() {
 export const demoTeam = {
   id: 'demo',
   owner_id: 'demo-user',
-  name: 'Cool Name Pending',
-  number: '30439',
+  name: 'Demo Robotics',
+  number: '00000',
   school: 'Sample High School',
   season: '2026–27 BIOBUZZ',
   location: 'Robotics lab',
   logo: '',
-  join_code: 'DEMO30439',
+  join_code: 'DEMO2026',
 };

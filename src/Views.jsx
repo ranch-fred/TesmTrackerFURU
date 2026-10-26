@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowRight,
@@ -49,6 +49,7 @@ import { seasonBadge } from './branding';
 import { approvedMembers } from './attendance';
 import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
 import { officialRules } from './robot-rules';
+import PillTabs from './PillTabs';
 const palette = [
   'var(--orange)',
   'color-mix(in srgb, var(--orange) 78%, white)',
@@ -122,6 +123,39 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
     <div className="chart-empty">Add funding and expenses to see your trend.</div>
   );
 }
+// Live days / hours / minutes / seconds until the next competition.
+function Countdown({ event }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const target = new Date(`${event.date}T${event.time || '08:00'}:00`).getTime();
+  const left = Math.max(0, target - now);
+  const parts = [
+    ['DAYS', Math.floor(left / 864e5)],
+    ['HRS', Math.floor(left / 36e5) % 24],
+    ['MIN', Math.floor(left / 6e4) % 60],
+    ['SEC', Math.floor(left / 1e3) % 60],
+  ];
+  return (
+    <section className="panel accent countdown-panel" aria-label={`${parts[0][1]} days until ${event.name}`}>
+      <div>
+        <div className="eyebrow">NEXT COMPETITION</div>
+        <h2>{event.name}</h2>
+        <small className="muted">{event.date}{event.location ? ` · ${event.location}` : ''}</small>
+      </div>
+      <div className="countdown" role="timer">
+        {parts.map(([label, value]) => (
+          <div key={label} className="countdown-cell">
+            <b>{String(value).padStart(2, '0')}</b>
+            <small>{label}</small>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 export function Dashboard({ w, navigate }) {
   const [form, setForm] = useState(null);
   const d = w.data,
@@ -164,6 +198,7 @@ export function Dashboard({ w, navigate }) {
         </div>
         <div className="banner-grid" />
       </section>
+      {next && <Countdown event={next} />}
       <div className="command-strip">
         <div className="command-label">
           <span className="dot" />
@@ -324,10 +359,6 @@ export function Dashboard({ w, navigate }) {
           <div className="robot-schematic" aria-label="Robot dimensional diagram">
             <div className="dimension top">{robot.length || '—'} IN</div>
             <div className="schematic-body">
-              <div className="wheel w1" />
-              <div className="wheel w2" />
-              <div className="wheel w3" />
-              <div className="wheel w4" />
               <span className="schematic-core">{w.team.number}</span>
               <span className="schematic-line" />
             </div>
@@ -617,13 +648,16 @@ export function Finance({ w, initial = 'overview' }) {
         />
       </div>
       <div className="page-actions">
-        <div className="tabs">
-          {(parent ? ['overview'] : ['overview', 'expenses', 'income', 'budgets']).map((t) => (
-            <button key={t} className={t === tab ? 'active' : ''} onClick={() => setTab(t)}>
-              {t === 'overview' ? 'Overview' : entities[t].title}
-            </button>
-          ))}
-        </div>
+        <PillTabs
+          label="Finance sections"
+          value={tab}
+          onChange={setTab}
+          tabs={(parent ? ['overview'] : ['overview', 'expenses', 'income', 'budgets']).map((t) => [
+            t,
+            t === 'overview' ? 'Overview' : entities[t].title,
+            t === 'overview' ? undefined : d[t]?.length,
+          ])}
+        />
         <div className="inline">
           <button className="outline" onClick={report}>
             <FileText size={16} /> Sponsor PDF
@@ -922,13 +956,12 @@ export function Robot({ w, initial = 'robot' }) {
           )}
         </section>
       </div>
-      <div className="tabs page-tabs">
-        {['robot', 'hardware', 'inspection', 'limits'].map((t) => (
-          <button key={t} className={tab === t ? 'active' : ''} onClick={() => setTab(t)}>
-            {t === 'limits' ? 'Limits & capacity' : entities[t].title}
-          </button>
-        ))}
-      </div>
+      <PillTabs
+        label="Robot sections"
+        value={tab}
+        onChange={setTab}
+        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
+      />
       {tab === 'hardware' ? (
         <HardwareMap w={w} />
       ) : tab === 'inspection' ? (

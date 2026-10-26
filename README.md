@@ -2,9 +2,18 @@
 
 A black-and-orange, mobile-friendly FTC team workspace for the team-provided 2026–27 BIOBUZZ season. Built for **GitHub → Vercel**, with **Supabase** accounts, shared Postgres data, private file uploads and role-based access.
 
-The sign-in page uses generic FTC Team Tracker branding. Once a member signs in, the sidebar, footer, robot panels, and browser title use that team's name, number, and season. The fictional demo still uses Cool Name Pending #30439 as sample data.
+The sign-in page uses generic FTC Team Tracker branding. Once a member signs in, the sidebar, footer, robot panels, and browser title use that team's name, number, and season. The fictional demo uses a generic sample team (Demo Robotics #00000), so any team can use the site.
 
 No generated robot images are included, as requested. The interface uses typography, blueprint grids and a simple CSS dimensional schematic. The requested Higgsfield video submission was rejected for insufficient workspace video credits; no video is included or claimed complete.
+
+## Construction redesign
+
+- **Design layer:**  loads last and restyles the whole console with riveted metal panels, hazard stripes on page headers, warnings and the top bar, Bebas Neue / Oswald headings, JetBrains Mono numbers, glowing hovers, and blueprint, steel and concrete textures. Every colour comes from the theme variables, so Forge, Ocean, Forest, Violet, Paper and custom themes all work.
+- **Field-building intro:** the landing page plays a 15-second 3D animation () that assembles the BIOBUZZ field: foam tiles, walls, the A-frame hive with its four hex pods and honeycomb sign, flowers, nectar rails and gardens. It ends on a generic "Team Tracker" title, so any team can use the site, and never draws a robot. Three.js and GSAP load from a pinned CDN at runtime, so  is unchanged. If WebGL or the CDN is unavailable, the original blueprint art shows instead. The motion toggle and reduced-motion setting hold it on the final frame.
+- **Pill tab carousel:**  is a single-row, swipeable pill tab bar with arrows that appear only when the row overflows. It's used where sections are numerous: Competition, Robot, Finance and Team settings.
+- **FTC Scout live:** Competition → FTC Scout live shows the team's official events, rank, W-L-T and matches from api.ftcscout.org for the team number in the profile. Editors can import played matches into the Matches log; already-imported matches are skipped.
+- **Dashboard:** a live countdown to the next competition. The robot panel shows a size envelope instead of a drawing.
+- **Search shortcut:** Ctrl/Cmd+K or / opens search.
 
 ## Layout and motion update
 

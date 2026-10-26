@@ -13,6 +13,7 @@ import { roles, subteams } from './schema';
 import { MotionToggle } from './Motion';
 import { readInvite, clearInvite, callbackError, signInWithGoogle } from './auth-flow';
 import { teamMonogram } from './branding';
+import HeroReel from './hero/HeroReel';
 function GoogleMark() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
@@ -231,14 +232,8 @@ export default function Auth({ w }) {
                 Explore demo workspace <ArrowRight size={15} />
               </button>
             </div>
-            <div className="hero-art">
-              <Blueprint />
-              <span className="art-tag">YOUR TEAM / BUILD TOGETHER</span>
-              <div className="art-coordinates">
-                PLAN / BUILD / TRACK
-                <br />
-                MADE FOR EVERY TEAM
-              </div>
+            <div className="hero-art hero-art-reel">
+              <HeroReel fallback={<Blueprint />} />
             </div>
           </section>
           <div className="hazard" />
