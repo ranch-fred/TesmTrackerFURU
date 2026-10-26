@@ -82,7 +82,13 @@ export function useWorkspace() {
         await supabase.from('records').select('*').eq('team_id', t.id).order('created_at'),
       );
       const next = EMPTY();
-      rows.forEach((r) => next[r.kind]?.push({ ...r.data, id: r.id }));
+      rows.forEach((r) => next[r.kind]?.push({
+        ...r.data,
+        ...(r.kind === 'sessions' && r.data?.attendanceCheckin
+          ? { attendanceUserId: r.created_by }
+          : {}),
+        id: r.id,
+      }));
       setData(next);
       setMembers(
         checked(

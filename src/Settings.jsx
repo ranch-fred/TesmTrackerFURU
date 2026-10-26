@@ -189,8 +189,8 @@ export default function Settings({ w }) {
             </button>
           </div>
           <p className="note">
-            Approval grants the selected role. Captains and coaches can administer the team. Roster
-            roles do not grant account access.
+            Approved accounts appear automatically in the team roster. Captains and coaches can
+            administer the team.
           </p>
           {w.members.map((m) => (
             <div key={m.id} className="membership-row">

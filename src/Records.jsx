@@ -99,7 +99,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
         <div className="form-grid">
           {schema.fields.map((f, index) => {
             let options = f.options || [];
-            if (f.type === 'members') options = w.data.roster.map((x) => x.name);
+            if (f.type === 'members') options = w.members.filter((member) => member.status === 'approved').map((member) => member.name);
             if (f.type === 'hardware') options = w.data.hardware.map((x) => x.name);
             const multi = ['multi', 'members', 'hardware'].includes(f.type);
             return (

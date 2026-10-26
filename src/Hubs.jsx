@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import Records from './Records';
 import { Matches, Events } from './Views';
 import PracticeMatches from './PracticeMatches';
+import { AttendanceCalendar, TeamRoster } from './AttendanceCalendar';
 
 export function AttendanceHub({ w, initial = 'sessions' }) {
-  const [tab, setTab] = useState(initial);
+  const [tab, setTab] = useState(initial === 'roster' ? 'roster' : 'sessions');
   return (
     <>
       <div className="page-intro compact-intro">
@@ -12,11 +13,11 @@ export function AttendanceHub({ w, initial = 'sessions' }) {
         <h1>
           SHOW UP. <span>BUILD TOGETHER.</span>
         </h1>
-        <p>Track sessions and keep the team roster in one place.</p>
+        <p>Check in on team days and see everyone who joined through the app.</p>
       </div>
       <div className="tabs page-tabs" role="tablist" aria-label="Attendance sections">
         {[
-          ['sessions', 'Attendance'],
+          ['sessions', 'Attendance calendar'],
           ['roster', 'Team roster'],
         ].map(([key, label]) => (
           <button
@@ -30,7 +31,7 @@ export function AttendanceHub({ w, initial = 'sessions' }) {
           </button>
         ))}
       </div>
-      <Records key={tab} kind={tab} w={w} />
+      {tab === 'sessions' ? <AttendanceCalendar w={w} /> : <TeamRoster w={w} />}
     </>
   );
 }
