@@ -14,7 +14,7 @@ import {
   LayoutList,
 } from 'lucide-react';
 import { entities } from './schema';
-import { canEdit, canDelete, csvText, attendance, sum } from './domain';
+import { canEdit, canDelete, csvText, attendance, sum, plural } from './domain';
 import { csv } from './exports';
 import { supabase } from './client';
 export function Badge({ children, tone = '' }) {
@@ -557,7 +557,7 @@ export default function Records({ kind, w, compact = false }) {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           >
-            <option value="">All {filterField.label.toLowerCase()}s</option>
+            <option value="">All {plural(filterField.label.toLowerCase())}</option>
             {filterOptions.map((o) => (
               <option key={o}>{o}</option>
             ))}
@@ -682,7 +682,7 @@ export default function Records({ kind, w, compact = false }) {
       ) : kind === 'announcements' ? (
         <div className="announcement-list">
           {rows.map((r) => (
-            <article key={r.id}>
+            <article key={r.id} className={r.pinned ? 'pinned' : ''}>
               <div>
                 <div className="inline">
                   <Badge tone={r.pinned ? 'orange' : ''}>{r.pinned ? 'PINNED' : 'UPDATE'}</Badge>

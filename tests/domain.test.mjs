@@ -110,3 +110,10 @@ test('Trend groups same-day amounts and keeps cumulative balances', () => {
     ],
   );
 });
+
+test('plural names filter options correctly', async () => {
+  const { plural } = await import('../src/domain.js');
+  assert.equal(plural('status'), 'statuses');
+  assert.equal(plural('date'), 'dates');
+  assert.equal(plural('sub-team'), 'sub-teams');
+});

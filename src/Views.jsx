@@ -698,8 +698,8 @@ export function Finance({ w, initial = 'overview' }) {
         <Records key={tab} kind={tab} w={w} />
       ) : (
         <>
-          <div className="finance-layout">
-            <section className="panel">
+          <div className="finance-layout flow-row">
+            <section className="panel cashflow-panel">
               <div className="panel-heading">
                 <div>
                   <span className="eyebrow subtle">CASH FLOW</span>
@@ -722,7 +722,7 @@ export function Finance({ w, initial = 'overview' }) {
               )}
             </section>
             {!parent && (
-              <section className="panel">
+              <section className="panel mix-panel">
                 <div className="panel-heading">
                   <div>
                     <span className="eyebrow subtle">SPENDING MIX</span>
@@ -772,8 +772,8 @@ export function Finance({ w, initial = 'overview' }) {
           </div>
           {!parent && (
             <>
-              <div className="finance-layout">
-                <section className="panel">
+              <div className="finance-layout plan-row">
+                <section className="panel budget-panel">
                   <div className="panel-heading">
                     <div>
                       <span className="eyebrow subtle">PLAN VS. REALITY</span>
@@ -826,7 +826,7 @@ export function Finance({ w, initial = 'overview' }) {
                       </p>
                     ))}
                 </section>
-                <section className="panel">
+                <section className="panel follow-panel">
                   <div className="panel-heading">
                     <div>
                       <span className="eyebrow subtle">FOLLOW THROUGH</span>
@@ -859,7 +859,7 @@ export function Finance({ w, initial = 'overview' }) {
                   </div>
                 </section>
               </div>
-              <section className="panel">
+              <section className="panel ledger-panel">
                 <div className="panel-heading">
                   <h2>Recent transactions</h2>
                   <button className="text-button" onClick={() => setTab('expenses')}>

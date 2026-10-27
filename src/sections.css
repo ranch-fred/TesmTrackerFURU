@@ -249,7 +249,7 @@ html[data-motion='on'] .page-dashboard .stat-card.motion-ready:not(.is-visible) 
   background:
     linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
     linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px !important;
-  border: 1px dashed var(--accent-line) !important;
+  border: 1px solid var(--glass-edge) !important;
   box-shadow: none !important;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -289,9 +289,8 @@ html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
 .page-dashboard :is(.priorities, .latest-word) .eyebrow {
   display: none;
 }
-.page-dashboard .priorities h2 {
-  font-size: clamp(28px, 3vw, 40px);
-  letter-spacing: -0.035em;
+.page-dashboard .priorities .panel-heading {
+  gap: 16px;
 }
 .page-dashboard .latest-word h2 {
   font-family: var(--mono);
@@ -316,23 +315,7 @@ html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
   box-shadow: none !important;
 }
 .page-dashboard .latest-word::before {
-  content: '“' !important;
-  inset: auto !important;
-  top: -34px !important;
-  right: 22px !important;
-  width: auto !important;
-  height: auto !important;
-  aspect-ratio: auto !important;
-  border-radius: 0 !important;
-  background: none !important;
-  filter: none !important;
-  animation: none !important;
-  opacity: 1 !important;
-  font-family: var(--heading);
-  font-size: 180px;
-  line-height: 1;
-  color: color-mix(in srgb, var(--accent) 22%, transparent);
-  z-index: -1 !important;
+  display: none !important;
 }
 .page-dashboard .latest-word .announcement-preview h3 {
   font-size: 22px;
@@ -346,36 +329,19 @@ html[data-motion='on'] .latest-word.motion-ready:not(.is-visible) {
   transform: scale(1.06);
 }
 
-/* 7. Crew, field notes and console: an uneven bento, with field notes in
-   solid orange as the one light surface on the page. */
+/* 7. Crew, field notes and console: an uneven row. Crew is a solid tile,
+   field notes an open oversized number, console a ruled note. */
 .page-dashboard .bottom-grid {
   grid-template-columns: 2fr 1.4fr 1fr !important;
-}
-.page-dashboard .notes-cell {
-  background: var(--accent) !important;
-  border: 0 !important;
-  color: #120700;
+  align-items: start;
 }
 .page-dashboard .crew-cell::before,
+.page-dashboard .crew-cell::after,
 .page-dashboard .notes-cell::before,
 .page-dashboard .notes-cell::after,
 .page-dashboard .console-cell::before,
-.page-dashboard .console-cell::after,
-.page-dashboard .crew-cell::after {
+.page-dashboard .console-cell::after {
   display: none !important;
-}
-.page-dashboard .notes-cell :is(h3, p, span, small, svg, .muted) {
-  color: #120700 !important;
-}
-.page-dashboard .notes-cell .icon-button {
-  color: #120700;
-  border-color: rgba(18, 7, 0, 0.35) !important;
-  background: none !important;
-}
-.page-dashboard .notes-cell .match-highlight strong {
-  color: #120700 !important;
-  font-size: 72px !important;
-  letter-spacing: -0.05em;
 }
 .page-dashboard .crew-cell {
   background: var(--raised) !important;
@@ -387,7 +353,7 @@ html[data-motion='on'] .latest-word.motion-ready:not(.is-visible) {
   font-size: 10px;
   letter-spacing: 0.14em;
 }
-.page-dashboard .console-cell {
+.page-dashboard :is(.notes-cell, .console-cell) {
   background: none !important;
   border: 0 !important;
   border-top: 1px solid var(--glass-edge) !important;
@@ -397,8 +363,20 @@ html[data-motion='on'] .latest-word.motion-ready:not(.is-visible) {
   backdrop-filter: none;
   padding-inline: 0 !important;
 }
-.page-dashboard .bottom-grid {
-  align-items: start;
+.page-dashboard .notes-cell .panel-heading,
+.page-dashboard .notes-cell > p {
+  padding-inline: 0 !important;
+}
+.page-dashboard .notes-cell .match-highlight strong {
+  color: var(--accent) !important;
+  font-size: 84px !important;
+  letter-spacing: -0.05em;
+}
+/* link bars only on the two framed cards; elsewhere links sit inline */
+.page-dashboard :is(.priorities, .latest-word, .crew-cell) .panel-link {
+  border-top: 0 !important;
+  justify-content: flex-start;
+  gap: 8px;
 }
 html[data-motion='on'] .bottom-grid .motion-ready:not(.is-visible) {
   transform: perspective(900px) rotateX(16deg) translateY(30px);
@@ -415,7 +393,10 @@ html[data-motion='on'] .bottom-grid .motion-ready:not(.is-visible) {
     justify-content: space-between;
   }
   .page-dashboard .countdown-cell {
-    padding: 0;
+    padding: 0 4px;
+  }
+  .page-dashboard .daily-log-links {
+    width: 100%;
   }
   .page-dashboard .countdown-cell + .countdown-cell::before {
     display: none;
@@ -429,8 +410,12 @@ html[data-motion='on'] .bottom-grid .motion-ready:not(.is-visible) {
     justify-content: center;
     padding-inline: 6px !important;
   }
+  .page-dashboard .command-actions {
+    border-radius: 14px;
+  }
   .page-dashboard .command-actions button {
     font-size: 13px !important;
+    min-height: 44px;
   }
   .page-dashboard .command-actions button svg {
     display: none;
@@ -599,7 +584,7 @@ html[data-motion='on'] .record-meetings.motion-ready:not(.is-visible) .meeting-t
 }
 .purchase-tickets {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: 22px;
   padding-bottom: 12px;
 }
@@ -645,6 +630,7 @@ html[data-motion='on'] .record-meetings.motion-ready:not(.is-visible) .meeting-t
   gap: 4px;
 }
 .purchase-steps li {
+  white-space: nowrap;
   padding-top: 8px;
   border-top: 3px solid var(--glass-edge);
   font-family: var(--mono);
@@ -672,4 +658,370 @@ html[data-motion='on'] .purchase-ticket {
 html[data-motion='on'] .record-purchases.motion-ready:not(.is-visible) .purchase-ticket {
   opacity: 0;
   transform: translateY(46px) rotate(-3deg);
+}
+
+/* ===================== Announcements ===================== */
+/* A bulletin board: pinned posts run full width as headlines, the rest fall
+   into newspaper columns. Actions surface on hover or keyboard focus. */
+.record-announcements.panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.record-announcements .section-toolbar,
+.record-announcements .list-controls {
+  padding-inline: 0 !important;
+}
+.announcement-list {
+  columns: 2 300px;
+  column-gap: 40px;
+  column-rule: 1px solid var(--glass-edge);
+}
+.announcement-list article {
+  break-inside: avoid;
+  display: block !important;
+  padding: 0 0 26px !important;
+  margin-bottom: 26px;
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--glass-edge);
+  position: relative;
+}
+.announcement-list article.pinned {
+  column-span: all;
+  padding: 26px 0 30px !important;
+  border-block: 2px solid var(--accent) !important;
+}
+.announcement-list article.pinned h3 {
+  font-size: clamp(30px, 4.4vw, 58px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  max-width: 18ch;
+}
+.announcement-list article.pinned p {
+  font-size: 18px;
+  max-width: 58ch;
+}
+.announcement-list h3 {
+  font-size: 22px !important;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.announcement-list .row-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transition: opacity 0.2s;
+}
+.announcement-list article.pinned .row-actions {
+  top: 26px;
+}
+@media (hover: hover) {
+  .announcement-list article:not(:hover):not(:focus-within) .row-actions {
+    opacity: 0;
+  }
+}
+html[data-motion='on'] .record-announcements.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .announcement-list article {
+  transition:
+    opacity 0.5s ease 0.1s,
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s;
+}
+html[data-motion='on'] .announcement-list article + article {
+  transition-delay: 0.25s;
+}
+html[data-motion='on'] .record-announcements.motion-ready:not(.is-visible) .announcement-list article {
+  opacity: 0;
+  transform: scale(0.92);
+}
+html[data-motion='on'] .record-announcements.motion-ready:not(.is-visible) .announcement-list article.pinned {
+  transform: translateY(-30px);
+}
+
+/* ===================== Task board ===================== */
+/* The board keeps its glass panel; columns read as lanes with a large count,
+   and they deal in from the right one after another. */
+.kanban-column h3 small {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 22px !important;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+.kanban-column h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--glass-edge);
+}
+.kanban .task-card {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.25s;
+}
+.kanban .task-card:hover {
+  transform: translateY(-3px) rotate(0.4deg);
+}
+html[data-motion='on'] .record-tasks.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .kanban-column {
+  transition:
+    opacity 0.45s ease,
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-motion='on'] .kanban-column:nth-child(2) { transition-delay: 0.08s; }
+html[data-motion='on'] .kanban-column:nth-child(3) { transition-delay: 0.16s; }
+html[data-motion='on'] .kanban-column:nth-child(4) { transition-delay: 0.24s; }
+html[data-motion='on'] .record-tasks.motion-ready:not(.is-visible) .kanban-column {
+  opacity: 0;
+  transform: translateX(70px);
+}
+
+/* ===================== Finance & expenses ===================== */
+/* 1. The four totals read as the sum they are: received − spent = balance,
+   with pledges set apart. Terms drop in one after another. */
+.page-finance .stats-grid {
+  display: grid !important;
+  grid-template-columns: 1fr auto 1fr auto 1.25fr !important;
+  align-items: end;
+  gap: 0 18px !important;
+}
+.page-finance .stat-card {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 10px 0 !important;
+}
+.page-finance .stat-card::before,
+.page-finance .stat-card::after {
+  display: none;
+}
+.page-finance .stat-card .stat-top svg {
+  display: none;
+}
+.page-finance .stat-card:nth-child(2) { order: 1; }
+.page-finance .stat-card:nth-child(3) { order: 3; }
+.page-finance .stat-card:nth-child(1) { order: 5; }
+.page-finance .stat-card:nth-child(4) {
+  order: 6;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  margin-top: 14px;
+  padding-top: 14px !important;
+  border-top: 1px dashed var(--glass-edge) !important;
+}
+.page-finance .stat-card:nth-child(4) strong {
+  font-size: 22px !important;
+}
+.page-finance .stats-grid::before,
+.page-finance .stats-grid::after {
+  font-family: var(--mono);
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1;
+  color: var(--accent);
+  padding-bottom: 34px;
+}
+.page-finance .stats-grid::before {
+  content: '−';
+  order: 2;
+}
+.page-finance .stats-grid::after {
+  content: '=';
+  order: 4;
+}
+.page-finance .stat-card strong {
+  font-size: clamp(30px, 3.6vw, 48px) !important;
+}
+.page-finance .stat-card:nth-child(1) strong {
+  font-size: clamp(40px, 5vw, 68px) !important;
+  color: var(--accent) !important;
+}
+html[data-motion='on'] .page-finance .stat-card.motion-ready:not(.is-visible) {
+  transform: translateY(-26px);
+}
+html[data-motion='on'] .page-finance .stat-card:nth-child(3) { --reveal-delay: 120ms !important; }
+html[data-motion='on'] .page-finance .stat-card:nth-child(1) { --reveal-delay: 240ms !important; }
+@media (max-width: 760px) {
+  .page-finance .stats-grid {
+    grid-template-columns: 1fr auto 1fr !important;
+  }
+  .page-finance .stats-grid::after {
+    display: none;
+  }
+  .page-finance .stat-card:nth-child(1) {
+    grid-column: 1 / -1;
+    border-top: 2px solid var(--accent) !important;
+    margin-top: 10px;
+  }
+}
+
+/* 2. Cash flow sits open on the page; the spending mix is a solid tile. */
+.page-finance .flow-row {
+  grid-template-columns: 2.2fr 1fr;
+  align-items: start;
+}
+.page-finance .cashflow-panel {
+  background: none !important;
+  border: 0 !important;
+  border-left: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-finance .mix-panel {
+  background: var(--raised) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none !important;
+}
+html[data-motion='on'] .cashflow-panel.motion-ready:not(.is-visible) {
+  transform: perspective(1200px) rotateY(-14deg);
+  transform-origin: left center;
+}
+html[data-motion='on'] .mix-panel.motion-ready:not(.is-visible) {
+  transform: rotate(-7deg) scale(0.9);
+}
+
+/* 3. Budget keeps the glass panel; follow-ups are an orange-tinted call list. */
+.page-finance .plan-row {
+  grid-template-columns: 1fr 1.6fr;
+}
+.page-finance .plan-row .follow-panel {
+  order: -1;
+  background: var(--accent-dim) !important;
+  border-color: var(--accent-line) !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-finance .follow-panel .funding-row {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.page-finance .follow-panel .funding-row:hover {
+  transform: translateX(6px);
+}
+html[data-motion='on'] .budget-panel.motion-ready:not(.is-visible) {
+  transform: scaleY(0.86);
+  transform-origin: bottom;
+}
+html[data-motion='on'] .follow-panel.motion-ready:not(.is-visible) {
+  transform: translateX(-48px);
+}
+
+/* 4. Recent transactions print like a receipt: mono, dotted rules, no box. */
+.page-finance .ledger-panel {
+  background: none !important;
+  border: 0 !important;
+  border-block: 2px solid var(--ink) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-finance .ledger-panel .panel-heading,
+.page-finance .ledger-panel .table-scroll {
+  padding-inline: 0 !important;
+}
+.page-finance .ledger-panel table {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.page-finance .ledger-panel td,
+.page-finance .ledger-panel th {
+  border-bottom: 1px dotted var(--glass-edge) !important;
+  background: none !important;
+}
+.page-finance .ledger-panel tbody tr {
+  transition: background 0.2s;
+}
+.page-finance .ledger-panel tbody tr:hover {
+  background: var(--accent-dim);
+}
+.page-finance .ledger-panel td.money {
+  text-align: right;
+  color: var(--accent);
+}
+html[data-motion='on'] .ledger-panel.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .ledger-panel tbody tr {
+  transition:
+    opacity 0.3s ease,
+    transform 0.4s ease,
+    background 0.2s;
+}
+html[data-motion='on'] .ledger-panel tbody tr:nth-child(2) { transition-delay: 0.07s, 0.07s, 0s; }
+html[data-motion='on'] .ledger-panel tbody tr:nth-child(3) { transition-delay: 0.14s, 0.14s, 0s; }
+html[data-motion='on'] .ledger-panel tbody tr:nth-child(4) { transition-delay: 0.21s, 0.21s, 0s; }
+html[data-motion='on'] .ledger-panel tbody tr:nth-child(5) { transition-delay: 0.28s, 0.28s, 0s; }
+html[data-motion='on'] .ledger-panel.motion-ready:not(.is-visible) tbody tr {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+@media (max-width: 900px) {
+  .page-finance :is(.flow-row, .plan-row) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ===================== Shared record pages ===================== */
+/* The page title already names the records; the toolbar keeps only the
+   count and actions. No grey band behind the filters, no box in a box. */
+.page-intro + .record-section .section-toolbar h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.list-controls {
+  background: none !important;
+}
+.search input {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.workspace-footer {
+  font-size: 11px !important;
+}
+.meeting-body p small {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent) !important;
+}
+@media (min-width: 900px) {
+  .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket {
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 1.2fr) minmax(320px, 1.6fr) auto;
+    align-items: center;
+    gap: 28px;
+    padding: 26px 30px;
+    -webkit-mask: none;
+    mask: none;
+    border-left: 4px solid var(--accent);
+  }
+  .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket header {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
 }
