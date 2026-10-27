@@ -324,7 +324,7 @@ function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
   [...gardens, ...trays].forEach((g, i) => tl.to(g.scale, { ...full, duration: 0.45, ease: 'back.out(2)' }, 7.5 + i * 0.1));
   lines.forEach((g, i) => tl.to(g.scale, { x: 1, duration: 0.5, ease: 'expo.out' }, 7.6 + i * 0.1));
   // finish on the orbit circle so the idle orbit picks up without a jump
-  const ORBIT = { r: 15.5, y: 7.2, ly: 1.8, speed: 0.05 };
+  const ORBIT = { r: 20, y: 10, ly: 1.2, speed: 0.05 };
   let angle = Math.atan2(9, -9);
   tl.to(cam, { x: Math.cos(angle) * ORBIT.r, y: ORBIT.y, z: Math.sin(angle) * ORBIT.r, ly: ORBIT.ly, duration: 2.2, ease: 'sine.inOut' }, 7.0);
 

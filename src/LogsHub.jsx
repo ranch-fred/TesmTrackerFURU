@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, Code2, Hammer, HeartHandshake, X } from 'lucide-react';
 import { canView } from './domain';
 import { LogPage } from './LogEntry';
@@ -69,7 +70,9 @@ export default function LogsHub({ w, initial }) {
 
   if (open) {
     const [, title] = LOGS.find(([k]) => k === open);
-    return (
+    // portalled to <body>: the page's motion wrapper keeps a transform,
+    // which would trap a fixed overlay inside the main column
+    return createPortal(
       <div className="log-focus" role="dialog" aria-modal="true" aria-label={title}>
         <header className="log-focus-bar">
           <button ref={closeButton} className="outline" onClick={close}>
@@ -88,7 +91,8 @@ export default function LogsHub({ w, initial }) {
         <div className="log-focus-body" key={open}>
           {open === 'outreach' ? <OutreachLog w={w} /> : <LogPage kind={open} w={w} />}
         </div>
-      </div>
+      </div>,
+      document.body,
     );
   }
 
@@ -119,7 +123,7 @@ export default function LogsHub({ w, initial }) {
               <strong>{title}</strong>
               <small>{blurb}</small>
               <span className="log-card-meta">
-                {count(kind)} entries
+                {count(kind)} {count(kind) === 1 ? 'entry' : 'entries'}
                 {lastDate(kind) && ` · last ${lastDate(kind)}`}
               </span>
             </button>
