@@ -492,8 +492,8 @@ table tbody tr:hover {
   box-shadow: none;
   border-radius: 50%;
   background: radial-gradient(circle, var(--accent) 0, color-mix(in srgb, var(--accent) 40%, transparent) 35%, transparent 68%);
-  filter: blur(34px);
-  opacity: 0.38;
+  filter: blur(30px);
+  opacity: 0.62;
   pointer-events: none;
   animation: glass-drift 14s ease-in-out infinite alternate;
 }
@@ -502,7 +502,7 @@ table tbody tr:hover {
   right: auto;
   bottom: -40%;
   left: -20%;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 70%, #ffd166) 0, transparent 66%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 80%, #ffd166) 0, color-mix(in srgb, var(--accent) 35%, transparent) 35%, transparent 68%);
   animation-delay: -6s;
 }
 .page-dashboard .welcome-banner::before {
