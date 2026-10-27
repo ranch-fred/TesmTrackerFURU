@@ -2454,3 +2454,291 @@ html[data-motion='on'] .settings-panel.motion-ready:not(.is-visible) {
 .attendance-day.missed {
   border-color: color-mix(in srgb, #d95757 45%, var(--glass-edge)) !important;
 }
+
+/* ===================== Round 9: quiet working tool ===================== */
+/* One body size, medium-weight headings, orange kept for the primary state. */
+
+/* shared: notes are plain muted text; disabled tab arrows take no space */
+.note {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  color: var(--ink-2) !important;
+  font-size: 13px !important;
+}
+.pill-arrow[disabled] {
+  display: none !important;
+}
+.row-actions .danger:not(:hover):not(:focus-visible) {
+  color: var(--ink-2) !important;
+}
+
+/* dashboard */
+.page-dashboard .panel-heading :is(h2, h3),
+.page-dashboard .dashboard-heading h2 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+.page-dashboard .stat-card strong,
+.page-dashboard .finance-numbers b {
+  color: var(--ink) !important;
+}
+.page-dashboard .robot-vitals .robot-schematic {
+  display: none !important;
+}
+.page-dashboard .dashboard-grid > .robot-vitals {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.page-dashboard .dashboard-grid > .robot-vitals > * {
+  grid-column: 1 !important;
+}
+.page-dashboard .robot-vitals .vitals-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+.page-dashboard .robot-vitals .vitals-stats > div {
+  border-bottom: 0 !important;
+  padding: 0 !important;
+}
+.page-dashboard .dashboard-grid > .priorities > .panel-heading {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.page-dashboard .daily-log-reminder {
+  border-left: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  padding: 16px 0 !important;
+}
+.page-dashboard .notes-cell > p {
+  display: none;
+}
+@media (max-width: 900px) {
+  .page-dashboard .dashboard-grid > .priorities > .panel-heading {
+    grid-column: 1 !important;
+  }
+}
+@media (max-width: 760px) {
+  .page-dashboard .stats-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .page-dashboard .stat-card {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--glass-edge) !important;
+  }
+  .page-dashboard .stat-card:nth-child(3) {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  .page-dashboard .stat-card strong {
+    font-size: 18px !important;
+  }
+}
+
+/* announcements: body at reading size, full width, no doubled closing rule */
+.announcement-list p {
+  font-size: 14px !important;
+  max-width: none !important;
+}
+.announcement-list article:last-child {
+  border-bottom: 0 !important;
+}
+
+/* task cards hug their content; tags read as plain meta; move menu overlays */
+.kanban .task-card {
+  position: relative;
+  height: auto !important;
+  min-height: 0 !important;
+}
+.kanban .task-card .badge {
+  background: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  color: var(--ink-2) !important;
+  font-size: 12px !important;
+}
+.kanban .task-card > select {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: auto !important;
+  max-width: 120px;
+  min-height: 28px !important;
+  font-size: 12px !important;
+}
+
+/* meeting log: a dense row with an inline date, no rail */
+.meeting-timeline::before,
+.meeting-timeline > li::before {
+  display: none !important;
+}
+.meeting-timeline > li {
+  grid-template-columns: 96px minmax(0, 1fr) !important;
+  gap: 0 18px !important;
+  padding: 14px 0;
+  border-top: 1px solid var(--glass-edge);
+}
+.meeting-timeline time {
+  text-align: left !important;
+  padding: 2px 0 0 !important;
+}
+.meeting-timeline time b {
+  display: inline !important;
+  font-size: 14px !important;
+  color: var(--ink) !important;
+  font-family: var(--heading) !important;
+}
+.meeting-timeline time small {
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  margin-left: 4px;
+}
+.meeting-body h3 {
+  font-size: 15px !important;
+}
+@media (max-width: 640px) {
+  .meeting-timeline > li {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* finance: one level per section, no fills, compact donut */
+.page-finance .plan-row .follow-panel {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  padding-inline: 0 !important;
+}
+.page-finance .stats-grid {
+  align-items: baseline !important;
+}
+.page-finance .stat-card:nth-child(4) {
+  margin-top: 0 !important;
+}
+.page-finance .mix-panel .recharts-responsive-container {
+  max-width: 220px;
+  max-height: 160px;
+  margin-inline: auto;
+}
+
+/* purchases: a full-width list row */
+.purchase-ticket {
+  background: none !important;
+  border: 0 !important;
+  border-block: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  padding: 14px 0 !important;
+}
+.purchase-ticket header {
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket {
+  padding: 14px 0 !important;
+  align-items: center !important;
+}
+
+/* resources: compact tabs, single-line index, no callout box */
+.page-resources .page-tabs {
+  display: inline-flex !important;
+  width: auto !important;
+}
+.resource-nav button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* competition: one face and scale for the readouts; small chart labels */
+.page-competition .stat-card strong {
+  font-family: var(--heading) !important;
+  font-weight: 600 !important;
+}
+.page-competition .points-panel .recharts-cartesian-axis-tick text {
+  font-size: 11px !important;
+}
+.page-competition .points-panel > h3 {
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+  font-size: 14px;
+}
+.page-competition .record-matches.panel {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* robot: the sheet hugs its text; checks in regular weight */
+.page-robot .robot-top {
+  align-items: start !important;
+}
+.page-robot .robot-detail,
+.page-robot .blueprint-grid {
+  min-height: 0 !important;
+  height: auto !important;
+}
+.page-robot .legality-panel .check-row {
+  font-family: var(--heading) !important;
+}
+.page-robot .legality-panel .check-row b {
+  font-weight: 500 !important;
+}
+
+/* small tables don't need search, filters and sort */
+.record-section:has(.table-scroll):not(:has(tbody tr:nth-child(5))) .list-controls {
+  display: none;
+}
+
+/* activity: a normal heading and the shared search look */
+.page-activity .panel-heading h2 {
+  font-family: var(--heading) !important;
+  font-size: 16px !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+}
+.page-activity input[aria-label='Search activity'] {
+  font-family: var(--heading) !important;
+  padding-left: 2px !important;
+  background-image: none !important;
+}
+
+/* settings: label left, compact control right */
+.page-settings .form-grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  row-gap: 4px !important;
+}
+.page-settings .form-grid > label {
+  display: grid !important;
+  grid-template-columns: 170px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  padding: 6px 0 !important;
+}
+.page-settings .form-grid > label :is(input, select, textarea) {
+  min-height: 34px !important;
+  font-weight: 400 !important;
+}
+@media (max-width: 640px) {
+  .page-settings .form-grid > label {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+
+/* attendance: borderless tiles; status as a soft tint */
+.attendance-day {
+  border-color: transparent !important;
+}
+.attendance-day.missed {
+  border-color: transparent !important;
+}

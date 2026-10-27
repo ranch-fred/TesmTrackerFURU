@@ -195,11 +195,11 @@ export function Dashboard({ w, navigate }) {
           </div>
           <h1>
             <span className="mask">
-              <i>LET’S GET</i>
+              <i>Let’s get</i>
             </span>{' '}
             <span className="mask">
               <i>
-                <span>BUILDING.</span>
+                <span>building.</span>
               </i>
             </span>
           </h1>
@@ -851,7 +851,10 @@ export function Finance({ w, initial = 'overview' }) {
                     <div>
                       <b>
                         {d.expenses.filter((e) => e.reimbursement === 'Pending').length}{' '}
-                        reimbursements pending
+                        {d.expenses.filter((e) => e.reimbursement === 'Pending').length === 1
+                          ? 'reimbursement'
+                          : 'reimbursements'}{' '}
+                        pending
                       </b>
                       <small>Keep your team’s out-of-pocket costs in view.</small>
                     </div>
