@@ -167,22 +167,15 @@ export default function App() {
   else if (page === 'settings') view = <Settings w={w} />;
   else if (page === 'activity')
     view = (
-      <>
-      <div className="page-intro compact-intro">
-        <div className="eyebrow">TEAM / {w.team.number}</div>
-        <h1>
-          ACTIVITY <span>LOG.</span>
-        </h1>
-        <p>Recorded changes, including who changed what and when.</p>
-      </div>
       <section className="panel">
         <div className="panel-heading">
-          <h2>Recent changes</h2>
+          <h2>Activity log</h2>
           <button className="outline" onClick={w.refresh}>
             <RefreshCw size={15} />
             Refresh
           </button>
         </div>
+        <p className="muted">Recorded changes, including who changed what and when.</p>
         <input
           aria-label="Search activity"
           placeholder="Search activity…"
@@ -207,7 +200,6 @@ export default function App() {
           {!w.activity.length && <p className="muted">Your first change will appear here.</p>}
         </div>
       </section>
-      </>
     );
   else
     view = (

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Records from './Records';
 
@@ -109,21 +109,6 @@ const groups = [
 export default function ResourcesCenter({ w, initial = 'official' }) {
   const sponsor = w.member.role === 'Parent/Sponsor';
   const [tab, setTab] = useState(sponsor ? 'official' : initial);
-  // the side index highlights the group currently in view
-  const sections = useRef([]);
-  const [shown, setShown] = useState(0);
-  useEffect(() => {
-    if (tab !== 'official' || !('IntersectionObserver' in window)) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const hit = entries.find((e) => e.isIntersecting);
-        if (hit) setShown(Number(hit.target.dataset.index));
-      },
-      { rootMargin: '-30% 0px -60% 0px' },
-    );
-    sections.current.forEach((el) => el && observer.observe(el));
-    return () => observer.disconnect();
-  }, [tab]);
   return (
     <>
       <div className="page-intro compact-intro">
@@ -159,53 +144,28 @@ export default function ResourcesCenter({ w, initial = 'official' }) {
             Use the season hub for the latest manual and updates. FIRST may change individual
             documents during the season.
           </p>
-          <div className="resource-index">
-            <nav className="resource-nav" aria-label="Resource groups">
-              {groups.map((group, i) => (
-                <button
-                  key={group.title}
-                  className={i === shown ? 'active' : ''}
-                  aria-current={i === shown ? 'true' : undefined}
-                  onClick={() =>
-                    sections.current[i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  }
-                >
-                  {group.title}
-                  <small>{group.links.length}</small>
-                </button>
-              ))}
-            </nav>
-            <div className="resource-sections">
-              {groups.map((group, i) => (
-                <section
-                  className="resource-group"
-                  data-reveal
-                  key={group.title}
-                  data-index={i}
-                  ref={(el) => (sections.current[i] = el)}
-                >
-                  <h2>{group.title}</h2>
-                  <div className="resource-grid">
-                    {group.links.map(([title, url, description]) => (
-                      <a
-                        className="resource-link"
-                        key={url}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <strong>
-                          {title}
-                          <ArrowUpRight size={16} />
-                        </strong>
-                        <span>{description}</span>
-                      </a>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
+          {groups.map((group) => (
+            <section className="panel resource-group" key={group.title}>
+              <h2>{group.title}</h2>
+              <div className="resource-grid">
+                {group.links.map(([title, url, description]) => (
+                  <a
+                    className="resource-link"
+                    key={url}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <strong>
+                      {title}
+                      <ArrowUpRight size={16} />
+                    </strong>
+                    <span>{description}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ))}
         </>
       ) : (
         <Records kind="resources" w={w} />

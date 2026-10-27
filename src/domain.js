@@ -104,6 +104,3 @@ export function trend(data) {
     return { date: date.slice(5), raised, spent, balance: raised - spent };
   });
 }
-
-// 'status' → 'statuses', 'date' → 'dates'
-export const plural = (word) => (/(s|x|ch|sh)$/.test(word) ? word + 'es' : word + 's');

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowRight,
@@ -176,32 +176,15 @@ export function Dashboard({ w, navigate }) {
       : null;
   const parent = w.member.role === 'Parent/Sponsor';
   const season = seasonBadge(w.team.season);
-  // the banner's orange light follows the pointer (or a finger), moved by transform only
-  const spot = useRef(null);
-  function spotlight(e) {
-    const box = e.currentTarget.getBoundingClientRect();
-    spot.current?.style.setProperty(
-      'transform',
-      `translate(${e.clientX - box.left}px, ${e.clientY - box.top}px)`,
-    );
-  }
   return (
     <>
-      <section className="welcome-banner" onPointerMove={spotlight}>
-        <span className="banner-spot" ref={spot} aria-hidden="true" />
+      <section className="welcome-banner">
         <div>
           <div className="eyebrow">
             <span className="dot" /> ALL SYSTEMS, ONE TEAM
           </div>
           <h1>
-            <span className="mask">
-              <i>Let’s get</i>
-            </span>{' '}
-            <span className="mask">
-              <i>
-                <span>building.</span>
-              </i>
-            </span>
+            LET’S GET <span>BUILDING.</span>
           </h1>
           <p>Good to see you, {w.member.name.split(' ')[0]}. Here’s where the team stands.</p>
         </div>
@@ -290,6 +273,7 @@ export function Dashboard({ w, navigate }) {
               : d.tasks
                   .filter((t) => t.status !== 'Done')
                   .length.toString()
+                  .padStart(2, '0')
           }
           note={
             parent
@@ -300,7 +284,7 @@ export function Dashboard({ w, navigate }) {
         />
         <Stat
           label="TEAM MEMBERS"
-          value={parent ? '—' : approvedMembers(w.members).length.toString()}
+          value={parent ? '—' : approvedMembers(w.members).length.toString().padStart(2, '0')}
           note={parent ? 'Visible to operational members' : 'Approved app accounts'}
           icon={CalendarDays}
         />
@@ -316,7 +300,7 @@ export function Dashboard({ w, navigate }) {
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">BUSINESS / FINANCE</span>
-              <h2>Making every dollar count</h2>
+              <h2>Making every dollar count.</h2>
             </div>
             <button
               className="icon-button"
@@ -419,7 +403,7 @@ export function Dashboard({ w, navigate }) {
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">UP NEXT</span>
-              <h2>Keep the build moving</h2>
+              <h2>Keep the build moving.</h2>
             </div>
             {!parent && (
               <button
@@ -472,11 +456,11 @@ export function Dashboard({ w, navigate }) {
             {parent ? 'Team announcements' : 'Open task board'} <ArrowRight size={16} />
           </button>
         </section>
-        <section className="panel latest-word">
+        <section className="panel">
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">FROM THE CREW</span>
-              <h2>The latest word</h2>
+              <h2>The latest word.</h2>
             </div>
             <Radio size={18} className="muted" />
           </div>
@@ -504,10 +488,10 @@ export function Dashboard({ w, navigate }) {
       </div>
       {!parent && (
         <div className="bottom-grid">
-          <section className="panel crew-cell">
+          <section className="panel">
             <div className="panel-heading">
               <h3>
-                <Flame size={16} className="orange" /> Your crew
+                <Flame size={16} className="orange" /> Your crew.
               </h3>
               <span className="muted">TEAM ROSTER</span>
             </div>
@@ -530,10 +514,10 @@ export function Dashboard({ w, navigate }) {
               View team roster <ArrowRight size={16} />
             </button>
           </section>
-          <section className="panel notes-cell">
+          <section className="panel">
             <div className="panel-heading">
               <h3>
-                <Target size={16} className="orange" /> Field notes
+                <Target size={16} className="orange" /> Field notes.
               </h3>
               <button
                 className="icon-button"
@@ -551,7 +535,7 @@ export function Dashboard({ w, navigate }) {
             </div>
             <p className="muted">Record. Review. Come back stronger.</p>
           </section>
-          <section className="panel console-cell">
+          <section className="panel">
             <div className="panel-heading">
               <h3>
                 <span className="dot" /> Who’s on the console?
@@ -697,8 +681,8 @@ export function Finance({ w, initial = 'overview' }) {
         <Records key={tab} kind={tab} w={w} />
       ) : (
         <>
-          <div className="finance-layout flow-row">
-            <section className="panel cashflow-panel">
+          <div className="finance-layout">
+            <section className="panel">
               <div className="panel-heading">
                 <div>
                   <span className="eyebrow subtle">CASH FLOW</span>
@@ -721,7 +705,7 @@ export function Finance({ w, initial = 'overview' }) {
               )}
             </section>
             {!parent && (
-              <section className="panel mix-panel">
+              <section className="panel">
                 <div className="panel-heading">
                   <div>
                     <span className="eyebrow subtle">SPENDING MIX</span>
@@ -771,8 +755,8 @@ export function Finance({ w, initial = 'overview' }) {
           </div>
           {!parent && (
             <>
-              <div className="finance-layout plan-row">
-                <section className="panel budget-panel">
+              <div className="finance-layout">
+                <section className="panel">
                   <div className="panel-heading">
                     <div>
                       <span className="eyebrow subtle">PLAN VS. REALITY</span>
@@ -825,7 +809,7 @@ export function Finance({ w, initial = 'overview' }) {
                       </p>
                     ))}
                 </section>
-                <section className="panel follow-panel">
+                <section className="panel">
                   <div className="panel-heading">
                     <div>
                       <span className="eyebrow subtle">FOLLOW THROUGH</span>
@@ -851,17 +835,14 @@ export function Finance({ w, initial = 'overview' }) {
                     <div>
                       <b>
                         {d.expenses.filter((e) => e.reimbursement === 'Pending').length}{' '}
-                        {d.expenses.filter((e) => e.reimbursement === 'Pending').length === 1
-                          ? 'reimbursement'
-                          : 'reimbursements'}{' '}
-                        pending
+                        reimbursements pending
                       </b>
                       <small>Keep your team’s out-of-pocket costs in view.</small>
                     </div>
                   </div>
                 </section>
               </div>
-              <section className="panel ledger-panel">
+              <section className="panel">
                 <div className="panel-heading">
                   <h2>Recent transactions</h2>
                   <button className="text-button" onClick={() => setTab('expenses')}>
@@ -926,12 +907,6 @@ export function Robot({ w, initial = 'robot' }) {
         </h1>
         <p>Every mechanism has a purpose. Every connection has a name.</p>
       </div>
-      <PillTabs
-        label="Robot sections"
-        value={tab}
-        onChange={setTab}
-        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
-      />
       <div className="robot-top">
         <section className="panel robot-detail">
           <div className="blueprint-grid">
@@ -943,7 +918,7 @@ export function Robot({ w, initial = 'robot' }) {
             <span>SEASON DESIGN / DIMENSIONAL REFERENCE</span>
           </div>
         </section>
-        <section className="panel legality-panel">
+        <section className="panel">
           <div className="panel-heading">
             <h2>Legality checks</h2>
             <ShieldCheck className="orange" />
@@ -977,6 +952,12 @@ export function Robot({ w, initial = 'robot' }) {
           )}
         </section>
       </div>
+      <PillTabs
+        label="Robot sections"
+        value={tab}
+        onChange={setTab}
+        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
+      />
       {tab === 'hardware' ? (
         <HardwareMap w={w} />
       ) : tab === 'inspection' ? (
@@ -1043,7 +1024,7 @@ export function Matches({ w, embedded = false }) {
       <p className="note">
         Use Practice matches for point-by-point BIOBUZZ scoring. Other match totals are entered manually.
       </p>
-      <section className="panel points-panel">
+      <section className="panel">
         <div className="panel-heading">
           <h2>Points over time</h2>
         </div>
