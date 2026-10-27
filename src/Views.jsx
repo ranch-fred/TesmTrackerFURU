@@ -316,7 +316,7 @@ export function Dashboard({ w, navigate }) {
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">BUSINESS / FINANCE</span>
-              <h2>Making every dollar count.</h2>
+              <h2>Making every dollar count</h2>
             </div>
             <button
               className="icon-button"
@@ -419,7 +419,7 @@ export function Dashboard({ w, navigate }) {
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">UP NEXT</span>
-              <h2>Keep the build moving.</h2>
+              <h2>Keep the build moving</h2>
             </div>
             {!parent && (
               <button
@@ -476,7 +476,7 @@ export function Dashboard({ w, navigate }) {
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">FROM THE CREW</span>
-              <h2>The latest word.</h2>
+              <h2>The latest word</h2>
             </div>
             <Radio size={18} className="muted" />
           </div>
@@ -507,7 +507,7 @@ export function Dashboard({ w, navigate }) {
           <section className="panel crew-cell">
             <div className="panel-heading">
               <h3>
-                <Flame size={16} className="orange" /> Your crew.
+                <Flame size={16} className="orange" /> Your crew
               </h3>
               <span className="muted">TEAM ROSTER</span>
             </div>
@@ -533,7 +533,7 @@ export function Dashboard({ w, navigate }) {
           <section className="panel notes-cell">
             <div className="panel-heading">
               <h3>
-                <Target size={16} className="orange" /> Field notes.
+                <Target size={16} className="orange" /> Field notes
               </h3>
               <button
                 className="icon-button"

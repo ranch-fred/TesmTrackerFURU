@@ -1305,132 +1305,19 @@ html[data-motion='on'] .resource-group.motion-ready:not(.is-visible) .resource-l
 }
 
 /* ===================== Page headers ===================== */
-/* Each page opens its own way. Default is calmer than before; pages then
-   pick a masthead, a rule, a split or an inline line. */
+/* Headers are shared chrome: one scale and one rule on every page, so the
+   variety lives in the sections below them. */
 .page-intro::after {
   box-shadow: none !important;
 }
 .page-intro h1 {
-  font-size: clamp(32px, 3.6vw, 48px) !important;
+  font-size: clamp(30px, 3.2vw, 44px) !important;
   letter-spacing: -0.035em !important;
-  line-height: 1 !important;
-}
-/* announcements: newspaper masthead between two heavy rules */
-.page-announcements .page-intro {
-  border: 0 !important;
-  border-top: 3px solid var(--ink) !important;
-  padding: 16px 0 0 !important;
-}
-.page-announcements .page-intro::after {
-  display: none;
-}
-.page-announcements .page-intro h1 {
+  line-height: 1.02 !important;
   overflow-wrap: anywhere;
 }
-/* task board: one inline line, eyebrow pushed right */
-.page-tasks .page-intro {
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
-  align-items: baseline;
-  border-bottom: 0 !important;
-}
-.page-tasks .page-intro::after {
-  display: none;
-}
-/* meeting log: an orange margin rule, like minutes in a notebook */
-.page-meetings .page-intro {
-  border: 0 !important;
-  border-left: 3px solid var(--accent) !important;
-  padding: 4px 0 4px 22px !important;
-}
-.page-meetings .page-intro::after {
-  display: none;
-}
-/* purchases: compact with a dashed tear line */
-.page-purchases .page-intro {
-  border-bottom: 1px dashed var(--glass-edge) !important;
-}
-.page-purchases .page-intro::after {
-  display: none;
-}
-/* finance: split, heading left and the explainer right */
-.page-finance .page-intro {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
-  align-items: end;
-  gap: 8px 40px;
-}
-.page-finance .page-intro .eyebrow {
-  grid-column: 1 / -1;
-}
-.page-finance .page-intro p {
-  margin: 0;
-  justify-self: end;
-}
-/* robot: a drawing title block */
-.page-robot .page-intro {
-  display: inline-grid;
-  border: 1px solid var(--glass-edge) !important;
-  padding: 14px 20px !important;
-  border-radius: 4px;
-}
-.page-robot .page-intro::after {
-  display: none;
-}
-.page-robot .page-intro h1 {
-  font-family: var(--mono);
-  font-size: clamp(24px, 2.6vw, 34px) !important;
-  letter-spacing: 0.02em !important;
-}
-/* competition: the largest headline in the app */
-.page-competition .page-intro h1 {
-  font-size: clamp(34px, 8vw, 116px) !important;
-  letter-spacing: -0.055em !important;
-}
-/* resources and settings: quiet utility headers */
-.page-resources .page-intro h1,
-.page-settings .page-intro h1 {
-  font-size: clamp(26px, 2.6vw, 34px) !important;
-  text-transform: none;
-}
-.page-settings .page-intro::after {
-  display: none;
-}
-html[data-motion='on'] .page-announcements .page-intro.motion-ready:not(.is-visible) { transform: scaleY(0.6); }
-html[data-motion='on'] .page-tasks .page-intro.motion-ready:not(.is-visible) { transform: translateX(-24px); }
-html[data-motion='on'] .page-meetings .page-intro.motion-ready:not(.is-visible) { transform: translateX(-40px); }
-html[data-motion='on'] .page-finance .page-intro.motion-ready:not(.is-visible) { transform: translateY(-20px); }
-html[data-motion='on'] .page-robot .page-intro.motion-ready:not(.is-visible) { transform: scale(0.9); transform-origin: left top; }
-html[data-motion='on'] .page-competition .page-intro.motion-ready:not(.is-visible) { transform: translateY(50px) scale(1.04); }
-@media (max-width: 640px) {
-  .page-finance .page-intro {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .page-finance .page-intro p {
-    justify-self: start;
-  }
-  .page-tasks .page-intro {
-    flex-direction: column;
-  }
-  .page-robot .page-intro {
-    display: grid;
-  }
-}
-
-/* primary buttons keep the orange fill but lose the glow; toolbars go quiet */
-.primary {
-  box-shadow: none !important;
-}
-.section-toolbar .outline,
-.list-controls select,
-.list-controls > .outline {
-  background: none !important;
-}
-.list-controls .search {
-  background: none !important;
-  border-width: 0 0 1px !important;
-  border-radius: 0 !important;
+.page-intro p {
+  margin-bottom: 0;
 }
 
 /* ===================== Competition ===================== */
@@ -1737,4 +1624,331 @@ html[data-motion='on'] .record-designs.motion-ready:not(.is-visible) {
     -webkit-mask: linear-gradient(90deg, #000 85%, transparent);
     mask: linear-gradient(90deg, #000 85%, transparent);
   }
+}
+
+/* ===================== Activity log ===================== */
+/* A console readout: no card, mono lines with a prompt-style filter, each
+   change expands in place. Lines print in from the top. */
+.page-activity > .motion-scene > .panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding-inline: 0 !important;
+}
+.page-activity .panel-heading {
+  padding-inline: 0 !important;
+}
+.page-activity .panel-heading h2 {
+  font-family: var(--mono);
+  font-size: 15px !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.page-activity input[aria-label='Search activity'] {
+  width: 100%;
+  font-family: var(--mono);
+  background: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--accent-line) !important;
+  border-radius: 0 !important;
+  padding-left: 22px !important;
+  background-image: linear-gradient(var(--accent), var(--accent)) !important;
+  background-size: 8px 2px !important;
+  background-position: 4px 55% !important;
+  background-repeat: no-repeat !important;
+}
+.page-activity .activity-feed {
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.page-activity .activity-feed details {
+  border: 0 !important;
+  border-bottom: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  background: none !important;
+  padding: 10px 0 !important;
+}
+.page-activity .activity-feed summary:hover {
+  color: var(--accent);
+}
+html[data-motion='on'] .page-activity .motion-scene > .panel.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .page-activity .activity-feed details {
+  transition: opacity 0.25s ease, transform 0.35s ease;
+}
+html[data-motion='on'] .page-activity .activity-feed details:nth-child(2) { transition-delay: 0.05s; }
+html[data-motion='on'] .page-activity .activity-feed details:nth-child(3) { transition-delay: 0.1s; }
+html[data-motion='on'] .page-activity .activity-feed details:nth-child(n + 4) { transition-delay: 0.15s; }
+html[data-motion='on'] .page-activity .motion-scene > .panel.motion-ready:not(.is-visible) .activity-feed details {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ===================== Team settings ===================== */
+/* A settings sheet: label column left, controls right, hairlines between. */
+.page-settings .settings-panel {
+  display: grid;
+  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr);
+  gap: 0 48px;
+  align-items: start;
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 28px 0 !important;
+}
+.page-settings .settings-panel > h2 {
+  font-size: 18px !important;
+  margin: 0 !important;
+}
+.page-settings .settings-panel > :not(h2) {
+  grid-column: 2;
+  min-width: 0;
+}
+html[data-motion='on'] .settings-panel.motion-ready:not(.is-visible) {
+  transform: translateY(14px);
+  transition-duration: 0.35s;
+}
+@media (max-width: 760px) {
+  .page-settings .settings-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-settings .settings-panel > :not(h2) {
+    grid-column: 1;
+  }
+  .page-settings .settings-panel > h2 {
+    margin-bottom: 14px !important;
+  }
+}
+
+/* ===================== Round 6 fixes ===================== */
+/* Dashboard: the label-column template stays for two rows only. Finance runs
+   full width, robot is a framed figure, the latest word is a dated changelog. */
+.page-dashboard .season-mark {
+  display: none !important;
+}
+.page-dashboard .countdown-panel h2 {
+  text-transform: none !important;
+  letter-spacing: -0.02em !important;
+  font-size: 22px !important;
+}
+.page-dashboard .daily-log-links button {
+  font-size: 13px !important;
+}
+.page-dashboard .countdown-panel ~ .stats-grid .stat-card:nth-child(4),
+.page-dashboard .countdown-panel ~ .dashboard-grid .priorities .event-row {
+  display: none !important;
+}
+@media (min-width: 1200px) {
+  .page-dashboard .countdown-panel ~ .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+.page-dashboard .dashboard-grid > .finance-panel,
+.page-dashboard .dashboard-grid > .robot-vitals,
+.page-dashboard .dashboard-grid > .latest-word {
+  grid-template-columns: minmax(0, 1fr);
+}
+.page-dashboard .dashboard-grid > :is(.finance-panel, .robot-vitals, .latest-word) > *,
+.page-dashboard .dashboard-grid > :is(.finance-panel, .robot-vitals, .latest-word) > .panel-heading {
+  grid-column: 1;
+  grid-row: auto;
+}
+.page-dashboard .dashboard-grid > :is(.finance-panel, .latest-word) > .panel-heading {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 18px !important;
+}
+/* robot: a framed figure, title inside the frame */
+.page-dashboard .dashboard-grid > .robot-vitals {
+  margin: 30px 0;
+  padding: 26px !important;
+  border: 1px solid var(--glass-edge) !important;
+  border-radius: var(--radius) !important;
+  background: var(--glass) !important;
+  justify-items: center;
+  text-align: center;
+}
+.page-dashboard .dashboard-grid > .robot-vitals > .panel-heading {
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+}
+.page-dashboard .robot-vitals .robot-schematic {
+  background: none;
+  border: 0;
+}
+.page-dashboard .robot-vitals .vitals-stats {
+  justify-content: center;
+}
+html[data-motion='off'] .schematic-body {
+  transform: none;
+}
+/* latest word: date column, then the post */
+.page-dashboard .latest-word .announcement-preview {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 4px 24px;
+  margin: 0 !important;
+  padding: 14px 0 !important;
+  border-top: 1px solid var(--glass-edge);
+}
+.page-dashboard .latest-word .announcement-preview > .inline {
+  grid-row: 1 / span 3;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.page-dashboard .latest-word .announcement-preview > :not(.inline) {
+  grid-column: 2;
+  margin: 0;
+}
+.page-dashboard .notes-cell .match-highlight {
+  margin-inline: 0 !important;
+}
+.page-dashboard .crew-cell .member-row b {
+  display: none;
+}
+.page-dashboard .bottom-grid {
+  border-bottom: 0 !important;
+}
+@media (max-width: 640px) {
+  .page-dashboard .latest-word .announcement-preview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-dashboard .latest-word .announcement-preview > :not(.inline),
+  .page-dashboard .latest-word .announcement-preview > .inline {
+    grid-column: 1;
+    grid-row: auto;
+    flex-direction: row;
+  }
+}
+
+/* tabs: no glow box behind the selected pill; tab rows sit on the content edge */
+.pill[aria-selected='true'] {
+  box-shadow: none !important;
+}
+.page-actions {
+  padding-inline: 0 !important;
+}
+
+/* tables on phones: the actions column stops covering cells, headers don't clip */
+@media (max-width: 640px) {
+  .table-scroll .sticky-end {
+    position: static !important;
+  }
+}
+.table-scroll th {
+  white-space: nowrap;
+}
+
+/* robot hero number never wraps */
+.technical-number {
+  white-space: nowrap;
+  font-size: clamp(36px, 11vw, 72px) !important;
+}
+
+/* announcements: one width for posts and toolbar, one title size */
+.announcement-list {
+  max-width: none !important;
+}
+.announcement-list article.pinned h3,
+.announcement-list h3 {
+  font-size: 24px !important;
+  line-height: 1.15 !important;
+  max-width: none !important;
+}
+
+/* task lanes: counts sit beside their label, cards are compact */
+.kanban-column h3 small {
+  margin-left: 4px !important;
+  font-size: 15px !important;
+  color: var(--ink-2) !important;
+}
+
+/* resources: group titles stay below the page title */
+.resource-group h2 {
+  font-size: 22px !important;
+}
+
+/* finance: body text in the receipt is sans, figures stay mono; tidy KPIs */
+.page-finance .ledger-panel table {
+  font-family: inherit !important;
+}
+.page-finance .ledger-panel td.money,
+.page-finance .ledger-panel td:first-child {
+  font-family: var(--mono);
+}
+.page-finance .stat-card:nth-child(4) small {
+  margin: 0 !important;
+}
+@media (max-width: 760px) {
+  .page-finance .stat-card:nth-child(1) {
+    order: 0 !important;
+    border-top: 0 !important;
+  }
+}
+
+/* competition on phones: the score, then readouts as label/value lines */
+@media (max-width: 760px) {
+  .page-competition .stats-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .page-competition .stat-card:not(:first-child) {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2px 12px;
+    border-left: 0 !important;
+    border-top: 1px solid var(--glass-edge) !important;
+  }
+  .page-competition .stat-card:not(:first-child) small {
+    flex-basis: 100%;
+  }
+}
+
+/* robot page: the title block joins the shared header; brackets hug the sheet */
+.page-robot .robot-detail::before {
+  top: 0;
+  left: 0;
+}
+.page-robot .robot-detail::after {
+  right: 0;
+  bottom: 0;
+}
+
+/* purchases: one record reads as a single line: id, item, stage, actions */
+@media (min-width: 900px) {
+  .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket {
+    grid-template-columns: minmax(170px, 1fr) minmax(0, 1fr) minmax(300px, 1.6fr) auto !important;
+  }
+  .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-steps {
+    grid-column: auto !important;
+    grid-row: auto !important;
+  }
+}
+.purchase-ticket .row-actions {
+  justify-content: flex-end;
+}
+
+/* design upload: one compact row instead of a tall tray */
+.page-designs .cad-panel {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) !important;
+  padding: 18px 22px !important;
+}
+.page-designs .cad-panel > .panel-heading {
+  padding: 0 !important;
+}
+.page-designs .cad-panel > p:not(.note) {
+  font-size: 13px;
+  margin: 0;
 }
