@@ -63,6 +63,7 @@ test('Roles enforce read-only sponsors and optional mentor editing', () => {
   assert.equal(canDelete('Coach'), true);
   assert.equal(canView('Parent/Sponsor', 'roster'), false);
   assert.equal(canView('Parent/Sponsor', 'finance'), true);
+  assert.equal(canView('Parent/Sponsor', 'logs'), true);
 });
 test('CSV escapes formulas, quotes and multiline values', () => {
   const fields = [

@@ -241,14 +241,8 @@ export function Dashboard({ w, navigate }) {
             <p>Each time you come in, add a dated entry for the work you did.</p>
           </div>
           <div className="daily-log-links">
-            <button onClick={() => navigate('programming')}>
-              Program log <ArrowRight size={14} />
-            </button>
-            <button onClick={() => navigate('build')}>
-              Build log <ArrowRight size={14} />
-            </button>
-            <button onClick={() => navigate('outreach')}>
-              Outreach log <ArrowRight size={14} />
+            <button onClick={() => navigate('logs')}>
+              Open logs <ArrowRight size={14} />
             </button>
           </div>
         </section>

@@ -7,14 +7,11 @@ import {
   CalendarDays,
   NotebookPen,
   Bot,
-  Code2,
-  Hammer,
   Lightbulb,
   Flag,
   BookOpen,
   Wallet,
   ShoppingCart,
-  HeartHandshake,
   FileText,
   Settings as SettingsIcon,
   Activity,
@@ -28,6 +25,7 @@ import {
   HelpCircle,
   ChevronRight,
   RefreshCw,
+  ScrollText,
 } from 'lucide-react';
 import Auth, { Brand } from './Auth';
 import { useWorkspace } from './store';
@@ -36,9 +34,8 @@ import { canView } from './domain';
 import Records, { Modal, Badge } from './Records';
 import { Dashboard, Finance, Robot } from './Views';
 import { AttendanceHub, CompetitionHub } from './Hubs';
-import OutreachLog from './OutreachLog';
 import DesignLibrary from './DesignLibrary';
-import { LogPage } from './LogEntry';
+import LogsHub from './LogsHub';
 import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
 import { MotionScene, MotionToggle } from './Motion';
@@ -51,14 +48,12 @@ const icons = {
   attendance: Users,
   meetings: NotebookPen,
   robot: Bot,
-  programming: Code2,
-  build: Hammer,
+  logs: ScrollText,
   designs: Lightbulb,
   competition: Flag,
   resources: BookOpen,
   finance: Wallet,
   purchases: ShoppingCart,
-  outreach: HeartHandshake,
 };
 const hiddenKinds = new Set(['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts', 'roster', 'sessions']);
 function pageForKind(kind) {
@@ -66,6 +61,7 @@ function pageForKind(kind) {
   if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
   if (['expenses', 'income', 'budgets'].includes(kind)) return 'finance';
   if (['hardware', 'inspection'].includes(kind)) return 'robot';
+  if (['programming', 'build', 'outreach'].includes(kind)) return 'logs';
   return kind;
 }
 export default function App() {
@@ -166,8 +162,7 @@ export default function App() {
   else if (page === 'competition')
     view = <CompetitionHub key={innerPage || 'matches'} w={w} initial={innerPage || 'matches'} />;
   else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
-  else if (page === 'outreach') view = <OutreachLog w={w} />;
-  else if (page === 'programming' || page === 'build') view = <LogPage kind={page} w={w} />;
+  else if (page === 'logs') view = <LogsHub key={innerPage || ''} w={w} initial={innerPage} />;
   else if (page === 'designs') view = <DesignLibrary w={w} />;
   else if (page === 'settings') view = <Settings w={w} />;
   else if (page === 'activity')
@@ -264,7 +259,7 @@ export default function App() {
                 {visible.map((p) => {
                   const Icon = icons[p] || FileText;
                   const highlight =
-                    (p === 'programming' && w.member.subteams?.includes('Programming')) ||
+                    (p === 'logs' && w.member.subteams?.includes('Programming')) ||
                     (p === 'designs' && w.member.subteams?.includes('CAD')) ||
                     (p === 'robot' && w.member.subteams?.includes('Mechanical'));
                   return (
@@ -381,7 +376,7 @@ export default function App() {
             </button>
           </div>
         )}
-        <main id="main-content" className="main-content" key={`${page}:${innerPage || ''}`}>
+        <main id="main-content" className={`main-content page-${page}`} key={`${page}:${innerPage || ''}`}>
           {w.error && (
             <div className="error notice" role="alert">
               {w.error}

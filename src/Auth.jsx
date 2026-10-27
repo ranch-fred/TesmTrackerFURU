@@ -13,7 +13,7 @@ import { roles, subteams } from './schema';
 import { MotionToggle } from './Motion';
 import { readInvite, clearInvite, callbackError, signInWithGoogle } from './auth-flow';
 import { teamMonogram } from './branding';
-import HeroReel from './hero/HeroReel';
+import FieldBackdrop from './hero/FieldBackdrop';
 function GoogleMark() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
@@ -52,22 +52,6 @@ export function Brand({ team }) {
           {team ? `FTC #${team.number} / TEAM WORKSPACE` : 'SIGN IN OR SIGN UP TO TRACK YOUR TEAM'}
         </small>
       </div>
-    </div>
-  );
-}
-export function Blueprint() {
-  return (
-    <div className="blueprint-art" aria-label="Abstract technical blueprint">
-      <div className="orbital orbit-one" />
-      <div className="orbital orbit-two" />
-      <div className="blueprint-core">
-        <Hexagon size={145} strokeWidth={0.7} />
-        <strong>FTC</strong>
-        <small>BUILT TOGETHER</small>
-      </div>
-      <span className="crosshair c1">+</span>
-      <span className="crosshair c2">+</span>
-      <span className="blueprint-label">ENGINEERING IN PROGRESS</span>
     </div>
   );
 }
@@ -190,6 +174,7 @@ export default function Auth({ w }) {
   const [flow, setFlow] = useState('join');
   return (
     <div className="entry">
+      <FieldBackdrop />
       <nav className="entry-nav">
         <Brand />
         <div>
@@ -232,11 +217,7 @@ export default function Auth({ w }) {
                 Explore demo workspace <ArrowRight size={15} />
               </button>
             </div>
-            <div className="hero-art hero-art-reel">
-              <HeroReel fallback={<Blueprint />} />
-            </div>
           </section>
-          <div className="hazard" />
           <section className="landing-bottom">
             <div>
               <Layers />
@@ -267,7 +248,6 @@ export default function Auth({ w }) {
               <br />
               <em>BETTER TEAMS.</em>
             </h1>
-            <Blueprint />
             <div className="shared-team-promise">
               <ShieldCheck size={18} />
               <p>

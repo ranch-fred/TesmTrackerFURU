@@ -408,12 +408,13 @@ export const sections = [
   ['ROBOT', ['robot', 'designs']],
   ['COMPETITION', ['competition']],
   ['BUSINESS', ['finance', 'purchases']],
-  ['LOG', ['programming', 'build', 'outreach']],
+  ['LOG', ['logs']],
   ['RESOURCES', ['resources']],
 ];
 export const labels = {
   ...Object.fromEntries(Object.entries(entities).map(([k, v]) => [k, v.title])),
   dashboard: 'Mission control',
+  logs: 'Logs',
   attendance: 'Attendance & roster',
   competition: 'Competition',
   finance: 'Finance & expenses',
