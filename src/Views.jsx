@@ -290,7 +290,6 @@ export function Dashboard({ w, navigate }) {
               : d.tasks
                   .filter((t) => t.status !== 'Done')
                   .length.toString()
-                  .padStart(2, '0')
           }
           note={
             parent
@@ -301,7 +300,7 @@ export function Dashboard({ w, navigate }) {
         />
         <Stat
           label="TEAM MEMBERS"
-          value={parent ? '—' : approvedMembers(w.members).length.toString().padStart(2, '0')}
+          value={parent ? '—' : approvedMembers(w.members).length.toString()}
           note={parent ? 'Visible to operational members' : 'Approved app accounts'}
           icon={CalendarDays}
         />

@@ -72,7 +72,7 @@ export function MotionScene({ children }) {
     const scan = () => {
       root.current
         ?.querySelectorAll(
-          '.panel, .stat-card, .page-intro, .welcome-banner, .command-strip, .profile-card, .task-card',
+          '.panel, .stat-card, .page-intro, .welcome-banner, .command-strip, .profile-card, .task-card, [data-reveal]',
         )
         .forEach((element) => {
           if (seen.has(element)) return;
