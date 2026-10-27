@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   ArrowRight,
@@ -176,15 +176,32 @@ export function Dashboard({ w, navigate }) {
       : null;
   const parent = w.member.role === 'Parent/Sponsor';
   const season = seasonBadge(w.team.season);
+  // the banner's orange light follows the pointer (or a finger), moved by transform only
+  const spot = useRef(null);
+  function spotlight(e) {
+    const box = e.currentTarget.getBoundingClientRect();
+    spot.current?.style.setProperty(
+      'transform',
+      `translate(${e.clientX - box.left}px, ${e.clientY - box.top}px)`,
+    );
+  }
   return (
     <>
-      <section className="welcome-banner">
+      <section className="welcome-banner" onPointerMove={spotlight}>
+        <span className="banner-spot" ref={spot} aria-hidden="true" />
         <div>
           <div className="eyebrow">
             <span className="dot" /> ALL SYSTEMS, ONE TEAM
           </div>
           <h1>
-            LET’S GET <span>BUILDING.</span>
+            <span className="mask">
+              <i>LET’S GET</i>
+            </span>{' '}
+            <span className="mask">
+              <i>
+                <span>BUILDING.</span>
+              </i>
+            </span>
           </h1>
           <p>Good to see you, {w.member.name.split(' ')[0]}. Here’s where the team stands.</p>
         </div>
@@ -456,7 +473,7 @@ export function Dashboard({ w, navigate }) {
             {parent ? 'Team announcements' : 'Open task board'} <ArrowRight size={16} />
           </button>
         </section>
-        <section className="panel">
+        <section className="panel latest-word">
           <div className="panel-heading">
             <div>
               <span className="eyebrow subtle">FROM THE CREW</span>
@@ -488,7 +505,7 @@ export function Dashboard({ w, navigate }) {
       </div>
       {!parent && (
         <div className="bottom-grid">
-          <section className="panel">
+          <section className="panel crew-cell">
             <div className="panel-heading">
               <h3>
                 <Flame size={16} className="orange" /> Your crew.
@@ -514,7 +531,7 @@ export function Dashboard({ w, navigate }) {
               View team roster <ArrowRight size={16} />
             </button>
           </section>
-          <section className="panel">
+          <section className="panel notes-cell">
             <div className="panel-heading">
               <h3>
                 <Target size={16} className="orange" /> Field notes.
@@ -535,7 +552,7 @@ export function Dashboard({ w, navigate }) {
             </div>
             <p className="muted">Record. Review. Come back stronger.</p>
           </section>
-          <section className="panel">
+          <section className="panel console-cell">
             <div className="panel-heading">
               <h3>
                 <span className="dot" /> Who’s on the console?

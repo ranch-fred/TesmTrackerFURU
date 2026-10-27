@@ -1,0 +1,376 @@
+/* Section layer, loaded last. Every section on a page gets its own layout,
+   surface and entrance, so no two read alike. Colours stay on the black and
+   orange theme tokens; entrances animate transform and opacity only, and the
+   reduced-motion rules in refinements.css show everything at rest. */
+
+/* ===================== Mission control ===================== */
+
+/* 1. Opening statement: no box, oversized type, outlined season numerals,
+   and an orange light that follows the pointer. */
+.page-dashboard .welcome-banner {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 28px 0 34px !important;
+  min-height: 0;
+}
+.page-dashboard .welcome-banner::before,
+.page-dashboard .welcome-banner::after,
+.page-dashboard .welcome-banner .banner-grid {
+  display: none !important;
+}
+.page-dashboard .welcome-banner h1 {
+  font-size: clamp(44px, 7.4vw, 104px) !important;
+  line-height: 0.92 !important;
+  letter-spacing: -0.045em !important;
+  margin: 14px 0 18px !important;
+}
+.welcome-banner h1 .mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: inherit !important;
+  padding-bottom: 0.04em;
+}
+.welcome-banner h1 .mask i {
+  display: inline-block;
+  font-style: normal;
+}
+.page-dashboard .welcome-banner p {
+  font-size: 17px;
+  max-width: 46ch;
+}
+.page-dashboard .season-mark strong {
+  font-size: clamp(64px, 9vw, 132px) !important;
+  color: transparent !important;
+  -webkit-text-stroke: 1.5px var(--accent);
+  letter-spacing: -0.05em;
+}
+.page-dashboard .season-mark strong span {
+  -webkit-text-stroke: 0;
+  color: var(--ink-2) !important;
+}
+.banner-spot {
+  position: absolute;
+  z-index: -1;
+  top: -260px;
+  left: -260px;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 62%);
+  transform: translate(30vw, 120px);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  pointer-events: none;
+  will-change: transform;
+}
+html[data-motion='on'] .welcome-banner.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .welcome-banner .mask i {
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-motion='on'] .welcome-banner .mask + .mask i {
+  transition-delay: 0.12s;
+}
+html[data-motion='on'] .welcome-banner.motion-ready:not(.is-visible) .mask i {
+  transform: translateY(105%);
+}
+html[data-motion='off'] .banner-spot {
+  display: none;
+}
+
+/* 2. Countdown: a hairline ticker across the page, digits set like a clock. */
+.page-dashboard .countdown-panel {
+  background: none !important;
+  border: 0 !important;
+  border-block: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 18px 0 !important;
+  justify-content: space-between;
+  overflow: visible;
+}
+.page-dashboard .countdown-panel::before,
+.page-dashboard .countdown-panel::after {
+  display: none !important;
+}
+.page-dashboard .countdown {
+  gap: 0;
+}
+.page-dashboard .countdown-cell {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  min-width: 0;
+  padding: 0 18px;
+  position: relative;
+}
+.page-dashboard .countdown-cell + .countdown-cell::before {
+  content: ':';
+  position: absolute;
+  left: -4px;
+  top: 0;
+  font-family: var(--mono);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--accent);
+}
+.page-dashboard .countdown-cell b {
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -0.04em;
+}
+html[data-motion='on'] .countdown-panel.motion-ready:not(.is-visible) {
+  transform: scaleX(0.82);
+  transform-origin: left center;
+}
+
+/* 3. Next move and daily log: one segmented toolbar, then an open prompt
+   with the question set large. */
+.page-dashboard .command-actions {
+  display: inline-flex;
+  gap: 0;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.page-dashboard .command-actions button {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+.page-dashboard .command-actions button + button {
+  border-left: 1px solid var(--glass-edge) !important;
+}
+.page-dashboard .command-actions button:hover {
+  background: var(--accent-dim) !important;
+  color: var(--ink);
+}
+.page-dashboard .daily-log-reminder {
+  background: none !important;
+  border: 0 !important;
+  border-left: 2px solid var(--accent) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 6px 0 6px 22px !important;
+  overflow: visible;
+}
+.page-dashboard .daily-log-reminder::before,
+.page-dashboard .daily-log-reminder::after {
+  display: none !important;
+}
+.page-dashboard .daily-log-reminder h2 {
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -0.03em;
+}
+html[data-motion='on'] :is(.command-strip, .daily-log-reminder).motion-ready:not(.is-visible) {
+  transform: translateX(-36px);
+}
+
+/* 4. Team at a glance: a ruled metric strip with no tiles. */
+.page-dashboard .stats-grid {
+  gap: 0 !important;
+  border-block: 1px solid var(--glass-edge);
+}
+.page-dashboard .stat-card {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 22px 24px 20px !important;
+  overflow: hidden;
+}
+.page-dashboard .stat-card + .stat-card {
+  border-left: 1px solid var(--glass-edge) !important;
+}
+.page-dashboard .stat-card::before {
+  display: none !important;
+}
+.page-dashboard .stat-card::after {
+  /* hover rule that draws in under the metric */
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0 !important;
+  height: 2px !important;
+  padding: 0 !important;
+  mask: none !important;
+  border-radius: 0 !important;
+  background: var(--accent) !important;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.page-dashboard .stat-card:hover::after {
+  transform: scaleX(1);
+}
+.page-dashboard .stat-card strong {
+  font-size: clamp(36px, 4vw, 52px) !important;
+}
+html[data-motion='on'] .page-dashboard .stat-card.motion-ready:not(.is-visible) {
+  transform: translateY(60%);
+}
+@media (max-width: 1199px) {
+  .page-dashboard .stat-card:nth-child(3) {
+    border-left: 0 !important;
+  }
+  .page-dashboard .stat-card:nth-child(n + 3) {
+    border-top: 1px solid var(--glass-edge) !important;
+  }
+}
+
+/* 5. Finance keeps the one glowing glass card; robot is an open blueprint. */
+.page-dashboard .robot-vitals {
+  background:
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px !important;
+  border: 1px dashed var(--accent-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-dashboard .robot-vitals::before,
+.page-dashboard .robot-vitals::after {
+  display: none !important;
+}
+html[data-motion='on'] .finance-panel.motion-ready:not(.is-visible) {
+  transform: scale(0.94);
+}
+html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
+  transform: translateX(48px);
+}
+
+/* 6. Up next is a bare ruled list; the latest word is a pulled quote. */
+.page-dashboard .priorities {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--ink) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-dashboard .priorities::before,
+.page-dashboard .priorities::after,
+.page-dashboard .latest-word::after {
+  display: none !important;
+}
+.page-dashboard .priorities .panel-heading,
+.page-dashboard .priorities .priority-row,
+.page-dashboard .priorities .event-row,
+.page-dashboard .priorities .panel-link {
+  padding-inline: 0 !important;
+}
+.page-dashboard .priority-row {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.page-dashboard .priority-row:hover {
+  transform: translateX(8px);
+}
+.page-dashboard .latest-word {
+  background: var(--accent-dim) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.page-dashboard .latest-word::before {
+  content: '“' !important;
+  inset: auto !important;
+  top: -18px !important;
+  right: 18px !important;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  border-radius: 0 !important;
+  background: none !important;
+  filter: none !important;
+  animation: none !important;
+  opacity: 1 !important;
+  font-family: var(--heading);
+  font-size: 180px;
+  line-height: 1;
+  color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.page-dashboard .latest-word .announcement-preview h3 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+html[data-motion='on'] .priorities.motion-ready:not(.is-visible) {
+  transform: translateY(40px);
+  transition-duration: 0.5s;
+}
+html[data-motion='on'] .latest-word.motion-ready:not(.is-visible) {
+  transform: scale(1.06);
+}
+
+/* 7. Crew, field notes and console: an uneven bento, with field notes in
+   solid orange as the one light surface on the page. */
+.page-dashboard .bottom-grid {
+  grid-template-columns: 2fr 1.4fr 1fr !important;
+}
+.page-dashboard .notes-cell {
+  background: var(--accent) !important;
+  border: 0 !important;
+  color: #120700;
+}
+.page-dashboard .notes-cell::before,
+.page-dashboard .notes-cell::after,
+.page-dashboard .console-cell::before,
+.page-dashboard .console-cell::after,
+.page-dashboard .crew-cell::after {
+  display: none !important;
+}
+.page-dashboard .notes-cell :is(h3, p, span, small, svg, .muted) {
+  color: #120700 !important;
+}
+.page-dashboard .notes-cell .icon-button {
+  color: #120700;
+  border-color: rgba(18, 7, 0, 0.35) !important;
+  background: none !important;
+}
+.page-dashboard .notes-cell .match-highlight strong {
+  color: #120700 !important;
+  font-size: 72px !important;
+  letter-spacing: -0.05em;
+}
+.page-dashboard .console-cell {
+  background: none !important;
+  border-style: dashed !important;
+  box-shadow: none !important;
+}
+html[data-motion='on'] .bottom-grid .motion-ready:not(.is-visible) {
+  transform: perspective(900px) rotateX(16deg) translateY(30px);
+  transform-origin: center top;
+}
+@media (max-width: 850px) {
+  .page-dashboard .bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+@media (max-width: 640px) {
+  .page-dashboard .countdown-cell {
+    padding: 0 10px;
+  }
+  .page-dashboard .command-actions {
+    display: flex;
+    width: 100%;
+  }
+  .page-dashboard .command-actions button {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 6px !important;
+  }
+  .page-dashboard .command-actions button svg:last-child {
+    display: none;
+  }
+}
