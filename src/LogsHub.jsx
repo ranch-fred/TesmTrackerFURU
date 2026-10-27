@@ -125,7 +125,7 @@ export default function LogsHub({ w, initial }) {
         <p>Pick a card to bring it forward, then open it to write today’s entry.</p>
       </div>
       <section className="log-carousel" aria-roledescription="carousel" aria-label="Team logs">
-        <div className="log-track" ref={track} onScroll={onScroll}>
+        <div className="log-track" ref={track} onScroll={onScroll} onScrollEnd={onScroll}>
           {logs.map(([kind, title, Icon, blurb], i) => (
             <button
               key={kind}
