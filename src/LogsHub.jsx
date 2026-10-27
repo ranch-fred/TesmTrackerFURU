@@ -136,7 +136,7 @@ export default function LogsHub({ w, initial }) {
               <small>{blurb}</small>
               <span className="log-card-meta">
                 {count(kind)} {count(kind) === 1 ? 'entry' : 'entries'}
-                {lastDate(kind) && ` · last ${lastDate(kind)}`}
+                {lastDate(kind) && <span className="log-card-last"> · last {lastDate(kind)}</span>}
               </span>
             </button>
           ))}

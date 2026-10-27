@@ -821,8 +821,8 @@ table tbody tr:hover {
 .log-card {
   --hi: color-mix(in srgb, var(--accent) 40%, #fff);
   --leak: var(--accent);
-  --mid: color-mix(in srgb, var(--accent) 72%, #2a1206);
-  --deep: color-mix(in srgb, var(--accent) 48%, #1a0a03);
+  --mid: color-mix(in srgb, var(--accent) 66%, #2a1206);
+  --deep: color-mix(in srgb, var(--accent) 40%, #1a0a03);
   flex: none;
   width: 220px;
   height: 360px;
@@ -910,6 +910,10 @@ table tbody tr:hover {
   color: #160800;
   border: 1px solid rgba(22, 8, 0, 0.45);
   background: rgba(255, 255, 255, 0.08);
+  white-space: nowrap;
+}
+.log-card:not(.active) .log-card-last {
+  display: none;
 }
 .log-card.active .log-card-meta {
   font-size: 13px;
