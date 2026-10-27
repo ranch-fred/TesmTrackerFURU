@@ -1629,7 +1629,8 @@ html[data-motion='on'] .record-designs.motion-ready:not(.is-visible) {
 /* ===================== Activity log ===================== */
 /* A console readout: no card, mono lines with a prompt-style filter, each
    change expands in place. Lines print in from the top. */
-.page-activity > .motion-scene > .panel {
+.page-activity > .motion-scene > .panel,
+.page-activity .motion-scene > section.panel {
   background: none !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -2121,4 +2122,335 @@ html[data-motion='on'] .settings-panel.motion-ready:not(.is-visible) {
   .page-designs .cad-panel {
     grid-template-columns: minmax(0, 1fr) !important;
   }
+}
+
+/* ===================== Round 8: product density ===================== */
+/* Judged against a dense product app: smaller row type, actions on hover,
+   one surface per page, numerals sized for reading rather than display. */
+
+/* record toolbars: compact controls; the Add button never spans the phone */
+.section-toolbar :is(button, .outline, .primary) {
+  min-height: 34px !important;
+  padding-block: 6px !important;
+  font-size: 13px !important;
+}
+@media (max-width: 760px) {
+  .toolbar-actions .primary {
+    flex: none !important;
+  }
+  .toolbar-actions {
+    justify-content: flex-start !important;
+  }
+}
+
+/* announcements: rows, not articles */
+.announcement-list article {
+  padding: 14px 0 !important;
+  margin: 0 !important;
+}
+.announcement-list article.pinned {
+  padding: 18px 0 !important;
+}
+.announcement-list h3,
+.announcement-list article.pinned h3 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  margin: 6px 0 4px !important;
+}
+.announcement-list article.pinned h3 {
+  font-size: 19px !important;
+}
+.announcement-list p {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  margin: 0 0 6px !important;
+}
+
+/* task cards: three lines, actions only on hover or focus */
+.kanban .task-card {
+  padding: 12px 14px !important;
+  gap: 6px !important;
+}
+.kanban .task-card h3 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin: 4px 0 2px !important;
+}
+.kanban .task-card > p:not(.muted) {
+  display: none;
+}
+.kanban .task-card .task-meta {
+  border: 0 !important;
+  padding: 0 !important;
+  font-size: 12px;
+}
+@media (hover: hover) {
+  .kanban .task-card:not(:hover):not(:focus-within) .row-actions {
+    opacity: 0;
+  }
+}
+.kanban .task-card .row-actions {
+  transition: opacity 0.2s;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* meeting log: a small date column instead of a display numeral */
+.meeting-timeline {
+  --rail: 76px !important;
+  gap: 22px !important;
+}
+.meeting-timeline time b {
+  font-size: 22px !important;
+  letter-spacing: -0.03em !important;
+}
+.meeting-body h3 {
+  font-size: 17px !important;
+  margin: 0 0 6px !important;
+}
+@media (max-width: 640px) {
+  .meeting-timeline {
+    --rail: 54px !important;
+  }
+  .meeting-timeline time b {
+    font-size: 18px !important;
+  }
+}
+
+/* finance: one surface, quieter numerals, no yellow box */
+.page-finance .stat-card strong {
+  font-size: clamp(22px, 2.2vw, 30px) !important;
+}
+.page-finance .stat-card:nth-child(1) strong {
+  font-size: clamp(28px, 3vw, 40px) !important;
+}
+.page-finance .finance-warning {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  margin: 18px 0 0 !important;
+  padding: 14px 0 0 !important;
+  color: var(--ink-2) !important;
+}
+.page-finance .finance-warning b {
+  font-size: 13px !important;
+  color: var(--ink);
+}
+.page-finance .finance-warning small {
+  font-size: 12px !important;
+}
+.page-finance .chart-legend {
+  font-size: 13px;
+}
+
+/* purchases: plain status steps in body type, no accent bar */
+.purchase-ticket {
+  border-left: 1px solid var(--glass-edge) !important;
+}
+.purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket {
+  border-left-width: 1px !important;
+}
+.purchase-steps li {
+  font-family: var(--body, inherit) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 12px !important;
+}
+@media (hover: hover) {
+  .purchase-ticket:not(:hover):not(:focus-within) .row-actions {
+    opacity: 0;
+  }
+}
+
+/* resources: row titles at reading size, descriptions muted, a firmer index */
+.resource-link strong {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+.resource-link span {
+  color: var(--ink-2) !important;
+}
+.resource-nav button.active {
+  background: var(--accent-dim);
+  color: var(--ink);
+}
+
+/* dashboard: a working header, not a hero; tighter section rhythm; readable labels */
+.page-dashboard .welcome-banner {
+  padding: 4px 0 18px !important;
+}
+.page-dashboard .welcome-banner h1 {
+  font-size: clamp(28px, 2.6vw, 34px) !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.03em !important;
+  margin: 6px 0 6px !important;
+}
+.page-dashboard .welcome-banner p {
+  font-size: 14px !important;
+}
+.page-dashboard .welcome-banner .eyebrow,
+.banner-spot {
+  display: none !important;
+}
+.page-dashboard .stats-grid,
+.page-dashboard .dashboard-heading,
+.page-dashboard .dashboard-grid > .panel {
+  padding-block: 18px !important;
+}
+.page-dashboard .dashboard-grid > .robot-vitals {
+  margin: 18px 0 !important;
+}
+.page-dashboard .stat-card strong {
+  font-size: clamp(22px, 2vw, 28px) !important;
+}
+.page-dashboard .finance-numbers b {
+  font-size: 22px !important;
+}
+.page-dashboard .stat-card .stat-top span,
+.page-dashboard .bottom-grid .panel-heading h3,
+.page-dashboard .match-highlight span {
+  font-size: 11px !important;
+  letter-spacing: 0.06em !important;
+}
+/* status pills: one quiet family */
+.page-dashboard .priority-row .badge {
+  background: none !important;
+  border: 1px solid var(--glass-edge) !important;
+  color: var(--ink-2) !important;
+}
+/* the robot figure on the dashboard is a clean square outline, no callouts */
+.page-dashboard .schematic-body,
+.page-dashboard .schematic-core {
+  transform: none !important;
+}
+.page-dashboard .robot-schematic :is(.dimension, .schematic-caption) {
+  display: none !important;
+}
+.page-dashboard .robot-schematic {
+  min-height: 0 !important;
+  padding: 18px 0 !important;
+}
+.page-dashboard .robot-vitals .panel-heading svg {
+  display: none;
+}
+@media (max-width: 760px) {
+  .page-dashboard .stat-card:nth-child(3) {
+    border-top: 0 !important;
+  }
+  .page-dashboard .stat-card {
+    border-right: 0 !important;
+  }
+  .page-dashboard .priorities .panel-heading .outline {
+    padding: 4px 10px !important;
+    min-height: 30px !important;
+  }
+}
+
+/* search fields: one box, not a box inside a box */
+.search input:not([type='checkbox']):not([type='radio']) {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* tables: dense single-line cells */
+.table-scroll td {
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  white-space: nowrap;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table-scroll th {
+  padding: 10px 14px !important;
+}
+
+/* competition: four compact readouts in one row */
+.page-competition .stats-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  background: none !important;
+}
+.page-competition .stat-card:first-child {
+  background: none !important;
+}
+.page-competition .stat-card:first-child strong,
+.page-competition .stat-card strong {
+  font-size: clamp(22px, 2vw, 28px) !important;
+  line-height: 1.1;
+}
+.page-competition .stat-card:first-child strong {
+  color: var(--accent) !important;
+}
+@media (max-width: 760px) {
+  .page-competition .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .page-competition .stat-card:first-child {
+    grid-column: auto !important;
+  }
+  .page-competition .stat-card:not(:first-child) {
+    display: block !important;
+  }
+  .page-competition .stat-card {
+    padding: 12px !important;
+  }
+  .page-competition .stat-card small {
+    display: none;
+  }
+}
+
+/* robot: the sheet is a quiet property list, no big number or brackets */
+.page-robot .technical-number,
+.page-robot .robot-detail::before,
+.page-robot .robot-detail::after {
+  display: none !important;
+}
+.page-robot .blueprint-grid {
+  min-height: 0 !important;
+  padding: 20px !important;
+}
+.page-robot .record-robot.panel {
+  border-top: 1px solid var(--glass-edge) !important;
+}
+
+/* design upload: a plain bordered drop row */
+.page-designs .cad-panel {
+  border: 1px solid var(--glass-edge) !important;
+}
+
+/* activity: shared left edge, contained filter, a real empty state */
+.page-activity .panel-heading,
+.page-activity .panel > p,
+.page-activity .panel > input,
+.page-activity .activity-feed {
+  margin-inline: 0 !important;
+}
+.page-activity .panel {
+  overflow: hidden;
+}
+.page-activity .activity-feed > p.muted {
+  padding: 28px 0;
+  text-align: center;
+  border: 1px dashed var(--glass-edge);
+  border-radius: 12px;
+  font-family: var(--heading);
+}
+
+/* settings: no rule under every field; the form keeps a readable width */
+.page-settings .form-grid > label {
+  border-bottom: 0 !important;
+}
+.page-settings .settings-panel form {
+  max-width: 720px;
+}
+
+/* attendance: quiet cells, status as a tint */
+.attendance-day {
+  border-color: var(--glass-edge) !important;
+}
+.attendance-day.missed {
+  border-color: color-mix(in srgb, #d95757 45%, var(--glass-edge)) !important;
 }
