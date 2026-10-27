@@ -45,8 +45,9 @@ export default function LogsHub({ w, initial }) {
     const n = Math.max(0, Math.min(logs.length - 1, i));
     setActive(n);
     const c = cards.current[n];
-    // wait a frame so the card has started growing before centring it
-    requestAnimationFrame(() => c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+    // only a row that overflows (narrow screens) needs scrolling to the card
+    const t = track.current;
+    if (t && t.scrollWidth > t.clientWidth) c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     if (focus) c?.focus({ preventScroll: true });
   }
   // back from full screen: centre and focus the card of the log that was open
@@ -141,21 +142,6 @@ export default function LogsHub({ w, initial }) {
             </button>
           ))}
         </div>
-        {logs.length > 1 && (
-          <div className="log-nav">
-            <div className="log-dots">
-              {logs.map(([kind, title], i) => (
-                <button
-                  key={kind}
-                  className={i === active ? 'on' : ''}
-                  aria-label={`Show ${title}`}
-                  aria-current={i === active ? 'true' : undefined}
-                  onClick={() => go(i)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </section>
     </>
   );
