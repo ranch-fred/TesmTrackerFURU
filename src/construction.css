@@ -923,17 +923,45 @@ table tbody tr:hover {
 .log-card:not(.active) .log-card-last {
   display: none;
 }
+/* phones: every card keeps one size and the side ones are just scaled down,
+   so switching only animates a transform (no layout work per frame) */
 @media (max-width: 640px) {
+  .log-track {
+    scroll-snap-type: x mandatory;
+    padding-inline: calc(50% - 34vw);
+  }
+  .log-card:first-child,
+  .log-card:last-child {
+    margin-inline: 0;
+  }
+  .log-card + .log-card {
+    margin-left: -12vw;
+  }
+  .log-card,
+  .log-card.active {
+    width: 68vw;
+    height: min(420px, 62vh);
+    padding: 22px 18px;
+  }
   .log-card {
-    width: 150px;
-    height: 280px;
-    padding: 18px 14px;
+    transform: scale(0.8);
+    will-change: transform;
+    transition: transform 0.2s ease-out;
   }
   .log-card.active {
-    height: 400px;
+    transform: none;
   }
-  .log-card strong {
-    font-size: 18px;
+  /* beat the app-wide button press shrink, which would make side cards jump */
+  html[data-motion] .log-track .log-card:not(.active) {
+    transform: scale(0.8);
+  }
+  .log-card strong,
+  .log-card.active strong {
+    font-size: 24px;
+  }
+  .log-card small,
+  .log-card.active small {
+    font-size: 14px;
   }
 }
 
