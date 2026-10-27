@@ -25,21 +25,28 @@ export default function LogsHub({ w, initial }) {
   const closeButton = useRef(null);
   const lastOpen = useRef(null);
 
-  // on narrow screens the row scrolls: whichever card crosses the middle of
-  // the row becomes the selected one, as you swipe (no waiting for it to stop)
-  useEffect(() => {
-    const t = track.current;
-    if (open || !t) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (t.scrollWidth <= t.clientWidth) return;
-        for (const e of entries) if (e.isIntersecting) setActive(cards.current.indexOf(e.target));
-      },
-      { root: t, rootMargin: '0px -49% 0px -49%' },
-    );
-    cards.current.forEach((c) => c && io.observe(c));
-    return () => io.disconnect();
-  }, [open]);
+  // on narrow screens the row scrolls: whichever card is nearest the middle
+  // becomes the selected one while you swipe, checked once per frame
+  const frame = useRef(0);
+  function onScroll() {
+    if (frame.current) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = 0;
+      const t = track.current;
+      if (!t || t.scrollWidth <= t.clientWidth) return;
+      const box = t.getBoundingClientRect();
+      const mid = box.left + box.width / 2;
+      let best = 0, bestDist = Infinity;
+      cards.current.forEach((c, i) => {
+        if (!c) return;
+        const r = c.getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - mid);
+        if (d < bestDist) (best = i), (bestDist = d);
+      });
+      setActive(best);
+    });
+  }
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
   function go(i, focus = true) {
     const n = Math.max(0, Math.min(logs.length - 1, i));
     setActive(n);
@@ -118,7 +125,7 @@ export default function LogsHub({ w, initial }) {
         <p>Pick a card to bring it forward, then open it to write today’s entry.</p>
       </div>
       <section className="log-carousel" aria-roledescription="carousel" aria-label="Team logs">
-        <div className="log-track" ref={track}>
+        <div className="log-track" ref={track} onScroll={onScroll}>
           {logs.map(([kind, title, Icon, blurb], i) => (
             <button
               key={kind}
