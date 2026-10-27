@@ -934,7 +934,7 @@ export function Robot({ w, initial = 'robot' }) {
             <span>SEASON DESIGN / DIMENSIONAL REFERENCE</span>
           </div>
         </section>
-        <section className="panel">
+        <section className="panel legality-panel">
           <div className="panel-heading">
             <h2>Legality checks</h2>
             <ShieldCheck className="orange" />
@@ -1040,7 +1040,7 @@ export function Matches({ w, embedded = false }) {
       <p className="note">
         Use Practice matches for point-by-point BIOBUZZ scoring. Other match totals are entered manually.
       </p>
-      <section className="panel">
+      <section className="panel points-panel">
         <div className="panel-heading">
           <h2>Points over time</h2>
         </div>

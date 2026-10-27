@@ -852,7 +852,7 @@ export default function Records({ kind, w, compact = false }) {
                   }
                 >
                   {schema.fields.map((f) => (
-                    <td key={f.key}>
+                    <td key={f.key} data-field={f.key}>
                       {kind === 'packing' && f.key === 'packed' && editAllowed ? (
                         <input
                           aria-label={`Packed ${r.component}`}

@@ -45,10 +45,10 @@
   max-width: 46ch;
 }
 .page-dashboard .season-mark strong {
-  font-size: clamp(64px, 9vw, 132px) !important;
+  font-size: clamp(36px, 3.4vw, 48px) !important;
   color: transparent !important;
-  -webkit-text-stroke: 1.5px var(--accent);
-  letter-spacing: -0.05em;
+  -webkit-text-stroke: 1px var(--ink-2);
+  letter-spacing: -0.04em;
 }
 .page-dashboard .season-mark strong span {
   -webkit-text-stroke: 0;
@@ -190,17 +190,63 @@ html[data-motion='on'] .countdown-panel.motion-ready:not(.is-visible) {
   display: none;
 }
 .page-dashboard .daily-log-reminder h2 {
-  font-size: clamp(24px, 3vw, 34px);
-  letter-spacing: -0.03em;
+  font-size: 20px;
+  letter-spacing: -0.02em;
 }
 html[data-motion='on'] :is(.command-strip, .daily-log-reminder).motion-ready:not(.is-visible) {
   transform: translateX(-36px);
 }
 
-/* 4. Team at a glance: a ruled metric strip with no tiles. */
+/* 4-7. Below the prompt, every section is one row on a shared skeleton:
+   title on the left, that section's own visual on the right, rows split by
+   hairlines. The visual changes per row (metric strip, chart, blueprint,
+   list, posts, status strip); the frame never does. */
+.page-dashboard .motion-scene {
+  display: grid;
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
+  column-gap: 56px;
+}
+.page-dashboard .motion-scene > * {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.page-dashboard .eyebrow.subtle,
+.page-dashboard .mini-status,
+.page-dashboard .countdown-panel + .command-strip .command-label small {
+  display: none;
+}
+/* one heading voice for every row title */
+.page-dashboard .panel-heading :is(h2, h3),
+.page-dashboard .dashboard-heading h2 {
+  font-family: var(--heading) !important;
+  font-size: 20px !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+  color: var(--ink) !important;
+  margin: 0 !important;
+}
+.page-dashboard :is(h2, h3) {
+  text-wrap: pretty;
+}
+
+/* 4. Team at a glance: title cell + a ruled metric strip. */
+.page-dashboard .dashboard-heading {
+  grid-column: 1;
+  margin: 0 !important;
+  padding: 30px 0 !important;
+  border-top: 1px solid var(--glass-edge);
+  display: block !important;
+}
+.page-dashboard .dashboard-heading::after {
+  display: none !important;
+}
 .page-dashboard .stats-grid {
+  grid-column: 2;
   gap: 0 !important;
-  border-block: 1px solid var(--glass-edge);
+  margin: 0 !important;
+  padding: 18px 0;
+  border-top: 1px solid var(--glass-edge);
 }
 .page-dashboard .stat-card {
   background: none !important;
@@ -209,12 +255,16 @@ html[data-motion='on'] :is(.command-strip, .daily-log-reminder).motion-ready:not
   box-shadow: none !important;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  padding: 22px 24px 20px !important;
+  padding: 8px 20px !important;
   overflow: hidden;
+}
+.page-dashboard .stat-card:first-child {
+  padding-left: 0 !important;
 }
 .page-dashboard .stat-card + .stat-card {
   border-left: 1px solid var(--glass-edge) !important;
 }
+.page-dashboard .stat-card .stat-top svg,
 .page-dashboard .stat-card::before {
   display: none !important;
 }
@@ -236,43 +286,27 @@ html[data-motion='on'] :is(.command-strip, .daily-log-reminder).motion-ready:not
   transform: scaleX(1);
 }
 .page-dashboard .stat-card strong {
-  font-size: clamp(36px, 4vw, 52px) !important;
+  font-size: clamp(30px, 3vw, 42px) !important;
 }
 html[data-motion='on'] .page-dashboard .stat-card.motion-ready:not(.is-visible) {
   transform: translateY(60%);
 }
-@media (max-width: 1199px) {
-  .page-dashboard .stat-card:nth-child(3) {
-    border-left: 0 !important;
-  }
-  .page-dashboard .stat-card:nth-child(n + 3) {
-    border-top: 1px solid var(--glass-edge) !important;
-  }
-}
 
-/* 5. Finance keeps the one glowing glass card; robot is an open blueprint. */
-.page-dashboard .robot-vitals {
-  background:
-    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px !important;
-  border: 1px solid var(--glass-edge) !important;
-  box-shadow: none !important;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
+/* 5-6. Finance, robot, up next, latest word: each panel becomes a row. */
+.page-dashboard :is(.dashboard-grid, .bottom-grid) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-areas: none !important;
+  gap: 0 !important;
+  margin: 0 !important;
 }
-.page-dashboard .robot-vitals::before,
-.page-dashboard .robot-vitals::after {
-  display: none !important;
-}
-html[data-motion='on'] .finance-panel.motion-ready:not(.is-visible) {
-  transform: scale(0.94);
-}
-html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
-  transform: translateX(48px);
-}
-
-/* 6. Up next is a bare ruled list; the latest word is a pulled quote. */
-.page-dashboard .priorities {
+.page-dashboard .dashboard-grid > .panel {
+  grid-column: auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
+  column-gap: 56px;
+  align-items: start;
+  padding: 30px 0 !important;
   background: none !important;
   border: 0 !important;
   border-top: 1px solid var(--glass-edge) !important;
@@ -280,46 +314,45 @@ html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
   box-shadow: none !important;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
+  overflow: visible !important;
 }
-.page-dashboard .priorities::before,
-.page-dashboard .priorities::after,
-.page-dashboard .latest-word::after {
+.page-dashboard :is(.dashboard-grid, .bottom-grid) > .panel::before,
+.page-dashboard :is(.dashboard-grid, .bottom-grid) > .panel::after {
   display: none !important;
 }
-.page-dashboard .priorities .panel-heading,
-.page-dashboard .priorities .priority-row,
-.page-dashboard .priorities .event-row,
-.page-dashboard .priorities .panel-link {
+.page-dashboard .dashboard-grid > .panel > * {
+  grid-column: 2;
   padding-inline: 0 !important;
+  min-width: 0;
 }
-.page-dashboard :is(.priorities, .latest-word) .eyebrow {
-  display: none;
+.page-dashboard .dashboard-grid > .panel > .panel-heading {
+  grid-column: 1;
+  grid-row: 1 / span 8;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 0 !important;
+  margin: 0 !important;
 }
-.page-dashboard .priorities .panel-heading {
-  gap: 16px;
+.page-dashboard .dashboard-grid .panel-link {
+  border-top: 0 !important;
+  justify-content: flex-start;
+  gap: 8px;
+  padding-block: 14px 0 !important;
 }
-/* one heading voice for every dashboard section below the hero */
-.page-dashboard .eyebrow.subtle {
-  display: none;
+.page-dashboard .finance-numbers {
+  padding-top: 0 !important;
 }
-.page-dashboard .panel-heading :is(h2, h3),
-.page-dashboard .dashboard-heading h2 {
-  font-family: var(--heading) !important;
-  font-size: 20px !important;
-  font-weight: 650 !important;
-  letter-spacing: -0.02em !important;
-  text-transform: none !important;
-  color: var(--ink) !important;
+.page-dashboard .robot-vitals .robot-schematic {
+  background:
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 22px 22px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 12px;
 }
-.page-dashboard :is(h2, h3) {
-  text-wrap: pretty;
-}
-.page-dashboard .dashboard-heading {
-  margin-top: 28px;
-}
-.page-dashboard .mini-status,
-.page-dashboard .countdown-panel + .command-strip .command-label small {
-  display: none;
+.page-dashboard .robot-vitals .vitals-stats {
+  padding-inline: 0 !important;
 }
 .page-dashboard .priority-row {
   transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -327,94 +360,125 @@ html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
 .page-dashboard .priority-row:hover {
   transform: translateX(8px);
 }
-.page-dashboard .latest-word {
-  background: var(--accent-dim) !important;
-  border: 0 !important;
-  box-shadow: none !important;
-}
-.page-dashboard .latest-word::before {
-  display: none !important;
+.page-dashboard .latest-word .announcement-preview {
+  padding-inline: 0 !important;
 }
 .page-dashboard .latest-word .announcement-preview h3 {
-  font-size: 22px;
+  font-size: 18px;
   letter-spacing: -0.02em;
+}
+html[data-motion='on'] .finance-panel.motion-ready:not(.is-visible) {
+  transform: scale(0.96);
+}
+html[data-motion='on'] .robot-vitals.motion-ready:not(.is-visible) {
+  transform: translateX(48px);
 }
 html[data-motion='on'] .priorities.motion-ready:not(.is-visible) {
   transform: translateY(40px);
   transition-duration: 0.5s;
 }
 html[data-motion='on'] .latest-word.motion-ready:not(.is-visible) {
-  transform: scale(1.06);
+  transform: scale(1.04);
 }
 
-/* 7. Crew, field notes and console: an uneven row. Crew is a solid tile,
-   field notes an open oversized number, console a ruled note. */
+/* 7. Crew, field notes and console collapse into one compact status strip. */
 .page-dashboard .bottom-grid {
-  grid-template-columns: 1.3fr 1fr !important;
-  grid-template-areas: 'crew notes' 'crew console';
-  align-items: start;
-  gap: 0 40px !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  border-block: 1px solid var(--glass-edge);
+  margin-top: 0 !important;
 }
-.page-dashboard .crew-cell { grid-area: crew; }
-.page-dashboard .notes-cell { grid-area: notes; }
-.page-dashboard .console-cell { grid-area: console; }
-.page-dashboard .notes-cell .match-highlight {
-  padding-inline: 0 !important;
-}
-.page-dashboard .crew-cell::before,
-.page-dashboard .crew-cell::after,
-.page-dashboard .notes-cell::before,
-.page-dashboard .notes-cell::after,
-.page-dashboard .console-cell::before,
-.page-dashboard .console-cell::after {
-  display: none !important;
-}
-.page-dashboard .crew-cell {
-  background: var(--glass) !important;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  box-shadow: none !important;
-}
-.page-dashboard .crew-cell .panel-heading .muted {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-}
-.page-dashboard :is(.notes-cell, .console-cell) {
+.page-dashboard .bottom-grid > .panel {
   background: none !important;
   border: 0 !important;
-  border-top: 1px solid var(--glass-edge) !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  padding-inline: 0 !important;
+  padding: 18px 22px !important;
 }
-.page-dashboard .notes-cell .panel-heading,
-.page-dashboard .notes-cell > p {
+.page-dashboard .bottom-grid > .panel:first-child {
+  padding-left: 0 !important;
+}
+.page-dashboard .bottom-grid > .panel + .panel {
+  border-left: 1px solid var(--glass-edge) !important;
+}
+.page-dashboard .bottom-grid .panel-heading {
+  padding: 0 0 10px !important;
+}
+.page-dashboard .bottom-grid .panel-heading h3 {
+  font-family: var(--mono) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-2) !important;
+}
+.page-dashboard .bottom-grid .panel-heading :is(svg, .muted, .icon-button) {
+  display: none;
+}
+.page-dashboard .bottom-grid :is(.member-row, .match-highlight, .panel-link, .panel > p) {
   padding-inline: 0 !important;
+  border: 0 !important;
+}
+.page-dashboard .bottom-grid .panel-link {
+  justify-content: flex-start;
+  gap: 6px;
+  padding-top: 6px !important;
+  font-size: 12px;
 }
 .page-dashboard .notes-cell .match-highlight strong {
   color: var(--accent) !important;
-  font-size: 84px !important;
-  letter-spacing: -0.05em;
-}
-/* link bars only on the two framed cards; elsewhere links sit inline */
-.page-dashboard :is(.priorities, .latest-word, .crew-cell) .panel-link {
-  border-top: 0 !important;
-  justify-content: flex-start;
-  gap: 8px;
+  font-size: 40px !important;
+  letter-spacing: -0.04em;
 }
 html[data-motion='on'] .bottom-grid .motion-ready:not(.is-visible) {
-  transform: perspective(900px) rotateX(16deg) translateY(30px);
+  transform: perspective(900px) rotateX(16deg) translateY(20px);
   transform-origin: center top;
 }
-@media (max-width: 850px) {
+@media (max-width: 900px) {
+  .page-dashboard .motion-scene,
+  .page-dashboard .dashboard-grid > .panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-dashboard .stats-grid,
+  .page-dashboard .dashboard-grid > .panel > *,
+  .page-dashboard .dashboard-grid > .panel > .panel-heading {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  .page-dashboard .dashboard-heading {
+    padding-bottom: 0 !important;
+  }
+  .page-dashboard .stats-grid {
+    border-top: 0;
+  }
+  .page-dashboard .dashboard-grid > .panel > .panel-heading {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 14px !important;
+  }
   .page-dashboard .bottom-grid {
-    grid-template-columns: 1fr !important;
-    grid-template-areas: 'notes' 'crew' 'console';
-    gap: 20px !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .page-dashboard .bottom-grid > .panel {
+    padding-inline: 0 !important;
+  }
+  .page-dashboard .bottom-grid > .panel + .panel {
+    border-left: 0 !important;
+    border-top: 1px solid var(--glass-edge) !important;
   }
 }
+@media (max-width: 1199px) {
+  .page-dashboard .stat-card:nth-child(3) {
+    border-left: 0 !important;
+    padding-left: 0 !important;
+  }
+  .page-dashboard .stat-card:nth-child(n + 3) {
+    border-top: 1px solid var(--glass-edge) !important;
+  }
+}
+
 @media (max-width: 640px) {
   .page-dashboard .countdown {
     width: 100%;
@@ -700,8 +764,7 @@ html[data-motion='on'] .record-purchases.motion-ready:not(.is-visible) .purchase
 }
 .announcement-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
-  gap: 0 40px;
+  max-width: 760px;
 }
 .announcement-list article {
   display: block !important;
@@ -1093,11 +1156,15 @@ html[data-motion='on'] .ledger-panel.motion-ready:not(.is-visible) tbody tr {
 }
 @media (min-width: 900px) {
   .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket {
-    grid-template-columns: minmax(180px, 1fr) minmax(0, 1.2fr) minmax(320px, 1.6fr) auto;
+    grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr) auto;
     align-items: center;
     gap: 28px;
     padding: 26px 30px;
     border-left: 3px solid var(--accent);
+  }
+  .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-steps {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
   .purchase-tickets:has(> .purchase-ticket:only-child) .purchase-ticket header {
     border-bottom: 0;
@@ -1250,15 +1317,15 @@ html[data-motion='on'] .resource-group.motion-ready:not(.is-visible) .resource-l
 }
 /* announcements: newspaper masthead between two heavy rules */
 .page-announcements .page-intro {
-  border-block: 3px solid var(--ink) !important;
-  padding: 18px 0 !important;
-  text-align: center;
+  border: 0 !important;
+  border-top: 3px solid var(--ink) !important;
+  padding: 16px 0 0 !important;
 }
 .page-announcements .page-intro::after {
   display: none;
 }
 .page-announcements .page-intro h1 {
-  font-size: clamp(44px, 7vw, 96px) !important;
+  overflow-wrap: anywhere;
 }
 /* task board: one inline line, eyebrow pushed right */
 .page-tasks .page-intro {
@@ -1318,7 +1385,7 @@ html[data-motion='on'] .resource-group.motion-ready:not(.is-visible) .resource-l
 }
 /* competition: the largest headline in the app */
 .page-competition .page-intro h1 {
-  font-size: clamp(48px, 8vw, 116px) !important;
+  font-size: clamp(34px, 8vw, 116px) !important;
   letter-spacing: -0.055em !important;
 }
 /* resources and settings: quiet utility headers */
@@ -1364,4 +1431,310 @@ html[data-motion='on'] .page-competition .page-intro.motion-ready:not(.is-visibl
   background: none !important;
   border-width: 0 0 1px !important;
   border-radius: 0 !important;
+}
+
+/* ===================== Competition ===================== */
+/* 1. Scoreboard: the average is the big score, the rest are readouts in one
+   dark slab. It lands with a short scale-down "slam". */
+.page-competition .stats-grid {
+  display: grid !important;
+  grid-template-columns: 1.6fr repeat(3, 1fr) !important;
+  gap: 0 !important;
+  background: #050302;
+  border: 1px solid var(--glass-edge);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.page-competition .stat-card {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  padding: 20px 22px !important;
+}
+.page-competition .stat-card::before,
+.page-competition .stat-card::after,
+.page-competition .stat-card .stat-top svg {
+  display: none;
+}
+.page-competition .stat-card + .stat-card {
+  border-left: 1px solid var(--glass-edge) !important;
+}
+.page-competition .stat-card:first-child {
+  background: var(--accent-dim) !important;
+}
+.page-competition .stat-card:first-child strong {
+  font-size: clamp(56px, 7vw, 96px) !important;
+  line-height: 0.9;
+  color: var(--accent) !important;
+}
+.page-competition .stat-card strong {
+  font-size: clamp(22px, 2.2vw, 30px) !important;
+}
+html[data-motion='on'] .page-competition .stat-card.motion-ready:not(.is-visible) {
+  transform: scale(1.18);
+  transition-duration: 0.45s;
+}
+@media (max-width: 760px) {
+  .page-competition .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .page-competition .stat-card:first-child {
+    grid-column: 1 / -1;
+  }
+  .page-competition .stat-card:nth-child(3) {
+    border-left: 0 !important;
+  }
+  .page-competition .stat-card:nth-child(n + 2) {
+    border-top: 1px solid var(--glass-edge) !important;
+  }
+}
+
+/* 2. Points over time sits open; partners become a ranked inline list. */
+.page-competition .points-panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-competition .points-panel .panel-heading,
+.page-competition .points-panel > h3,
+.page-competition .partner-grid {
+  padding-inline: 0 !important;
+}
+.page-competition .partner-grid {
+  display: grid !important;
+  gap: 0 !important;
+}
+.page-competition .partner-grid > div {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 16px;
+  padding: 12px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  min-width: 0 !important;
+}
+.page-competition .partner-grid strong {
+  font-size: 15px !important;
+}
+.page-competition .partner-grid b {
+  color: var(--accent);
+}
+html[data-motion='on'] .points-panel.motion-ready:not(.is-visible) {
+  transform: none;
+  transition-duration: 1.2s;
+}
+
+/* 3. Match records: the points column reads like a score. */
+.record-matches td[data-field='points'] {
+  font-family: var(--mono);
+  font-size: 18px !important;
+  color: var(--accent);
+}
+html[data-motion='on'] .record-matches.motion-ready:not(.is-visible) {
+  transform: translateY(0) scale(0.98);
+  transition-duration: 1s;
+}
+
+/* ===================== Robot specs ===================== */
+/* A drawing sheet: the blueprint keeps its grid and gains crop marks; the
+   legality checks are an open inspection list beside it; robot records read
+   as a datasheet under a heavy rule. */
+.page-robot .robot-detail {
+  position: relative;
+  overflow: visible !important;
+}
+.page-robot .robot-detail::before,
+.page-robot .robot-detail::after {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-color: var(--accent);
+  border-style: solid;
+  pointer-events: none;
+}
+.page-robot .robot-detail::before {
+  top: -7px;
+  left: -7px;
+  border-width: 2px 0 0 2px;
+}
+.page-robot .robot-detail::after {
+  right: -7px;
+  bottom: -7px;
+  border-width: 0 2px 2px 0;
+}
+.page-robot .legality-panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-robot .legality-panel .check-row {
+  font-family: var(--mono);
+  font-size: 13px;
+  border-bottom: 1px solid var(--glass-edge);
+}
+.page-robot .record-robot.panel {
+  background: none !important;
+  border: 0 !important;
+  border-top: 3px solid var(--ink) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-robot .record-robot :is(.section-toolbar, .list-controls) {
+  padding-inline: 0 !important;
+}
+.page-robot .record-robot table {
+  font-family: var(--mono);
+}
+html[data-motion='on'] .robot-detail.motion-ready:not(.is-visible) {
+  transform: translate(-30px, 30px);
+}
+html[data-motion='on'] .legality-panel.motion-ready:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+}
+html[data-motion='on'] .legality-panel :is(.check-row, .rule-warning, .badge) {
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+html[data-motion='on'] .legality-panel .check-row:nth-of-type(2) { transition-delay: 0.08s; }
+html[data-motion='on'] .legality-panel .check-row:nth-of-type(3) { transition-delay: 0.16s; }
+html[data-motion='on'] .legality-panel .check-row:nth-of-type(n + 4) { transition-delay: 0.24s; }
+html[data-motion='on'] .legality-panel.motion-ready:not(.is-visible) :is(.check-row, .rule-warning, .badge) {
+  opacity: 0;
+  transform: translateX(24px);
+}
+html[data-motion='on'] .record-robot.motion-ready:not(.is-visible) {
+  transform: translateY(0);
+  opacity: 0;
+  transition-duration: 0.9s;
+}
+
+/* ===================== Engineering design ===================== */
+/* The CAD panel is an upload tray: dashed edge, copy on the left, the form
+   on the right. Design options read as a scored decision matrix. */
+.page-designs .cad-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px 40px;
+  align-items: start;
+  background: none !important;
+  border: 1.5px dashed var(--accent-line) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-designs .cad-panel > .panel-heading {
+  grid-column: 1 / -1;
+}
+.page-designs .cad-panel > :is(.note, form) {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+}
+.page-designs .record-designs.panel {
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.page-designs .record-designs :is(.section-toolbar, .list-controls) {
+  padding-inline: 0 !important;
+}
+.page-designs .record-designs td:is([data-field='performance'], [data-field='reliability'], [data-field='simplicity'], [data-field='cost']) {
+  font-family: var(--mono);
+  text-align: center;
+  background: var(--accent-dim) !important;
+}
+.page-designs .record-designs td b.orange {
+  font-family: var(--mono);
+  font-size: 18px;
+}
+html[data-motion='on'] .cad-panel.motion-ready:not(.is-visible) {
+  transform: translate(30px, -20px);
+}
+html[data-motion='on'] .record-designs.motion-ready:not(.is-visible) {
+  transform: perspective(1000px) rotateY(8deg);
+  transform-origin: right center;
+}
+@media (max-width: 760px) {
+  .page-designs .cad-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .page-designs .cad-panel > :is(.note, form) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* a list with a single record does not need search and sort */
+.record-section:has(:is(.meeting-timeline > li, .purchase-ticket, .announcement-list > article):only-child) .list-controls {
+  display: none;
+}
+
+/* task cards: one divider, readable tags, the move menu on hover or focus */
+.kanban .task-card .badge {
+  font-size: 11px !important;
+}
+@media (hover: hover) {
+  .kanban .task-card:not(:hover):not(:focus-within) > select {
+    opacity: 0;
+  }
+}
+.kanban .task-card > select {
+  transition: opacity 0.2s;
+}
+
+/* finance: every panel on one open surface, split by hairlines */
+.page-finance :is(.mix-panel, .follow-panel, .budget-panel) {
+  background: none !important;
+  border: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding-inline: 0 !important;
+}
+.page-finance :is(.mix-panel, .follow-panel, .budget-panel) :is(.panel-heading, .chart-legend, .funding-row, .finance-warning) {
+  padding-inline: 0 !important;
+}
+.page-finance .cashflow-panel {
+  border-left: 0 !important;
+  border-top: 1px solid var(--glass-edge) !important;
+  padding-inline: 0 !important;
+}
+.page-finance .page-actions {
+  margin-top: 8px !important;
+}
+
+/* purchase ticket: stepper gets its own full-width row; accent on phones too */
+.purchase-ticket {
+  border-left: 3px solid var(--accent) !important;
+}
+.purchase-steps {
+  gap: 10px;
+}
+
+/* resources: group titles clearly above the rows; scroll hint on phone tabs */
+.resource-group h2 {
+  font-size: clamp(26px, 3vw, 40px) !important;
+  font-weight: 700;
+}
+.page-resources .note {
+  font-size: 13px !important;
+}
+@media (max-width: 820px) {
+  .resource-nav {
+    -webkit-mask: linear-gradient(90deg, #000 85%, transparent);
+    mask: linear-gradient(90deg, #000 85%, transparent);
+  }
 }
