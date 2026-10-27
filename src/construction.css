@@ -759,131 +759,201 @@ table tbody tr:hover {
   }
 }
 
-/* ---------- logs: glass card carousel ---------- */
+/* first visit: the field builds full screen, then the page fades in over it */
+.entry > :not(.field-backdrop) {
+  transition: opacity 0.9s ease, visibility 0s linear 0s;
+}
+.entry::after {
+  transition: opacity 0.9s ease;
+}
+.entry.intro > :not(.field-backdrop):not(.intro-caption) {
+  opacity: 0;
+  visibility: hidden;
+  transition: none;
+}
+.entry.intro::after {
+  opacity: 0;
+}
+.intro-caption {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: color-mix(in srgb, #000 45%, transparent);
+  border: 1px solid var(--glass-edge);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+/* ---------- logs: glowing glass cards, the selected one is biggest ---------- */
 .log-carousel {
   margin-top: 4px;
 }
 .log-track {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 12px;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
   scroll-behavior: smooth;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
-  /* side padding lets the first and last card sit in the middle */
-  padding: 28px calc(50% - min(150px, 35vw, 22vh));
+  padding: 30px 16px 26px;
 }
 .log-track::-webkit-scrollbar {
   display: none;
 }
+/* auto margins centre the row without clipping it when it overflows */
+.log-card:first-child {
+  margin-left: auto;
+}
+.log-card:last-child {
+  margin-right: auto;
+}
 .log-card {
+  --hi: color-mix(in srgb, var(--accent) 40%, #fff);
+  --leak: var(--accent);
+  --mid: color-mix(in srgb, var(--accent) 72%, #2a1206);
+  --deep: color-mix(in srgb, var(--accent) 48%, #1a0a03);
   flex: none;
-  width: min(300px, 70vw, 44vh);
-  aspect-ratio: 3 / 4;
+  width: 220px;
+  height: 360px;
   scroll-snap-align: center;
   position: relative;
-  overflow: hidden;
-  isolation: isolate;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 28px;
+  padding: 26px 22px;
   text-align: center;
   cursor: pointer;
-  color: #170a02;
-  border-radius: 30px;
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  color: #160800;
+  border-radius: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  /* bright light leaks along each edge over a deep frosted body */
   background:
-    radial-gradient(90% 60% at 50% 0%, color-mix(in srgb, var(--accent) 70%, #fff) 0, transparent 70%),
-    radial-gradient(80% 50% at 50% 100%, color-mix(in srgb, var(--accent) 80%, #ffd9a0) 0, transparent 70%),
-    linear-gradient(160deg, color-mix(in srgb, var(--accent) 78%, #000), color-mix(in srgb, var(--accent) 42%, #000));
+    radial-gradient(48% 5% at 50% 0%, var(--hi), transparent),
+    radial-gradient(44% 6% at 50% 100%, var(--leak), transparent),
+    radial-gradient(6% 34% at 0% 42%, color-mix(in srgb, var(--leak) 80%, transparent), transparent),
+    radial-gradient(6% 34% at 100% 42%, color-mix(in srgb, var(--leak) 65%, transparent), transparent),
+    radial-gradient(14% 10% at 100% 0%, color-mix(in srgb, var(--hi) 70%, transparent), transparent),
+    radial-gradient(14% 10% at 0% 100%, color-mix(in srgb, var(--leak) 70%, transparent), transparent),
+    radial-gradient(75% 70% at 52% 46%, var(--mid) 0%, var(--deep) 62%, var(--mid) 100%);
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.65),
-    inset 0 0 34px rgba(255, 255, 255, 0.14),
-    inset 0 -14px 34px -16px color-mix(in srgb, var(--accent) 50%, #fff),
-    0 34px 70px -30px color-mix(in srgb, var(--accent) 85%, transparent);
-  transform: scale(0.84);
-  opacity: 0.55;
-  filter: saturate(0.85) brightness(0.75);
-  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s, filter 0.3s, box-shadow 0.3s;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 0 22px rgba(255, 255, 255, 0.2),
+    inset 0 0 60px color-mix(in srgb, var(--accent) 35%, transparent),
+    0 0 8px rgba(255, 255, 255, 0.3),
+    0 0 60px -16px color-mix(in srgb, var(--accent) 70%, transparent);
+  transition:
+    width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s;
 }
-.log-card::before {
-  /* frosted sheen across the top third */
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 38%);
-  pointer-events: none;
+.log-card > * {
+  opacity: 0.72;
+  transition: opacity 0.3s;
 }
 .log-card.active {
-  transform: scale(1);
-  opacity: 1;
-  filter: none;
+  width: min(360px, 74vw);
+  height: 470px;
 }
-.log-card:hover {
-  filter: none;
+.log-card.active > *,
+.log-card:hover > * {
   opacity: 1;
 }
 .log-card.active:hover {
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.7),
-    inset 0 0 34px rgba(255, 255, 255, 0.2),
-    inset 0 -14px 34px -16px color-mix(in srgb, var(--accent) 50%, #fff),
-    0 0 60px -10px var(--accent);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 0 22px rgba(255, 255, 255, 0.26),
+    inset 0 0 60px color-mix(in srgb, var(--accent) 45%, transparent),
+    0 0 10px rgba(255, 255, 255, 0.4),
+    0 0 70px -10px var(--accent);
 }
 .log-card-icon {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .log-card strong {
   font-family: var(--heading);
-  font-size: 26px;
+  font-size: 22px;
+  font-weight: 700;
   letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.log-card.active strong {
+  font-size: 30px;
 }
 .log-card small {
-  color: rgba(23, 10, 2, 0.75) !important;
+  color: #1c0b02 !important;
   font-size: 13px;
+  font-weight: 500;
+}
+.log-card.active small {
+  font-size: 15px;
 }
 .log-card-meta {
-  margin-top: 10px;
-  padding: 5px 12px;
+  margin-top: 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   font-family: var(--mono);
   font-size: 11px;
-  background: rgba(0, 0, 0, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-weight: 600;
+  color: #160800;
+  border: 1px solid rgba(22, 8, 0, 0.45);
+  background: rgba(255, 255, 255, 0.08);
+}
+.log-card.active .log-card-meta {
+  font-size: 13px;
 }
 .log-nav {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 16px;
-}
-.log-nav .icon-button[disabled] {
-  opacity: 0.3;
 }
 .log-dots {
   display: flex;
-  gap: 12px;
+  gap: 18px;
 }
+/* small copper beads */
 .log-dots button {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   padding: 0;
   border-radius: 50%;
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: color-mix(in srgb, var(--accent) 45%, #000);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
-  transition: background 0.2s, box-shadow 0.2s;
+  border: 0;
+  background: radial-gradient(circle at 36% 32%, color-mix(in srgb, var(--accent) 40%, #fff) 0, var(--accent) 38%, color-mix(in srgb, var(--accent) 38%, #000) 100%);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.18);
+  filter: brightness(0.62) saturate(0.85);
+  transition: filter 0.25s, box-shadow 0.25s;
+}
+.log-dots button:hover {
+  filter: brightness(0.85);
 }
 .log-dots button.on {
-  background: var(--accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 0 14px var(--accent);
+  filter: none;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 14px -2px var(--accent);
+}
+@media (max-width: 640px) {
+  .log-card {
+    width: 150px;
+    height: 280px;
+    padding: 18px 14px;
+  }
+  .log-card.active {
+    height: 400px;
+  }
+  .log-card strong {
+    font-size: 18px;
+  }
 }
 
 /* ---------- logs: a log opened full screen ---------- */

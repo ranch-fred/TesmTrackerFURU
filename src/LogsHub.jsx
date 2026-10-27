@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowLeft, ArrowRight, Code2, Hammer, HeartHandshake, X } from 'lucide-react';
+import { ArrowLeft, Code2, Hammer, HeartHandshake, X } from 'lucide-react';
 import { canView } from './domain';
 import { LogPage } from './LogEntry';
 import OutreachLog from './OutreachLog';
@@ -12,37 +12,48 @@ const LOGS = [
   ['outreach', 'Outreach log', HeartHandshake, 'Events, demos and community'],
 ];
 
-// One "Logs" page: a side-scrolling carousel of glass cards, one per log.
-// Opening a card takes the log full screen, with a switcher to change logs.
+// One "Logs" page: a row of glowing glass cards, one per log. The selected
+// card is the big one; picking another card or dot makes it the big one, and
+// opening the big card takes that log full screen, with a switcher to change logs.
 export default function LogsHub({ w, initial }) {
   const logs = LOGS.filter(([kind]) => canView(w.member.role, kind));
   const [open, setOpen] = useState(logs.some(([k]) => k === initial) ? initial : null);
-  const [active, setActive] = useState(Math.max(0, logs.findIndex(([k]) => k === initial)));
+  const middle = Math.floor((logs.length - 1) / 2);
+  const [active, setActive] = useState(middle);
+  const settle = useRef(0);
   const track = useRef(null);
   const cards = useRef([]);
   const closeButton = useRef(null);
   const lastOpen = useRef(null);
 
-  // the card nearest the middle of the track is the "active" one
+  // on narrow screens the row scrolls: once a swipe settles, the card
+  // nearest the middle becomes the selected one
   function onScroll() {
-    const t = track.current;
-    if (!t) return;
-    const mid = t.scrollLeft + t.clientWidth / 2;
-    let best = 0;
-    cards.current.forEach((c, i) => {
-      if (c && Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid) < Math.abs(cards.current[best].offsetLeft + cards.current[best].offsetWidth / 2 - mid)) best = i;
-    });
-    setActive(best);
+    clearTimeout(settle.current);
+    settle.current = setTimeout(() => {
+      const t = track.current;
+      if (!t || t.scrollWidth <= t.clientWidth) return;
+      const mid = t.getBoundingClientRect().left + t.clientWidth / 2;
+      const dist = (c) => Math.abs(c.getBoundingClientRect().left + c.offsetWidth / 2 - mid);
+      let best = 0;
+      cards.current.forEach((c, i) => c && dist(c) < dist(cards.current[best]) && (best = i));
+      setActive(best);
+    }, 140);
   }
-  function go(i) {
-    const c = cards.current[Math.max(0, Math.min(logs.length - 1, i))];
-    c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-    c?.focus({ preventScroll: true });
+  useEffect(() => () => clearTimeout(settle.current), []);
+  function go(i, focus = true) {
+    const n = Math.max(0, Math.min(logs.length - 1, i));
+    setActive(n);
+    const c = cards.current[n];
+    // wait a frame so the card has started growing before centring it
+    requestAnimationFrame(() => c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+    if (focus) c?.focus({ preventScroll: true });
   }
   // back from full screen: centre and focus the card of the log that was open
   useEffect(() => {
     if (open) return;
-    const i = Math.max(0, logs.findIndex(([k]) => k === lastOpen.current));
+    const found = logs.findIndex(([k]) => k === lastOpen.current);
+    const i = found < 0 ? middle : found;
     cards.current[i]?.scrollIntoView({ inline: 'center', block: 'nearest' });
     if (lastOpen.current) cards.current[i]?.focus({ preventScroll: true });
     setActive(i);
@@ -104,7 +115,7 @@ export default function LogsHub({ w, initial }) {
         <h1>
           PICK A <span>LOG.</span>
         </h1>
-        <p>Swipe or use the arrows, then open a log to write today’s entry.</p>
+        <p>Pick a card to bring it forward, then open it to write today’s entry.</p>
       </div>
       <section className="log-carousel" aria-roledescription="carousel" aria-label="Team logs">
         <div className="log-track" ref={track} onScroll={onScroll}>
@@ -113,14 +124,14 @@ export default function LogsHub({ w, initial }) {
               key={kind}
               ref={(el) => (cards.current[i] = el)}
               className={`log-card ${i === active ? 'active' : ''}`}
-              aria-label={`Open ${title}, ${count(kind)} ${count(kind) === 1 ? 'entry' : 'entries'}`}
-              onClick={() => setOpen(kind)}
+              aria-label={`${i === active ? 'Open' : 'Show'} ${title}, ${count(kind)} ${count(kind) === 1 ? 'entry' : 'entries'}`}
+              onClick={() => (i === active ? setOpen(kind) : go(i, false))}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') go(i + 1);
                 if (e.key === 'ArrowLeft') go(i - 1);
               }}
             >
-              <Icon className="log-card-icon" size={64} strokeWidth={1.6} aria-hidden="true" />
+              <Icon className="log-card-icon" size={72} strokeWidth={1.8} aria-hidden="true" />
               <strong>{title}</strong>
               <small>{blurb}</small>
               <span className="log-card-meta">
@@ -132,9 +143,6 @@ export default function LogsHub({ w, initial }) {
         </div>
         {logs.length > 1 && (
           <div className="log-nav">
-            <button className="icon-button" aria-label="Previous log" disabled={active === 0} onClick={() => go(active - 1)}>
-              <ArrowLeft size={16} />
-            </button>
             <div className="log-dots">
               {logs.map(([kind, title], i) => (
                 <button
@@ -146,9 +154,6 @@ export default function LogsHub({ w, initial }) {
                 />
               ))}
             </div>
-            <button className="icon-button" aria-label="Next log" disabled={active === logs.length - 1} onClick={() => go(active + 1)}>
-              <ArrowRight size={16} />
-            </button>
           </div>
         )}
       </section>

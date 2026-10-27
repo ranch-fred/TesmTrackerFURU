@@ -33,7 +33,7 @@ export async function createFieldScene(container, opts = {}) {
   return build(container, opts, L);
 }
 
-function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
+function build(container, { accent = '#FF6B00', animate = true, centered = false, onBuilt } = {}, L) {
   const THREE = L.three;
   const gsap = L.gsap.gsap || L.gsap.default;
   const { EffectComposer } = L.composer, { RenderPass } = L.render, { UnrealBloomPass } = L.bloom;
@@ -188,19 +188,23 @@ function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
     p.rotation.y = r; p.position.x = r > 0 ? 0.03 : -0.03; sign.add(p);
   }
   sign.scale.set(1, 0.001, 1);
-  // hex pods: clear hex tube along x with a coloured rim at each end,
-  // tipped so the outer opening faces up and out (a V when seen from the side)
-  const hexPath = (r, P) => { for (let k = 0; k < 6; k++) { const a = (k * Math.PI) / 3; P[k ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r) } P.closePath(); return P };
-  const rimGeo = (() => { const s = hexPath(0.82, new THREE.Shape()); s.holes.push(hexPath(0.7, new THREE.Path())); const g = new THREE.ExtrudeGeometry(s, { depth: 0.07, bevelEnabled: false }); g.translate(0, 0, -0.035); return g })();
-  const tubeGeo = new THREE.CylinderGeometry(0.78, 0.78, 1.3, 6, 1, true);
+  // pods: clear "house" tubes (flat floor, upright walls, peaked roof) along x
+  // with a coloured frame at each end, tipped so the outer opening faces up and out
+  const houseOutline = (k) => [[-0.75, -0.6], [0.75, -0.6], [0.75, 0.15], [0, 0.85], [-0.75, 0.15]].map(([x, y]) => [x * k, (y + 0.05) * k - 0.05]);
+  const housePath = (k, P) => { houseOutline(k).forEach(([x, y], i) => P[i ? 'lineTo' : 'moveTo'](x, y)); P.closePath(); return P };
+  const rimGeo = (() => { const s = housePath(1, new THREE.Shape()); s.holes.push(housePath(0.84, new THREE.Path())); const g = new THREE.ExtrudeGeometry(s, { depth: 0.07, bevelEnabled: false }); g.translate(0, 0, -0.035); return g })();
+  const tubeGeo = new THREE.ExtrudeGeometry(housePath(0.97, new THREE.Shape()), { depth: 1.3, bevelEnabled: false });
+  tubeGeo.translate(0, 0, -0.65);
+  const noCaps = new THREE.MeshBasicMaterial({ visible: false });
   const pods = [];
-  for (const [sz, col, kind] of [[-1, BLUE, 'blue'], [1, RED, 'red']]) for (const sx of [-1, 1]) {
+  for (const [sz, col] of [[-1, BLUE], [1, RED]]) for (const sx of [-1, 1]) {
     const pod = new THREE.Group();
-    const tube = new THREE.Mesh(tubeGeo, poly); tube.rotation.z = Math.PI / 2; pod.add(tube);
+    // extrude groups: 0 = end caps (left open), 1 = walls
+    const tube = new THREE.Mesh(tubeGeo, [noCaps, poly]); tube.rotation.y = Math.PI / 2; pod.add(tube);
     const mat = glow(col);
     for (const ex of [-0.66, 0.66]) { const r = new THREE.Mesh(rimGeo, mat); r.rotation.y = Math.PI / 2; r.position.x = ex; r.castShadow = true; pod.add(r) }
-    // the manual's drawing shows three alliance balls preloaded in one pod per side
-    if (sx === (sz < 0 ? -1 : 1)) for (let k = 0; k < 3; k++) pod.add(ball(kind, (k - 1) * 0.36, -0.58, 0));
+    // floor rails the pod sits on, along its length
+    for (const fz of [-0.55, 0.55]) { const rail = box(1.32, 0.04, 0.05, mat); rail.position.set(0, -0.6, fz); pod.add(rail) }
     pod.position.set(sx * 1.1, TOP + 0.62, sz * BEAM);
     pod.rotation.z = sx * 0.38;
     pod.userData = { home: pod.position.clone(), mat };
@@ -294,7 +298,9 @@ function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
   composer.addPass(new OutputPass());
 
   /* ================= assembly timeline (~9 s) ================= */
-  const tl = gsap.timeline({ paused: true });
+  let finished = false;
+  const built = () => { if (!finished) { finished = true; onBuilt?.() } };
+  const tl = gsap.timeline({ paused: true, onComplete: built });
   const snap = (p, n = 26) => emit(p, n);
   const full = { x: 1, y: 1, z: 1 };
   tl.to(floorU.uReveal, { value: 32, duration: 4, ease: 'power2.inOut' }, 0);
@@ -330,7 +336,9 @@ function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
 
   /* ================= render loop ================= */
   const clock = new THREE.Clock();
-  let raf = 0, moving = animate;
+  let raf = 0, moving = animate, lastOff = null;
+  // how far the field slides right to leave room for the sign-in copy (0 while it plays centred)
+  const shift = { v: centered ? 0 : 0.2 };
   const look = new THREE.Vector3();
   function frame() {
     raf = requestAnimationFrame(frame);
@@ -348,26 +356,33 @@ function build(container, { accent = '#FF6B00', animate = true } = {}, L) {
     // tall screens need a wider lens to keep the whole field in view
     const fov = Math.min(75, cam.fov * (camera.aspect < 1.25 ? 1 + (1.25 - camera.aspect) * 0.8 : 1));
     if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix() }
+    // on wide screens slide the field right so the copy on the left stays readable
+    const off = camera.aspect > 1.2 ? Math.round(W() * shift.v) : 0;
+    if (off !== lastOff) {
+      lastOff = off;
+      if (off) camera.setViewOffset(W(), H(), -off, 0, W(), H()); else camera.clearViewOffset();
+      camera.updateProjectionMatrix();
+    }
     composer.render();
   }
   function resize() {
     const w = W(), h = H(); if (!w || !h) return;
     renderer.setSize(w, h); composer.setSize(w, h); bloom.setSize(w, h);
-    camera.aspect = w / h;
-    // on wide screens slide the field right so the sign-in copy on the left stays readable
-    if (w / h > 1.2) camera.setViewOffset(w, h, -w * 0.2, 0, w, h); else camera.clearViewOffset();
+    camera.aspect = w / h; lastOff = null;
     camera.updateProjectionMatrix();
   }
   const ro = new ResizeObserver(resize); ro.observe(container);
   resize(); frame();
-  if (animate) tl.play(); else tl.progress(1, true);
+  if (animate) tl.play(); else { tl.progress(1, true); built() }
 
   return {
     // motion off: finish the build and hold the camera still
-    setMotion(on) { moving = on; if (!on) tl.progress(1, true); else if (tl.progress() < 1) tl.play() },
+    setMotion(on) { moving = on; if (!on) { tl.progress(1, true); built() } else if (tl.progress() < 1) tl.play() },
+    // slide the field aside once the sign-in copy appears
+    makeRoom() { gsap.to(shift, { v: 0.2, duration: 1.2, ease: 'power2.inOut' }) },
     dispose() {
       cancelAnimationFrame(raf); ro.disconnect(); tl.kill();
-      gsap.killTweensOf([warm, ...pods.map((p) => p.userData.mat)]);
+      gsap.killTweensOf([warm, shift, ...pods.map((p) => p.userData.mat)]);
       renderer.dispose(); pmrem.dispose();
       scene.traverse((o) => { o.geometry?.dispose?.(); const m = o.material; (Array.isArray(m) ? m : [m]).forEach((x) => { x?.map?.dispose?.(); x?.dispose?.() }) });
       renderer.domElement.remove();

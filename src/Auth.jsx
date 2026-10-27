@@ -55,7 +55,30 @@ export function Brand({ team }) {
     </div>
   );
 }
+const INTRO_KEY = 'tt-field-intro-v1';
+function introSeen() {
+  try {
+    return localStorage.getItem(INTRO_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
 export default function Auth({ w }) {
+  // first visit only: the field builds full screen, then the sign-in fades in over it
+  const [intro, setIntro] = useState(() => !introSeen());
+  useEffect(() => {
+    if (!intro) return;
+    const t = setTimeout(endIntro, 25000); // never strand someone behind a slow CDN
+    return () => clearTimeout(t);
+  }, [intro]);
+  function endIntro() {
+    setIntro(false);
+    try {
+      localStorage.setItem(INTRO_KEY, '1');
+    } catch {
+      /* private mode: they will see it again next time */
+    }
+  }
   const [joinCode, setJoinCode] = useState(() => {
     try {
       return readInvite(location.search, sessionStorage);
@@ -173,8 +196,13 @@ export default function Auth({ w }) {
   }
   const [flow, setFlow] = useState('join');
   return (
-    <div className="entry">
-      <FieldBackdrop />
+    <div className={`entry ${intro ? 'intro' : ''}`}>
+      <FieldBackdrop centered={intro} onBuilt={endIntro} />
+      {intro && (
+        <p className="intro-caption" role="status">
+          Building the BIOBUZZ field…
+        </p>
+      )}
       <nav className="entry-nav">
         <Brand />
         <div>
