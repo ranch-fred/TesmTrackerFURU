@@ -441,6 +441,37 @@ export default function Records({ kind, w, compact = false }) {
       </div>
     );
   }
+  // a meeting's action items, one per line, become task-board cards
+  async function createTasks(r) {
+    try {
+      for (const title of (r.actions || '').split('\n').filter(Boolean)) {
+        if (
+          !w.data.tasks.some((t) => t.meetingId === r.id && t.title === title)
+        )
+          await w.save('tasks', {
+            title,
+            description: r.summary,
+            assignees: r.attendees || [],
+            subteam: 'Mechanical',
+            priority: 'Medium',
+            assigned: r.date,
+            due: '',
+            status: 'To Do',
+            meetingId: r.id,
+          });
+      }
+      setErr('Action items added to the task board.');
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+  function createTasksButton(r) {
+    return (
+      <button className="text-button" onClick={() => createTasks(r)}>
+        Create tasks <ArrowUpRight size={13} />
+      </button>
+    );
+  }
   function value(r, f) {
     const v = r[f.key];
     if (f.type === 'checkbox')
@@ -485,7 +516,7 @@ export default function Records({ kind, w, compact = false }) {
     return String(v ?? '—');
   }
   return (
-    <section className={compact ? 'record-section' : 'record-section panel'}>
+    <section className={`record-section record-${kind}${compact ? '' : ' panel'}`}>
       <div className="section-toolbar">
         <div>
           <h2>{schema.title}</h2>
@@ -667,6 +698,74 @@ export default function Records({ kind, w, compact = false }) {
             </article>
           ))}
         </div>
+      ) : kind === 'meetings' ? (
+        <ol className="meeting-timeline">
+          {rows.map((r) => {
+            const when = r.date ? new Date(r.date + 'T12:00') : null;
+            return (
+              <li key={r.id}>
+                <time dateTime={r.date}>
+                  <b>{when ? when.getDate() : '—'}</b>
+                  <small>
+                    {when
+                      ? when.toLocaleString('en-US', { month: 'short', year: 'numeric' })
+                      : 'No date'}
+                  </small>
+                </time>
+                <div className="meeting-body">
+                  <h3>{r.summary || 'Meeting'}</h3>
+                  {r.decisions && (
+                    <p>
+                      <small className="muted">Decided · </small>
+                      {r.decisions}
+                    </p>
+                  )}
+                  {r.actions && (
+                    <ul className="meeting-actions">
+                      {r.actions
+                        .split('\n')
+                        .filter(Boolean)
+                        .map((a) => (
+                          <li key={a}>{a}</li>
+                        ))}
+                    </ul>
+                  )}
+                  <div className="meeting-foot">
+                    <span className="muted">{r.attendees?.join(', ') || 'No attendees'}</span>
+                    {actions(r)}
+                    {editAllowed && r.actions && createTasksButton(r)}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      ) : kind === 'purchases' ? (
+        <div className="purchase-tickets">
+          {rows.map((r) => {
+            const stages = schema.fields.find((f) => f.key === 'status').options;
+            const at = stages.indexOf(r.status);
+            return (
+              <article key={r.id} className="purchase-ticket">
+                <header>
+                  <b>{r.number || 'No indent number'}</b>
+                  <small className="muted">
+                    {r.requestedBy || 'Unknown'} · needed by {r.neededBy || 'not set'}
+                  </small>
+                </header>
+                <p>{r.parts?.join(', ') || 'No parts listed'}</p>
+                <ol className="purchase-steps" aria-label={`Status: ${r.status || 'not set'}`}>
+                  {stages.map((st, i) => (
+                    <li key={st} className={i <= at ? 'done' : ''} aria-current={i === at ? 'step' : undefined}>
+                      {st}
+                    </li>
+                  ))}
+                </ol>
+                {actions(r)}
+              </article>
+            );
+          })}
+        </div>
       ) : kind === 'roster' ? (
         <div className="roster-grid">
           {rows.map((r) => {
@@ -808,36 +907,6 @@ export default function Records({ kind, w, compact = false }) {
                   )}
                   <td className="sticky-end">
                     {actions(r)}
-                    {kind === 'meetings' && editAllowed && (
-                      <button
-                        className="text-button"
-                        onClick={async () => {
-                          try {
-                            for (const title of (r.actions || '').split('\n').filter(Boolean)) {
-                              if (
-                                !w.data.tasks.some((t) => t.meetingId === r.id && t.title === title)
-                              )
-                                await w.save('tasks', {
-                                  title,
-                                  description: r.summary,
-                                  assignees: r.attendees || [],
-                                  subteam: 'Mechanical',
-                                  priority: 'Medium',
-                                  assigned: r.date,
-                                  due: '',
-                                  status: 'To Do',
-                                  meetingId: r.id,
-                                });
-                            }
-                            setErr('Action items added to the task board.');
-                          } catch (e) {
-                            setErr(e.message);
-                          }
-                        }}
-                      >
-                        Create tasks <ArrowUpRight size={13} />
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}
