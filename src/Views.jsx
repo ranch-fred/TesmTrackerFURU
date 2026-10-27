@@ -923,6 +923,12 @@ export function Robot({ w, initial = 'robot' }) {
         </h1>
         <p>Every mechanism has a purpose. Every connection has a name.</p>
       </div>
+      <PillTabs
+        label="Robot sections"
+        value={tab}
+        onChange={setTab}
+        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
+      />
       <div className="robot-top">
         <section className="panel robot-detail">
           <div className="blueprint-grid">
@@ -968,12 +974,6 @@ export function Robot({ w, initial = 'robot' }) {
           )}
         </section>
       </div>
-      <PillTabs
-        label="Robot sections"
-        value={tab}
-        onChange={setTab}
-        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
-      />
       {tab === 'hardware' ? (
         <HardwareMap w={w} />
       ) : tab === 'inspection' ? (

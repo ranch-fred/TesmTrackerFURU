@@ -716,7 +716,7 @@ export default function Records({ kind, w, compact = false }) {
                   <h3>{r.summary || 'Meeting'}</h3>
                   {r.decisions && (
                     <p>
-                      <small className="muted">Decided · </small>
+                      <small className="muted">Decided</small>
                       {r.decisions}
                     </p>
                   )}

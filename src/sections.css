@@ -1790,9 +1790,6 @@ html[data-motion='on'] .settings-panel.motion-ready:not(.is-visible) {
 .page-dashboard .robot-vitals .vitals-stats {
   justify-content: center;
 }
-html[data-motion='off'] .schematic-body {
-  transform: none;
-}
 /* latest word: date column, then the post */
 .page-dashboard .latest-word .announcement-preview {
   display: grid;
@@ -1951,4 +1948,177 @@ html[data-motion='off'] .schematic-body {
 .page-designs .cad-panel > p:not(.note) {
   font-size: 13px;
   margin: 0;
+}
+
+/* ===================== Round 7: dashboard ===================== */
+/* Fewer kickers: the countdown, daily log and next-move labels go; the
+   quick actions sit right under the countdown. */
+.page-dashboard :is(.countdown-panel, .daily-log-reminder) .eyebrow,
+.page-dashboard .command-label {
+  display: none !important;
+}
+.page-dashboard .command-strip {
+  justify-content: flex-start !important;
+}
+/* robot: a two-column figure, drawing left and readings right */
+.page-dashboard .dashboard-grid > .robot-vitals {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) !important;
+  justify-items: stretch;
+  align-items: center;
+  text-align: left;
+  column-gap: 40px;
+}
+.page-dashboard .dashboard-grid > .robot-vitals > .panel-heading {
+  grid-column: 1 / -1 !important;
+  justify-content: space-between;
+}
+.page-dashboard .dashboard-grid > .robot-vitals > .robot-schematic {
+  grid-column: 1 !important;
+}
+.page-dashboard .dashboard-grid > .robot-vitals > :not(.panel-heading):not(.robot-schematic) {
+  grid-column: 2 !important;
+}
+.page-dashboard .robot-vitals .vitals-stats {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px !important;
+  justify-content: start;
+}
+.page-dashboard .robot-vitals .vitals-stats > div {
+  border: 0 !important;
+  border-bottom: 1px solid var(--glass-edge) !important;
+  padding: 0 0 12px !important;
+}
+.page-dashboard .robot-vitals .schematic-caption {
+  position: static !important;
+  display: block;
+  margin-top: 18px;
+  text-align: center;
+}
+/* the bottom strip is plain columns, unlike the ruled metric strip */
+.page-dashboard .bottom-grid > .panel + .panel {
+  border-left: 0 !important;
+}
+.page-dashboard .notes-cell .match-highlight strong {
+  color: var(--ink) !important;
+  font-family: var(--heading) !important;
+}
+.page-dashboard .bottom-grid > .panel > * {
+  margin-inline: 0 !important;
+  padding-inline: 0 !important;
+}
+@media (max-width: 760px) {
+  .page-dashboard .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .page-dashboard .stat-card {
+    padding: 6px 10px !important;
+    border-top: 0 !important;
+  }
+  .page-dashboard .stat-card:nth-child(3) {
+    border-left: 1px solid var(--glass-edge) !important;
+    padding-left: 10px !important;
+  }
+  .page-dashboard .stat-card strong {
+    font-size: 24px !important;
+  }
+  .page-dashboard .stat-card small {
+    display: none;
+  }
+  .page-dashboard .dashboard-grid > .robot-vitals {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .page-dashboard .dashboard-grid > .robot-vitals > :not(.panel-heading) {
+    grid-column: 1 !important;
+  }
+}
+
+/* ===================== Round 7: pages ===================== */
+/* announcements: neutral rules; the accent stays on the pinned badge */
+.announcement-list article.pinned {
+  border-block: 1px solid var(--glass-edge) !important;
+}
+/* meetings: one rule under the header, checklist below the title in size */
+.record-meetings.panel {
+  border-top: 0 !important;
+}
+.meeting-actions {
+  font-size: 14px;
+  color: var(--ink-2);
+}
+/* finance: one divider language, no gap above the tabs */
+.page-finance .ledger-panel {
+  border-block: 1px solid var(--glass-edge) !important;
+}
+.page-finance .stats-grid {
+  margin-bottom: 8px !important;
+}
+.page-finance .stat-card:nth-child(4) {
+  margin-top: 6px !important;
+  padding-top: 10px !important;
+}
+.page-finance .stat-card {
+  align-self: end;
+}
+/* purchases: the item is the headline, the indent number the label */
+.purchase-ticket p {
+  font-size: 18px !important;
+  font-weight: 600;
+  color: var(--ink) !important;
+}
+.purchase-ticket header b {
+  font-size: 13px !important;
+}
+/* resources: the arrow sits beside its title */
+.resource-link strong {
+  display: inline-flex !important;
+  gap: 8px;
+}
+/* task lanes: cards size to content; a fade says the lanes scroll on phones */
+.kanban-column {
+  align-content: start;
+  align-self: start;
+}
+@media (max-width: 760px) {
+  .record-tasks .kanban {
+    -webkit-mask: linear-gradient(90deg, #000 88%, transparent);
+    mask: linear-gradient(90deg, #000 88%, transparent);
+  }
+}
+/* activity: the filter stays inside the gutter */
+.page-activity input[aria-label='Search activity'] {
+  box-sizing: border-box;
+  max-width: 100%;
+  font-size: 14px !important;
+}
+.page-activity .panel > p {
+  padding-inline: 0 !important;
+}
+/* settings: styled file picker, quieter save button */
+.page-settings input[type='file']::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+/* attendance: status shown as tinted outlines, not solid fills */
+.attendance-day.missed {
+  background: color-mix(in srgb, #d95757 10%, transparent) !important;
+}
+.attendance-calendar-tools label {
+  white-space: nowrap;
+}
+/* competition: readouts stay on one line */
+.page-competition .stat-card strong {
+  white-space: nowrap;
+}
+/* design upload on phones: copy uses the full width */
+@media (max-width: 760px) {
+  .page-designs .cad-panel {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
 }
