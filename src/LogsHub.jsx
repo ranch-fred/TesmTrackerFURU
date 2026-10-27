@@ -21,7 +21,7 @@ export default function LogsHub({ w, initial }) {
   const track = useRef(null);
   const cards = useRef([]);
   const closeButton = useRef(null);
-  const lastCard = useRef(null);
+  const lastOpen = useRef(null);
 
   // the card nearest the middle of the track is the "active" one
   function onScroll() {
@@ -39,12 +39,18 @@ export default function LogsHub({ w, initial }) {
     c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     c?.focus({ preventScroll: true });
   }
+  // back from full screen: centre and focus the card of the log that was open
   useEffect(() => {
-    if (!open) cards.current[active]?.scrollIntoView({ inline: 'center', block: 'nearest' });
+    if (open) return;
+    const i = Math.max(0, logs.findIndex(([k]) => k === lastOpen.current));
+    cards.current[i]?.scrollIntoView({ inline: 'center', block: 'nearest' });
+    if (lastOpen.current) cards.current[i]?.focus({ preventScroll: true });
+    setActive(i);
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
+    lastOpen.current = open;
     closeButton.current?.focus();
     const onKey = (e) => e.key === 'Escape' && close();
     document.addEventListener('keydown', onKey);
@@ -55,13 +61,8 @@ export default function LogsHub({ w, initial }) {
     };
   }, [open]);
 
-  function openLog(kind, card) {
-    lastCard.current = card;
-    setOpen(kind);
-  }
   function close() {
     setOpen(null);
-    requestAnimationFrame(() => lastCard.current?.focus());
   }
 
   const count = (kind) => (w.data[kind] || []).length;
@@ -112,8 +113,8 @@ export default function LogsHub({ w, initial }) {
               key={kind}
               ref={(el) => (cards.current[i] = el)}
               className={`log-card ${i === active ? 'active' : ''}`}
-              aria-label={`Open ${title}, ${count(kind)} entries`}
-              onClick={(e) => openLog(kind, e.currentTarget)}
+              aria-label={`Open ${title}, ${count(kind)} ${count(kind) === 1 ? 'entry' : 'entries'}`}
+              onClick={() => setOpen(kind)}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowRight') go(i + 1);
                 if (e.key === 'ArrowLeft') go(i - 1);
