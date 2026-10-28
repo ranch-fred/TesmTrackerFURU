@@ -17,6 +17,7 @@ import { entities } from './schema';
 import { canEdit, canDelete, csvText, attendance, sum } from './domain';
 import { csv } from './exports';
 import { supabase } from './client';
+import Announcements from './Announcements';
 export function Badge({ children, tone = '' }) {
   return (
     <span
@@ -484,6 +485,61 @@ export default function Records({ kind, w, compact = false }) {
     if (Array.isArray(v)) return v.join(', ') || '—';
     return String(v ?? '—');
   }
+  const dialogs = (
+    <>
+      {edit && (
+        <RecordForm
+          kind={kind}
+          record={edit.id ? edit : null}
+          w={w}
+          onClose={() => setEdit(null)}
+        />
+      )}
+      {discussion && (
+        <Comments row={discussion} kind={kind} w={w} onClose={() => setDiscussion(null)} />
+      )}
+      {deleting && (
+        <Modal title="Delete this record?" onClose={() => setDeleting(null)}>
+          <p>This permanently removes the record. The change remains in the team activity log.</p>
+          <div className="modal-actions">
+            <button className="outline" onClick={() => setDeleting(null)}>
+              Keep record
+            </button>
+            <button
+              className="primary danger-button"
+              onClick={async () => {
+                try {
+                  await w.remove(kind, deleting.id);
+                  setDeleting(null);
+                } catch (e) {
+                  setErr(e.message);
+                  setDeleting(null);
+                }
+              }}
+            >
+              Delete record
+            </button>
+          </div>
+        </Modal>
+      )}
+    </>
+  );
+  if (kind === 'announcements') {
+    return (
+      <section className="announcements-page">
+        <Announcements
+          records={w.data.announcements || []}
+          actions={actions}
+          canCreate={editAllowed}
+          onCreate={() => setEdit({})}
+          onExport={(visibleRows) => csv(kind, visibleRows, schema.fields)}
+          onDiscuss={setDiscussion}
+          error={err}
+        />
+        {dialogs}
+      </section>
+    );
+  }
   return (
     <section className={compact ? 'record-section' : 'record-section panel'}>
       <div className="section-toolbar">
@@ -648,25 +704,6 @@ export default function Records({ kind, w, compact = false }) {
             )}
           </div>
         </>
-      ) : kind === 'announcements' ? (
-        <div className="announcement-list">
-          {rows.map((r) => (
-            <article key={r.id}>
-              <div>
-                <div className="inline">
-                  <Badge tone={r.pinned ? 'orange' : ''}>{r.pinned ? 'PINNED' : 'UPDATE'}</Badge>
-                  <small className="muted">
-                    {r.date} · {r.author}
-                  </small>
-                </div>
-                <h3>{r.title}</h3>
-                <p>{r.message}</p>
-                <small className="muted">To: {r.targets?.join(', ') || 'Whole team'}</small>
-              </div>
-              {actions(r)}
-            </article>
-          ))}
-        </div>
       ) : kind === 'roster' ? (
         <div className="roster-grid">
           {rows.map((r) => {
@@ -883,41 +920,7 @@ export default function Records({ kind, w, compact = false }) {
           })}
         </div>
       )}
-      {edit && (
-        <RecordForm
-          kind={kind}
-          record={edit.id ? edit : null}
-          w={w}
-          onClose={() => setEdit(null)}
-        />
-      )}
-      {discussion && (
-        <Comments row={discussion} kind={kind} w={w} onClose={() => setDiscussion(null)} />
-      )}
-      {deleting && (
-        <Modal title="Delete this record?" onClose={() => setDeleting(null)}>
-          <p>This permanently removes the record. The change remains in the team activity log.</p>
-          <div className="modal-actions">
-            <button className="outline" onClick={() => setDeleting(null)}>
-              Keep record
-            </button>
-            <button
-              className="primary danger-button"
-              onClick={async () => {
-                try {
-                  await w.remove(kind, deleting.id);
-                  setDeleting(null);
-                } catch (e) {
-                  setErr(e.message);
-                  setDeleting(null);
-                }
-              }}
-            >
-              Delete record
-            </button>
-          </div>
-        </Modal>
-      )}
+      {dialogs}
     </section>
   );
 }
