@@ -1,0 +1,658 @@
+/* This surface is deliberately scoped to Announcements. Shared console styles stay intact. */
+.announcements-page {
+  min-width: 0;
+  container-type: inline-size;
+}
+.ann-board {
+  --ann-edge: color-mix(in srgb, var(--ink) 13%, transparent);
+  --ann-muted: var(--ink-2);
+  color: var(--ink);
+  position: relative;
+  isolation: isolate;
+  padding: 30px;
+  border: 1px solid var(--ann-edge);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      ellipse at 100% 0%,
+      color-mix(in srgb, var(--accent) 12%, transparent),
+      transparent 55%
+    ),
+    color-mix(in srgb, var(--surface) 46%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--ink) 9%, transparent),
+    0 25px 70px -45px #000;
+}
+.ann-board::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(var(--ann-edge) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ann-edge) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, #00000030, transparent 45%);
+}
+.ann-board .ann-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+.ann-board .ann-kicker,
+.ann-board .ann-side-label,
+.ann-board .ann-label,
+.ann-board .ann-feed-heading {
+  font: 10px var(--mono);
+  letter-spacing: 1.5px;
+}
+.ann-board .ann-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--accent);
+  margin-bottom: 13px;
+}
+.ann-board .ann-kicker > span {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 14px var(--accent);
+}
+.ann-board .ann-header h2 {
+  font: 600 clamp(28px, 3.1vw, 42px)/1.1 var(--heading);
+  letter-spacing: -1.5px;
+}
+.ann-board .ann-header h2 > span {
+  color: var(--accent);
+}
+.ann-board .ann-header p {
+  color: var(--ann-muted);
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.ann-board .ann-header-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.ann-board .ann-header-actions button {
+  font-size: 12px;
+  min-height: 42px;
+}
+.ann-board .ann-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 24px;
+  align-items: start;
+}
+.ann-board .ann-main {
+  min-width: 0;
+}
+.ann-board .ann-controls {
+  border: 1px solid var(--ann-edge);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  backdrop-filter: blur(22px);
+  padding: 6px 14px 0;
+}
+.ann-board .ann-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ann-muted);
+  border-bottom: 1px solid var(--ann-edge);
+}
+.ann-board .ann-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink);
+  min-height: 49px;
+  padding: 10px 0;
+  font-size: 13px;
+}
+.ann-board input::placeholder {
+  color: var(--ann-muted);
+  opacity: 1;
+}
+.ann-board .ann-filter-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+.ann-board .ann-tabs {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.ann-board .ann-tabs button {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--ann-muted);
+  gap: 6px;
+}
+.ann-board .ann-tabs button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent);
+  background: var(--accent-dim);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 15%, transparent);
+}
+.ann-board .ann-tabs button span {
+  font: 10px var(--mono);
+  padding: 2px 5px;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  border-radius: 5px;
+}
+.ann-board .ann-sort {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  color: var(--ann-muted);
+  margin: 0;
+}
+.ann-board .ann-sort select {
+  min-height: 36px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 0;
+  font-size: 11px;
+  padding: 5px 7px;
+  width: auto;
+}
+.ann-board .ann-mobile-audience {
+  display: none;
+}
+.ann-board .ann-results {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 45px;
+  color: var(--ann-muted);
+  font: 10px var(--mono);
+}
+.ann-board .ann-results button {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 11px;
+  padding: 7px 0;
+}
+.ann-board .ann-card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--ann-edge);
+  border-radius: 18px;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--ink) 6%, transparent), transparent 50%),
+    color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(24px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent),
+    0 16px 32px -24px #000;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.ann-board .ann-card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--ann-edge));
+  box-shadow:
+    inset 0 1px 0 var(--ann-edge),
+    0 18px 34px -25px var(--accent);
+  transform: translateY(-2px);
+}
+.ann-board .ann-spotlight {
+  padding: 28px;
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background:
+    radial-gradient(
+      ellipse at 95% 10%,
+      color-mix(in srgb, var(--accent) 20%, transparent),
+      transparent 65%
+    ),
+    linear-gradient(130deg, color-mix(in srgb, var(--ink) 8%, transparent), transparent 60%),
+    color-mix(in srgb, var(--surface) 78%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--accent) 50%, transparent),
+    0 16px 50px -35px var(--accent);
+}
+.ann-board .ann-card-top {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.ann-board .ann-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--ann-muted);
+  font-size: 9px;
+  letter-spacing: 1.1px;
+}
+.ann-board .ann-label-accent {
+  color: var(--accent);
+}
+.ann-board .ann-card time {
+  font: 10px var(--mono);
+  color: var(--ann-muted);
+}
+.ann-board .ann-card h3 {
+  position: relative;
+  font: 600 23px/1.25 var(--heading);
+  letter-spacing: -0.5px;
+  margin: 20px 0 12px;
+  overflow-wrap: anywhere;
+}
+.ann-board .ann-spotlight h3 {
+  font-size: clamp(26px, 2.5vw, 34px);
+  max-width: 80%;
+}
+.ann-board .ann-message {
+  position: relative;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink);
+  max-width: 68ch;
+}
+.ann-board .ann-audiences {
+  position: relative;
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 23px 0;
+  color: var(--ann-muted);
+}
+.ann-board .ann-audiences > span {
+  border: 1px solid var(--ann-edge);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 10px;
+  background: color-mix(in srgb, var(--surface) 30%, transparent);
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.ann-board .ann-card-footer {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 18px;
+  border-top: 1px solid var(--ann-edge);
+}
+.ann-board .ann-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.ann-board .ann-author > div {
+  min-width: 0;
+}
+.ann-board .ann-author strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.ann-board .ann-author small {
+  display: block;
+  color: var(--ann-muted);
+  font-size: 10px;
+  margin-top: 4px;
+}
+.ann-board .ann-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 11px;
+  font: 11px var(--mono);
+  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent-dim), transparent);
+}
+.ann-board .row-actions {
+  gap: 5px;
+  padding: 0;
+  border: 0;
+}
+.ann-board .row-actions .icon-button {
+  border: 1px solid var(--ann-edge);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 45%, transparent);
+  width: 34px;
+  height: 34px;
+  color: var(--ann-muted);
+}
+.ann-board .row-actions .icon-button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.ann-board .row-actions .danger:hover {
+  color: #ef7777;
+  border-color: #ef7777;
+}
+.ann-board .ann-discuss {
+  position: relative;
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin-top: 18px;
+  border: 0;
+  border-top: 1px solid var(--ann-edge);
+  padding: 17px 0 0;
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+}
+.ann-board .ann-discuss svg:last-child {
+  margin-left: auto;
+}
+.ann-board .ann-orbit {
+  position: absolute;
+  right: -15px;
+  top: 36px;
+  width: 190px;
+  height: 190px;
+  opacity: 0.17;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  pointer-events: none;
+}
+.ann-board .ann-orbit span {
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+}
+.ann-board .ann-orbit span:nth-child(2) {
+  inset: 30px;
+  border-style: dashed;
+}
+.ann-board .ann-feed-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 27px 0 18px;
+  color: var(--ann-muted);
+  font-size: 9px;
+}
+.ann-board .ann-feed-heading > span {
+  height: 1px;
+  background: var(--ann-edge);
+  flex: 1;
+}
+.ann-board .ann-feed {
+  display: grid;
+  gap: 18px;
+}
+.ann-board .ann-sidebar {
+  display: grid;
+  gap: 18px;
+}
+.ann-board .ann-overview,
+.ann-board .ann-channels {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ann-edge);
+  border-radius: 18px;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--ink) 7%, transparent), transparent 70%),
+    color-mix(in srgb, var(--surface) 62%, transparent);
+  backdrop-filter: blur(22px);
+  padding: 22px;
+  box-shadow: inset 0 1px 0 var(--ann-edge);
+}
+.ann-board .ann-side-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ann-muted);
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+.ann-board .ann-overview h3 {
+  font: 600 28px/1.15 var(--heading);
+  letter-spacing: -0.7px;
+  margin: 24px 0;
+}
+.ann-board .ann-overview h3 > span {
+  color: var(--accent);
+}
+.ann-board .ann-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--ann-edge);
+}
+.ann-board .ann-metrics > div + div {
+  padding-left: 22px;
+  border-left: 1px solid var(--ann-edge);
+}
+.ann-board .ann-metrics strong {
+  display: block;
+  font: 32px var(--mono);
+  letter-spacing: -2px;
+}
+.ann-board .ann-metrics span {
+  display: block;
+  font-size: 10px;
+  color: var(--ann-muted);
+  margin-top: 5px;
+}
+.ann-board .ann-overview p {
+  color: var(--ann-muted);
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 20px 0;
+}
+.ann-board .ann-signal {
+  display: flex;
+  height: 54px;
+  gap: 4px;
+  align-items: center;
+  mask-image: linear-gradient(90deg, transparent, #000 25%, #000 75%, transparent);
+}
+.ann-board .ann-signal i {
+  flex: 1;
+  background: linear-gradient(0deg, var(--accent-dim), var(--accent));
+  opacity: 0.65;
+  border-radius: 3px;
+}
+.ann-board .ann-channels {
+  padding: 20px 14px 14px;
+}
+.ann-board .ann-channels .ann-side-label {
+  margin: 0 6px 17px;
+}
+.ann-board .ann-channels button {
+  width: 100%;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  padding: 11px 10px;
+  background: transparent;
+  color: var(--ann-muted);
+  font-size: 12px;
+  text-align: left;
+}
+.ann-board .ann-channels button span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.ann-board .ann-channels button b {
+  font: 10px var(--mono);
+}
+.ann-board .ann-channels button[aria-pressed='true'] {
+  background: var(--accent-dim);
+  border-color: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--accent);
+}
+.ann-board .ann-side-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 0 8px;
+  color: var(--ann-muted);
+}
+.ann-board .ann-side-note > svg {
+  color: var(--accent);
+  margin-top: 3px;
+  flex-shrink: 0;
+}
+.ann-board .ann-side-note p {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.ann-board .ann-side-note strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.ann-board .ann-empty {
+  text-align: center;
+  border: 1px dashed var(--ann-edge);
+  border-radius: 18px;
+  padding: 46px 24px;
+  background: var(--glass);
+}
+.ann-board .ann-empty > span {
+  display: inline-grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 22px;
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  background: var(--accent-dim);
+  margin-bottom: 20px;
+}
+.ann-board .ann-empty h3 {
+  font-size: 23px;
+}
+.ann-board .ann-empty p {
+  color: var(--ann-muted);
+  line-height: 1.8;
+  margin: 12px auto 23px;
+  max-width: 340px;
+}
+@container (max-width: 950px) {
+  .ann-board {
+    padding: 22px;
+  }
+  .ann-board .ann-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .ann-board .ann-layout {
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 18px;
+  }
+}
+@container (max-width: 700px) {
+  .ann-board {
+    padding: 16px;
+    border-radius: 18px;
+  }
+  .ann-board .ann-layout {
+    display: block;
+  }
+  .ann-board .ann-sidebar {
+    display: none;
+  }
+  .ann-board .ann-mobile-audience {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid var(--ann-edge);
+    padding: 10px 0;
+    margin: 0;
+    font-size: 11px;
+    color: var(--ann-muted);
+  }
+  .ann-board .ann-mobile-audience select {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--ann-edge);
+    border-radius: 8px;
+    min-height: 36px;
+    width: auto;
+    min-width: 0;
+    flex: 1;
+    font-size: 12px;
+  }
+  .ann-board .ann-card,
+  .ann-board .ann-spotlight {
+    padding: 20px;
+  }
+  .ann-board .ann-spotlight h3 {
+    max-width: 100%;
+  }
+}
+@container (max-width: 380px) {
+  .ann-board {
+    padding: 12px;
+  }
+  .ann-board .ann-header-actions {
+    width: 100%;
+  }
+  .ann-board .ann-header-actions .primary {
+    flex: 1;
+  }
+  .ann-board .ann-header-actions button {
+    font-size: 11px;
+    padding-inline: 10px;
+  }
+  .ann-board .ann-card {
+    padding: 16px;
+  }
+  .ann-board .ann-filter-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ann-board .ann-card {
+    transition: none;
+  }
+  .ann-board .ann-card:hover {
+    transform: none;
+  }
+}
+:root[data-motion='off'] .ann-board .ann-card {
+  transition: none;
+  transform: none;
+}
