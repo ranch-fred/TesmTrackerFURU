@@ -35,36 +35,39 @@ export default async function handler(req, res) {
     .eq('id', teamId)
     .single();
   if (teamError || !team) return res.status(404).json({ error: 'Team not found.' });
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.INVITE_FROM_EMAIL;
-  if (!apiKey || !from)
+  const webAppUrl = process.env.GOOGLE_INVITE_WEB_APP_URL;
+  const secret = process.env.GOOGLE_INVITE_SECRET;
+  if (!webAppUrl || !secret)
     return res
       .status(503)
       .json({
         error:
-          'Email sending is not configured yet. Ask the site owner to set RESEND_API_KEY and INVITE_FROM_EMAIL.',
+          'Email sending is not configured yet. Ask the site owner to connect the team Gmail account.',
       });
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(webAppUrl))
+    return res.status(503).json({ error: 'The Google mail connection URL is invalid.' });
   const base = process.env.SITE_URL || 'https://tesm-tracker-furu.vercel.app';
   const invite = new URL('/', base);
   invite.searchParams.set('invite', team.join_code);
   const safeName = team.name.replace(/[\r\n]/g, ' ').slice(0, 100);
   try {
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await fetch(webAppUrl, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({
-        from,
-        to: [email],
-        subject: `Join ${safeName} on FTC Team Tracker`,
-        text: `${safeName} invited you to join their team workspace.\n\nOpen this link to join: ${invite}\n\nYou can sign in with Google or email. A captain or coach will approve your request.`,
+        secret,
+        email,
+        teamName: safeName,
+        inviteUrl: invite.toString(),
       }),
     });
-    if (!response.ok)
+    const result = await response.json().catch(() => null);
+    if (!response.ok || result?.ok !== true)
       return res
         .status(502)
         .json({
           error:
-            'The email service could not send this invitation. Check the sender configuration and try again.',
+            'Google could not send the invitation. Check the Apps Script deployment and Gmail quota.',
         });
     return res.status(200).json({ sent: true });
   } catch {
