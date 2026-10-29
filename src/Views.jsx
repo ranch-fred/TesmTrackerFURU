@@ -46,6 +46,7 @@ import RobotWorkspace from './RobotWorkspace';
 import { officialRules } from './robot-rules';
 import PillTabs from './PillTabs';
 import IsoLoop from './IsoLoop';
+import './finance.css';
 const palette = [
   'var(--orange)',
   'color-mix(in srgb, var(--orange) 78%, white)',
@@ -117,6 +118,42 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
     </div>
   ) : (
     <div className="chart-empty">Add funding and expenses to see your trend.</div>
+  );
+}
+function FinanceBalanceChart({ data }) {
+  const { enabled } = useMotion();
+  if (!data.length) return <div className="chart-empty">Add funding or an expense to see your balance.</div>;
+  const points = [{ date: 'Start', balance: 0 }, ...data.map(({ date, balance }) => ({ date, balance }))];
+  return (
+    <div className="finance-balance-chart">
+      <ResponsiveContainer>
+        <AreaChart data={points} margin={{ left: 0, right: 16, top: 12, bottom: 0 }}>
+          <defs>
+            <linearGradient id="financeBalanceFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--orange)" stopOpacity={0.28} />
+              <stop offset="100%" stopColor="var(--orange)" stopOpacity={0.01} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid stroke="#333" vertical={false} strokeDasharray="3 6" />
+          <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fill: '#929292', fontSize: 11 }} dy={8} />
+          <YAxis width={52} axisLine={false} tickLine={false} tick={{ fill: '#929292', fontSize: 11 }} tickFormatter={money} />
+          <Tooltip
+            contentStyle={{ background: '#1b1b1b', border: '1px solid #555', borderRadius: 10 }}
+            formatter={(value) => [money(value), 'Balance']}
+          />
+          <Area
+            isAnimationActive={enabled}
+            type="monotone"
+            dataKey="balance"
+            stroke="var(--orange)"
+            strokeWidth={3}
+            fill="url(#financeBalanceFill)"
+            dot={{ r: 4, fill: 'var(--orange)', stroke: '#fff', strokeWidth: 2 }}
+            activeDot={{ r: 6, fill: 'var(--orange)', stroke: '#fff', strokeWidth: 2 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 // Live days / hours / minutes / seconds until the next competition.
@@ -575,6 +612,7 @@ export function Dashboard({ w, navigate }) {
 export function Finance({ w }) {
   const { enabled } = useMotion();
   const [form, setForm] = useState(null);
+  const [addOpen, setAddOpen] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [error, setError] = useState('');
   const d = w.data,
@@ -587,6 +625,11 @@ export function Finance({ w }) {
       'amount',
     ),
   }));
+  const transactions = [
+    ...d.income.map((record) => ({ kind: 'income', record, date: record.lastContact || '', amount: record.received })),
+    ...d.expenses.map((record) => ({ kind: 'expenses', record, date: record.date || '', amount: record.amount })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
+  const editable = !parent && canEdit(w.member.role, w.member.mentor_edit);
   return (
     <>
       <div className="page-intro">
@@ -596,7 +639,7 @@ export function Finance({ w }) {
         </h1>
         <p>Every receipt. Every relationship. Every next possibility.</p>
       </div>
-      <div className="stats-grid">
+      <div className="stats-grid finance-stats">
         <Stat
           label="CURRENT BALANCE"
           value={money(f.balance)}
@@ -612,32 +655,18 @@ export function Finance({ w }) {
         />
         <Stat label="MONEY SPENT" value={money(f.spent)} note="All recorded expenses" icon={Out} />
       </div>
-      <div className="page-actions">
-        <div className="inline">
-          {!parent && canEdit(w.member.role, w.member.mentor_edit) && (
-            <>
-              <button className="outline" onClick={() => setForm({ kind: 'income' })}>
-                <Plus size={16} /> Log funding
-              </button>
-              <button className="primary" onClick={() => setForm({ kind: 'expenses' })}>
-                <Plus size={16} /> Add expense
-              </button>
-            </>
-          )}
-        </div>
-      </div>
       {error && (
         <p className="error" role="alert">
           {error}
         </p>
       )}
       <>
-        <div className="finance-layout">
+        <div className="finance-layout finance-overview">
           <section className="panel">
             <div className="panel-heading">
               <div>
                 <span className="eyebrow subtle">CASH FLOW</span>
-                <h2>Resources for the road ahead.</h2>
+                <h2>Balance over time.</h2>
               </div>
               <Badge tone="orange">SEASON TO DATE</Badge>
             </div>
@@ -648,9 +677,9 @@ export function Finance({ w }) {
               </div>
             ) : (
               <>
-                <Chart data={trend(d)} height={280} />
+                <FinanceBalanceChart data={trend(d)} />
                 <small className="chart-footnote">
-                  Cumulative recorded totals by funding and expense date.
+                  Running balance by recorded funding and expense date.
                 </small>
               </>
             )}
@@ -665,7 +694,7 @@ export function Finance({ w }) {
               </div>
               {split.length ? (
                 <>
-                  <div style={{ height: 210 }}>
+                  <div className="finance-donut">
                     <ResponsiveContainer>
                       <PieChart>
                         <Pie
@@ -687,6 +716,10 @@ export function Finance({ w }) {
                         />
                       </PieChart>
                     </ResponsiveContainer>
+                    <div className="finance-donut-center">
+                      <strong>{money(f.spent)}</strong>
+                      <small>spent</small>
+                    </div>
                   </div>
                   <div className="chart-legend">
                     {split.map((c, i) => (
@@ -705,99 +738,65 @@ export function Finance({ w }) {
           )}
         </div>
         {!parent && (
-          <div className="finance-layout">
-            <section className="panel">
-              <div className="panel-heading">
-                <h2>Funding</h2>
+          <section className="panel finance-timeline">
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow subtle">ACTIVITY</span>
+                <h2>Transaction timeline.</h2>
               </div>
-              {[...d.income]
-                .sort((a, b) => (b.lastContact || '').localeCompare(a.lastContact || ''))
-                .map((item) => (
-                  <div className="funding-row" key={item.id}>
-                    <span className="funding-icon">{item.company?.[0] || '$'}</span>
-                    <div>
-                      <strong>{item.company || 'Funding source'}</strong>
-                      <small>{item.lastContact || 'No date'}</small>
+            </div>
+            {transactions.length ? (
+              <div className="finance-timeline-list">
+                {transactions.map(({ kind, record, date, amount }) => {
+                  const incoming = kind === 'income';
+                  const title = incoming ? record.company || 'Funding source' : record.description || 'Expense';
+                  return (
+                    <div className="finance-transaction" key={`${kind}-${record.id}`}>
+                      <time dateTime={date}>{date || 'No date'}</time>
+                      <span className={`finance-transaction-dot ${incoming ? 'incoming' : ''}`} />
+                      <div className="finance-transaction-card">
+                        <span className="funding-icon">{incoming ? title[0] : '−'}</span>
+                        <strong className="finance-transaction-title">{title}</strong>
+                        <span className={`finance-category ${incoming ? 'incoming' : ''}`}>
+                          {incoming ? 'Funding' : record.category || 'Other'}
+                        </span>
+                        <strong className={`finance-transaction-amount ${incoming ? 'incoming' : ''}`}>
+                          {incoming ? '+' : '−'}{money(amount)}
+                        </strong>
+                        {editable && (
+                          <button className="icon-button" aria-label={`Edit ${incoming ? 'funding from' : 'expense'} ${title}`} onClick={() => setForm({ kind, record })}>
+                            <Pencil size={16} />
+                          </button>
+                        )}
+                        {canDelete(w.member.role) && (
+                          <button className="icon-button danger" aria-label={`Delete ${incoming ? 'funding from' : 'expense'} ${title}`} onClick={() => setDeleting({ kind, record })}>
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <strong className="money">+{money(item.received)}</strong>
-                    {canEdit(w.member.role, w.member.mentor_edit) && (
-                      <button
-                        className="icon-button"
-                        aria-label={`Edit funding from ${item.company}`}
-                        onClick={() => setForm({ kind: 'income', record: item })}
-                      >
-                        <Pencil size={16} />
-                      </button>
-                    )}
-                    {canDelete(w.member.role) && (
-                      <button
-                        className="icon-button danger"
-                        aria-label={`Delete funding from ${item.company}`}
-                        onClick={() => setDeleting({ kind: 'income', record: item })}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    )}
-                  </div>
-                ))}
-              {!d.income.length && <p className="empty-copy">No funding logged yet.</p>}
-            </section>
-            <section className="panel">
-              <div className="panel-heading">
-                <h2>Expenses</h2>
+                  );
+                })}
               </div>
-              <div className="table-scroll">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>Amount</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...d.expenses]
-                      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
-                      .map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.date}</td>
-                          <td>
-                            <strong>{item.description}</strong>
-                          </td>
-                          <td>{item.category}</td>
-                          <td className="money">−{money(item.amount)}</td>
-                          <td>
-                            {canEdit(w.member.role, w.member.mentor_edit) && (
-                              <button
-                                className="icon-button"
-                                aria-label={`Edit expense ${item.description}`}
-                                onClick={() => setForm({ kind: 'expenses', record: item })}
-                              >
-                                <Pencil size={16} />
-                              </button>
-                            )}
-                            {canDelete(w.member.role) && (
-                              <button
-                                className="icon-button danger"
-                                aria-label={`Delete expense ${item.description}`}
-                                onClick={() => setDeleting({ kind: 'expenses', record: item })}
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-                {!d.expenses.length && <p className="empty-copy">No expenses logged yet.</p>}
-              </div>
-            </section>
-          </div>
+            ) : (
+              <p className="empty-copy">No transactions logged yet.</p>
+            )}
+          </section>
         )}
       </>
+      {editable && (
+        <div className="finance-add-dock">
+          {addOpen && (
+            <div className="finance-add-menu" role="menu" aria-label="Add finance record">
+              <button role="menuitem" onClick={() => { setAddOpen(false); setForm({ kind: 'income' }); }}>Add funding</button>
+              <button role="menuitem" onClick={() => { setAddOpen(false); setForm({ kind: 'expenses' }); }}>Add expense</button>
+            </div>
+          )}
+          <button className="finance-add-button" aria-label="Add finance record" aria-expanded={addOpen} onClick={() => setAddOpen((open) => !open)}>
+            <Plus size={25} />
+          </button>
+        </div>
+      )}
       {form && (
         <RecordForm w={w} kind={form.kind} record={form.record} onClose={() => setForm(null)} />
       )}
