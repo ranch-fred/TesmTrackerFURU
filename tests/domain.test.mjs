@@ -110,3 +110,19 @@ test('Trend groups same-day amounts and keeps cumulative balances', () => {
     ],
   );
 });
+
+test('roster lists approved accounts that have no roster record', async () => {
+  const { rosterWithMembers } = await import('../src/domain.js');
+  const roster = [{ id: 'r1', name: 'Avery Chen' }];
+  const members = [
+    { id: 'm1', name: 'avery chen', status: 'approved', role: 'Captain' },
+    { id: 'm2', name: 'Sam Lee', status: 'approved', role: 'Member', grade: '10' },
+    { id: 'm3', name: 'Pending Pat', status: 'pending', role: 'Member' },
+  ];
+  const rows = rosterWithMembers(roster, members);
+  assert.deepEqual(
+    rows.map((r) => r.name),
+    ['Avery Chen', 'Sam Lee'],
+  );
+  assert.equal(rows[1].fromAccount, true);
+});

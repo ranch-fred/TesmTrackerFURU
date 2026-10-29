@@ -104,3 +104,33 @@ export function trend(data) {
     return { date: date.slice(5), raised, spent, balance: raised - spent };
   });
 }
+// Roster = hand-entered roster records plus every approved account, so people who
+// joined through an invite show up without being typed in a second time.
+export function rosterWithMembers(roster = [], members = []) {
+  const known = new Set(
+    roster.map((r) =>
+      String(r.name || '')
+        .trim()
+        .toLowerCase(),
+    ),
+  );
+  const fromAccounts = members
+    .filter(
+      (m) =>
+        m.status === 'approved' &&
+        !known.has(
+          String(m.name || '')
+            .trim()
+            .toLowerCase(),
+        ),
+    )
+    .map((m) => ({
+      id: `member-${m.id}`,
+      fromAccount: true,
+      name: m.name,
+      grade: m.grade || '',
+      role: m.role,
+      subteams: m.subteams || [],
+    }));
+  return [...roster, ...fromAccounts];
+}
