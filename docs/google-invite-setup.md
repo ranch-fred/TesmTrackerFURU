@@ -1,6 +1,8 @@
 # Send team invitations with Gmail
 
-The **Team settings → Invites** email form uses a Google Apps Script web app to send a styled join link from a team Gmail account. No paid email service or custom domain is needed. Google currently limits personal accounts to 100 recipients per day; check [Google's quota page](https://developers.google.com/apps-script/guides/services/quotas) for current limits.
+The **Team settings → Invites** email form uses a Google Apps Script web app to send a styled, one-time join link from a team Gmail account. Each code is tied to the recipient email, expires after seven days, and is spent when that person requests to join. No paid email service or custom domain is needed. Google currently limits personal accounts to 100 recipients per day; check [Google's quota page](https://developers.google.com/apps-script/guides/services/quotas) for current limits.
+
+Before testing one-time invites on an existing team, run [`20261029_one_time_email_invites.sql`](../supabase/migrations/20261029_one_time_email_invites.sql) in the live Supabase SQL Editor. Old reusable team codes stop working after this migration.
 
 1. Sign in to the Gmail account that should send invitations. Open [script.google.com](https://script.google.com/) and create a **New project**.
 2. Replace the editor's `Code.gs` contents with [`scripts/google-invite.gs`](../scripts/google-invite.gs), then save the project.

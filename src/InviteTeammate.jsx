@@ -45,7 +45,7 @@ export default function InviteTeammate({ w }) {
         <div>
           <span className="eyebrow">DIRECT INVITE / EMAIL</span>
           <h3>Bring someone aboard.</h3>
-          <p>Send a join link from the team Gmail account.</p>
+          <p>A private code is sent from the team Gmail account and works once for that email.</p>
         </div>
         <ArrowUpRight size={18} aria-hidden="true" />
       </div>

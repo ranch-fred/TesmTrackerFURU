@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PillTabs from './PillTabs';
 import {
-  Copy,
   RefreshCw,
   Download,
   Upload,
@@ -11,7 +10,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { roles, entities, subteams } from './schema';
-import { canDelete, canEdit, uid } from './domain';
+import { canDelete, canEdit } from './domain';
 import { download, csv } from './exports';
 import { Modal, Badge } from './Records';
 import { parseCSV, validateImport } from './importer';
@@ -427,43 +426,10 @@ export default function Settings({ w, initial }) {
           <div className="eyebrow">BRING YOUR CREW</div>
           <h2>Bring the crew in.</h2>
           <p>
-            Send an email invitation or share a link. A captain or coach approves each join request.
+            Send a single-use invite to a teammate's email. A captain or coach approves each join
+            request.
           </p>
           <InviteTeammate w={w} />
-          <div className="invite-share-label">OR SHARE AN INVITE LINK</div>
-          <div className="invite-code">{w.team.join_code}</div>
-          <div className="inline">
-            <button
-              className="primary"
-              onClick={() =>
-                act(async () => {
-                  await navigator.clipboard.writeText(
-                    `${location.origin}/?invite=${w.team.join_code}`,
-                  );
-                  setNote('Invite link copied.');
-                })
-              }
-            >
-              <Copy size={16} /> Copy invite link
-            </button>
-            <button
-              className="outline"
-              onClick={() =>
-                setConfirm({
-                  title: 'Replace the join code?',
-                  run: async () => {
-                    if (w.demo) await w.updateTeam({ join_code: uid().slice(0, 8).toUpperCase() });
-                    else await w.rpc('rotate_invite', { t: w.team.id });
-                  },
-                })
-              }
-            >
-              <RefreshCw size={16} /> New code
-            </button>
-          </div>
-          <p className="note">
-            Rotating the code invalidates old invite links. Existing members keep access.
-          </p>
         </section>
       )}
       {tab === 'preferences' && (
