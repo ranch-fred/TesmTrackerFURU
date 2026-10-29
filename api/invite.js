@@ -49,13 +49,15 @@ export default async function handler(req, res) {
     t: teamId,
     invite_email: email,
   });
-  if (inviteError || !inviteCode)
-    return res
-      .status(503)
-      .json({
-        error:
-          'One-time invites need the Supabase database update. Ask the site owner to apply the invite migration.',
-      });
+  if (inviteError || !inviteCode) {
+    console.error('Could not create one-time invite:', inviteError);
+    return res.status(503).json({
+      error:
+        inviteError?.code === 'PGRST202'
+          ? 'One-time invites need the Supabase database update. Ask the site owner to apply the invite migration.'
+          : `Could not create the invite. Please report error ${inviteError?.code || 'unknown'} to the site owner.`,
+    });
+  }
   const base = process.env.SITE_URL || 'https://tesm-tracker-furu.vercel.app';
   const invite = new URL('/', base);
   invite.searchParams.set('invite', inviteCode);
