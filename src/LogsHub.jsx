@@ -5,6 +5,8 @@ import { canView } from './domain';
 import { LogPage } from './LogEntry';
 import OutreachLog from './OutreachLog';
 import PillTabs from './PillTabs';
+import LogScene from './LogScenes';
+import './log-scenes.css';
 
 const LOGS = [
   ['programming', 'Programming log', Code2, 'Code, tests and autonomous tuning'],
@@ -36,12 +38,13 @@ export default function LogsHub({ w, initial }) {
       if (!t || t.scrollWidth <= t.clientWidth) return;
       const box = t.getBoundingClientRect();
       const mid = box.left + box.width / 2;
-      let best = 0, bestDist = Infinity;
+      let best = 0,
+        bestDist = Infinity;
       cards.current.forEach((c, i) => {
         if (!c) return;
         const r = c.getBoundingClientRect();
         const d = Math.abs(r.left + r.width / 2 - mid);
-        if (d < bestDist) (best = i), (bestDist = d);
+        if (d < bestDist) ((best = i), (bestDist = d));
       });
       setActive(best);
     });
@@ -53,7 +56,8 @@ export default function LogsHub({ w, initial }) {
     const c = cards.current[n];
     // only a row that overflows (narrow screens) needs scrolling to the card
     const t = track.current;
-    if (t && t.scrollWidth > t.clientWidth) c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (t && t.scrollWidth > t.clientWidth)
+      c?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     if (focus) c?.focus({ preventScroll: true });
   }
   // back from full screen: centre and focus the card of the log that was open
@@ -85,7 +89,11 @@ export default function LogsHub({ w, initial }) {
 
   const count = (kind) => (w.data[kind] || []).length;
   const lastDate = (kind) =>
-    (w.data[kind] || []).map((r) => r.date).filter(Boolean).sort().at(-1);
+    (w.data[kind] || [])
+      .map((r) => r.date)
+      .filter(Boolean)
+      .sort()
+      .at(-1);
 
   if (open) {
     const [, title] = LOGS.find(([k]) => k === open);
@@ -108,6 +116,7 @@ export default function LogsHub({ w, initial }) {
           </button>
         </header>
         <div className="log-focus-body" key={open}>
+          <LogScene kind={open} banner />
           {open === 'outreach' ? <OutreachLog w={w} /> : <LogPage kind={open} w={w} />}
         </div>
       </div>,
@@ -130,7 +139,7 @@ export default function LogsHub({ w, initial }) {
             <button
               key={kind}
               ref={(el) => (cards.current[i] = el)}
-              className={`log-card ${i === active ? 'active' : ''}`}
+              className={`log-card with-scene ${i === active ? 'active' : ''}`}
               aria-label={`${i === active ? 'Open' : 'Show'} ${title}, ${count(kind)} ${count(kind) === 1 ? 'entry' : 'entries'}`}
               onClick={() => (i === active ? setOpen(kind) : go(i, false))}
               onKeyDown={(e) => {
@@ -138,6 +147,7 @@ export default function LogsHub({ w, initial }) {
                 if (e.key === 'ArrowLeft') go(i - 1);
               }}
             >
+              <LogScene kind={kind} />
               <Icon className="log-card-icon" size={72} strokeWidth={1.8} aria-hidden="true" />
               <strong>{title}</strong>
               <small>{blurb}</small>

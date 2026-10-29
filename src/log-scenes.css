@@ -1,0 +1,390 @@
+.log-card.with-scene {
+  align-items: flex-start;
+  justify-content: flex-end;
+  text-align: left;
+  gap: 8px;
+  background:
+    radial-gradient(circle at 52% 24%, #b5622b54, transparent 44%),
+    linear-gradient(150deg, #5b3421, #321c13 54%, #24140f);
+}
+
+.log-card.with-scene::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #10090600 24%, #1b0d08aa 66%, #160a07e8 100%);
+  pointer-events: none;
+}
+
+.log-card.with-scene > .log-card-icon,
+.log-card.with-scene > strong,
+.log-card.with-scene > small,
+.log-card.with-scene > .log-card-meta {
+  position: relative;
+  z-index: 2;
+}
+
+.log-card.with-scene .log-card-icon {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  width: 31px;
+  height: 31px;
+  color: #ffd2ad;
+  filter: drop-shadow(0 0 8px #ff8a35a0);
+}
+
+.log-card.with-scene strong {
+  text-shadow: 0 2px 12px #000;
+}
+
+.log-card.with-scene small {
+  line-height: 1.4;
+  text-shadow: 0 2px 10px #000;
+}
+
+.log-card.with-scene .log-card-meta {
+  margin-top: 6px;
+}
+
+.log-scene {
+  position: absolute;
+  inset: 15px -12% auto;
+  z-index: 0;
+  display: block;
+  height: 68%;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.67;
+  transition: opacity 0.2s ease-out;
+}
+
+.log-card.active .log-scene {
+  opacity: 0.92;
+}
+
+.log-scene svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.scene-grid {
+  fill: none;
+  stroke: #f9b67a22;
+  stroke-width: 1;
+}
+
+.scene-orbit {
+  fill: none;
+  stroke: #ffc58a55;
+  stroke-width: 1.5;
+  stroke-dasharray: 9 10;
+  animation: scene-orbit-pulse 8s ease-in-out infinite;
+}
+
+.scene-glow-line {
+  fill: none;
+  stroke: #ffad63;
+  stroke-width: 3;
+  filter: drop-shadow(0 0 8px #ff7b2b);
+}
+
+.scene-desk,
+.scene-stage {
+  fill: #3d2b26;
+  stroke: #ffd0a6;
+  stroke-width: 3;
+}
+
+.scene-screen-frame,
+.scene-crane,
+.scene-build-frame {
+  fill: #332d2c;
+  stroke: #f4bc8b;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.scene-code-lines {
+  fill: none;
+  stroke: #74e0be;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 70 30 32 40;
+  animation: scene-code-cycle 3.1s linear infinite;
+}
+
+.scene-code-pulse {
+  fill: none;
+  stroke: #ffac63;
+  stroke-width: 6;
+  stroke-linecap: round;
+  animation: scene-cursor 0.75s step-end infinite;
+}
+
+.scene-person {
+  fill: #e5a77c;
+  stroke: #4b2e26;
+  stroke-width: 3;
+}
+
+.scene-person-body {
+  fill: #c26439;
+  stroke: #ffce9d;
+  stroke-width: 3;
+}
+
+.scene-arm {
+  fill: none;
+  stroke: #f0b589;
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+
+.scene-coder-arm-left {
+  transform-origin: 66px 178px;
+  animation: scene-type-left 0.55s ease-in-out infinite alternate;
+}
+
+.scene-coder-arm-right {
+  transform-origin: 117px 177px;
+  animation: scene-type-right 0.45s ease-in-out infinite alternate;
+}
+
+.scene-keyboard {
+  fill: #15191c;
+  stroke: #ffc58a;
+  stroke-width: 2;
+}
+
+.scene-brackets {
+  fill: none;
+  stroke: #ffae6b;
+  stroke-width: 5;
+  stroke-linecap: round;
+  animation: scene-float 3s ease-in-out infinite;
+}
+
+.scene-wheel {
+  fill: #19191a;
+  stroke: #ffc999;
+  stroke-width: 6;
+}
+
+.scene-wheel-core {
+  fill: #ff8a3b;
+  stroke: #ffdeb4;
+  stroke-width: 3;
+}
+
+.scene-motor {
+  fill: #d6874b;
+  stroke: #ffdfb7;
+  stroke-width: 3;
+}
+
+.scene-lift {
+  animation: scene-lower-part 4.8s ease-in-out infinite;
+}
+
+.scene-gear {
+  transform-origin: 323px 177px;
+  animation: scene-spin 7s linear infinite;
+}
+
+.scene-gear-ring {
+  fill: none;
+  stroke: #ffb774;
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.scene-sparks {
+  fill: none;
+  stroke: #ffe8a9;
+  stroke-width: 4;
+  stroke-linecap: round;
+  animation: scene-spark 1.2s ease-in-out infinite;
+}
+
+.scene-presentation-board {
+  fill: #241d1c;
+  stroke: #ffd1a9;
+  stroke-width: 4;
+}
+
+.scene-presentation-content {
+  fill: none;
+  stroke: #ffb978;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: scene-slide 5s ease-in-out infinite;
+}
+
+.scene-pointer {
+  fill: none;
+  stroke: #ffdbad;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transform-origin: 296px 183px;
+  animation: scene-point 2.5s ease-in-out infinite alternate;
+}
+
+.scene-speech {
+  fill: none;
+  stroke: #ffcf88;
+  stroke-width: 3;
+  stroke-linecap: round;
+  animation: scene-speech 2.5s ease-in-out infinite;
+}
+
+.scene-audience {
+  fill: #261916;
+  stroke: #efb286;
+  stroke-width: 3;
+  animation: scene-audience-bob 3s ease-in-out infinite;
+}
+
+.scene-raised-hand {
+  fill: none;
+  stroke: #efb286;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transform-origin: 185px 271px;
+  animation: scene-hand-wave 2.8s ease-in-out infinite;
+}
+
+.log-focus-body {
+  position: relative;
+}
+
+.log-focus-body > :not(.log-scene-banner) {
+  position: relative;
+  z-index: 1;
+}
+
+.log-focus-body > .log-scene-banner {
+  top: 0;
+  right: 0;
+  left: auto;
+  width: min(46vw, 420px);
+  height: 235px;
+  opacity: 0.3;
+  mask-image: linear-gradient(90deg, transparent, black 28%);
+}
+
+@keyframes scene-code-cycle {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+@keyframes scene-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-type-left {
+  to {
+    transform: rotate(5deg) translateY(3px);
+  }
+}
+
+@keyframes scene-type-right {
+  to {
+    transform: rotate(-5deg) translateY(3px);
+  }
+}
+
+@keyframes scene-float {
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes scene-lower-part {
+  0%,
+  12%,
+  85%,
+  100% {
+    transform: translateY(-22px);
+  }
+  42%,
+  58% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes scene-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scene-spark {
+  0%,
+  45%,
+  100% {
+    opacity: 0.1;
+  }
+  55%,
+  70% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-slide {
+  50% {
+    opacity: 0.45;
+    transform: translateX(5px);
+  }
+}
+
+@keyframes scene-point {
+  to {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes scene-speech {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  45% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-audience-bob {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes scene-hand-wave {
+  50% {
+    transform: rotate(-13deg);
+  }
+}
+
+@keyframes scene-orbit-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+html[data-motion='off'] .log-scene * {
+  animation: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log-scene * {
+    animation: none !important;
+  }
+}
