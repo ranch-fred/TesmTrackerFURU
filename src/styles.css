@@ -629,6 +629,33 @@ small {
   border-radius: 5px;
   margin: 0 14px 12px;
   background: #1a1a1a;
+  color: inherit;
+  text-align: left;
+  width: calc(100% - 28px);
+  cursor: pointer;
+}
+.team-switch:hover,
+.team-switch:focus-visible {
+  border-color: var(--orange);
+}
+.brand[role='button'] {
+  cursor: pointer;
+  border-radius: 5px;
+}
+.brand[role='button']:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 4px;
+}
+.breadcrumb-home {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 7px 0;
+  font: inherit;
+  cursor: pointer;
+}
+.breadcrumb-home:hover {
+  color: var(--orange);
 }
 .team-switch > div {
   flex: 1;
@@ -1119,6 +1146,22 @@ small {
   bottom: 0;
   width: 100%;
   background: linear-gradient(90deg, var(--orange), transparent);
+}
+.stat-card-link {
+  cursor: pointer;
+  transition:
+    border-color 0.18s,
+    transform 0.18s,
+    background 0.18s;
+}
+.stat-card-link:hover,
+.stat-card-link:focus-visible {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+  outline: none;
+}
+.stat-card-link:focus-visible {
+  box-shadow: 0 0 0 2px var(--orange);
 }
 .dashboard-grid {
   display: grid;
@@ -2956,8 +2999,8 @@ dialog::backdrop {
     font-size: 17px;
   }
   .sidebar .nav-item {
-    font-size: 12px;
-    min-height: 40px;
+    font-size: 14px;
+    min-height: 48px;
   }
   .sidebar .nav-heading {
     font-size: 9px;
@@ -2967,6 +3010,9 @@ dialog::backdrop {
   }
   .sidebar nav {
     padding-top: 5px;
+  }
+  .sidebar-bottom .nav-item {
+    min-height: 48px;
   }
   .main-shell {
     margin: 0;
@@ -2987,6 +3033,9 @@ dialog::backdrop {
     font-size: 10px;
   }
   .breadcrumbs > span {
+    display: none;
+  }
+  .breadcrumbs > .breadcrumb-home {
     display: none;
   }
   .breadcrumbs > svg {

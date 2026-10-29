@@ -1,6 +1,24 @@
 .account-roster .panel-heading p {
   margin: 5px 0 0;
 }
+.roster-invite {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 24px 16px;
+}
+.roster-invite label {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 230px;
+}
+.roster-invite input {
+  width: 100%;
+}
+.roster-invite-error {
+  margin: 0 24px 12px;
+}
 .account-roster-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

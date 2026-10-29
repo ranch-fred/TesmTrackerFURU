@@ -36,9 +36,25 @@ function GoogleMark() {
     </svg>
   );
 }
-export function Brand({ team }) {
+export function Brand({ team, onHome }) {
   return (
-    <div className="brand">
+    <div
+      className="brand"
+      role={onHome ? 'button' : undefined}
+      tabIndex={onHome ? 0 : undefined}
+      onClick={onHome}
+      onKeyDown={
+        onHome
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onHome();
+              }
+            }
+          : undefined
+      }
+      aria-label={onHome ? 'Go to home' : undefined}
+    >
       <span className="brand-icon">
         <Hexagon size={26} />
         <b>{team ? teamMonogram(team.name).slice(0, 1) : 'T'}</b>
@@ -204,12 +220,12 @@ export default function Auth({ w }) {
         </p>
       )}
       <nav className="entry-nav">
-        <Brand />
+        <Brand onHome={() => setMode('landing')} />
         <div>
           <span className="season-label">FTC / TEAM TRACKER</span>
           <MotionToggle />
-          <button className="outline" onClick={() => setMode('login')}>
-            Team sign in <ArrowUpRight size={15} />
+          <button className="outline" onClick={() => (w.user ? w.logout() : setMode('login'))}>
+            {w.user ? 'Switch account' : 'Team sign in'} <ArrowUpRight size={15} />
           </button>
         </div>
       </nav>
@@ -511,6 +527,11 @@ export default function Auth({ w }) {
                       : 'Sign in'}
                   <ArrowRight size={16} />
                 </button>
+                {step === 'team' && (
+                  <button className="text-button full" type="button" onClick={w.logout}>
+                    Use a different account
+                  </button>
+                )}
                 {step !== 'team' && (
                   <button
                     className="text-button full"

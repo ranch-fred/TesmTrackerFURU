@@ -55,9 +55,25 @@ const palette = [
   'color-mix(in srgb, var(--orange) 50%, black)',
   'color-mix(in srgb, var(--orange) 30%, black)',
 ];
-export function Stat({ label, value, note, icon: Icon, tone = '' }) {
+export function Stat({ label, value, note, icon: Icon, tone = '', onClick }) {
   return (
-    <article className={`stat-card ${tone}`}>
+    <article
+      className={`stat-card ${tone} ${onClick ? 'stat-card-link' : ''}`}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onClick();
+              }
+            }
+          : undefined
+      }
+      aria-label={onClick ? `Open ${label.toLowerCase()}` : undefined}
+    >
       <div className="stat-top">
         <span>{label}</span>
         {Icon && <Icon size={17} />}
@@ -347,6 +363,7 @@ export function Dashboard({ w, navigate }) {
           note={`${money(f.received)} raised this season`}
           icon={Wallet}
           tone="accent"
+          onClick={() => navigate('finance')}
         />
         <Stat
           label="OPEN TASKS"
@@ -364,18 +381,21 @@ export function Dashboard({ w, navigate }) {
               : `${d.tasks.filter((t) => t.status === 'In Progress').length} in progress · ${d.tasks.filter((t) => t.status === 'Blocked').length} blocked`
           }
           icon={CheckCircle2}
+          onClick={parent ? undefined : () => navigate('tasks')}
         />
         <Stat
           label="TEAM MEMBERS"
           value={parent ? '—' : approvedMembers(w.members).length.toString().padStart(2, '0')}
           note={parent ? 'Visible to operational members' : 'Approved app accounts'}
           icon={CalendarDays}
+          onClick={parent ? undefined : () => navigate('attendance', 'roster')}
         />
         <Stat
           label="NEXT COMPETITION"
           value={days === null ? '—' : days + 'd'}
           note={next?.name || 'Add a competition event'}
           icon={CalendarDays}
+          onClick={parent ? undefined : () => navigate('competition', 'events')}
         />
       </div>
       <div className="dashboard-grid">

@@ -241,7 +241,7 @@ export default function App() {
       )}
       <aside className={`sidebar ${menu ? 'open' : ''}`}>
         <div className="sidebar-brand">
-          <Brand team={w.team} />
+          <Brand team={w.team} onHome={() => navigate('dashboard')} />
           <button
             className="mobile-only icon-button"
             onClick={() => setMenu(false)}
@@ -250,7 +250,11 @@ export default function App() {
             <X />
           </button>
         </div>
-        <div className="team-switch">
+        <button
+          className="team-switch"
+          onClick={() => navigate('dashboard')}
+          aria-label="Go to team dashboard"
+        >
           <span className="team-monogram">{teamMonogram(w.team.name)}</span>
           <div>
             <strong>{w.team.name}</strong>
@@ -258,8 +262,8 @@ export default function App() {
               #{w.team.number} · {w.team.season}
             </small>
           </div>
-          <ChevronDown size={15} />
-        </div>
+          <ChevronRight size={15} />
+        </button>
         <nav aria-label="Team navigation">
           {sections.map(([group, items]) => {
             const visible = items.filter((p) => canView(role, p));
@@ -328,7 +332,9 @@ export default function App() {
             >
               <Menu />
             </button>
-            <span>Team console</span>
+            <button className="breadcrumb-home" onClick={() => navigate('dashboard')}>
+              Team console
+            </button>
             <ChevronRight size={13} />
             <strong>{labels[page]}</strong>
           </div>
