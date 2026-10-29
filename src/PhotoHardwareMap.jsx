@@ -4,6 +4,7 @@ import { canEdit } from './domain';
 import { Modal } from './Records';
 import { hardwarePortName } from './robot-rules';
 import { useMotion } from './Motion';
+import HubWiring from './HubWiring';
 import {
   ACTUATOR_LIMIT,
   robotKey,
@@ -243,6 +244,7 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
             alt={`REV ${hub}, select a connector to configure it`}
             draggable="false"
           />
+          <HubWiring hub={hub} records={records} />
           {PORT_GROUPS.flatMap(([name, count]) =>
             Array.from({ length: count }, (_, i) => {
               const port = hubPort(name, i),
