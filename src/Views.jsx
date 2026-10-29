@@ -688,7 +688,6 @@ export function Dashboard({ w, navigate }) {
 export function Finance({ w }) {
   const { enabled } = useMotion();
   const [form, setForm] = useState(null);
-  const [addOpen, setAddOpen] = useState(false);
   const [deleting, setDeleting] = useState(null);
   const [error, setError] = useState('');
   const d = w.data,
@@ -724,6 +723,16 @@ export function Finance({ w }) {
           FUND THE <span>MISSION.</span>
         </h1>
         <p>Every receipt. Every relationship. Every next possibility.</p>
+        {editable && (
+          <div className="finance-actions" data-tour="finance-add">
+            <button className="primary" onClick={() => setForm({ kind: 'income' })}>
+              <Plus size={16} /> Add funding
+            </button>
+            <button className="outline" onClick={() => setForm({ kind: 'expenses' })}>
+              <Plus size={16} /> Add expense
+            </button>
+          </div>
+        )}
       </div>
       <div className="stats-grid finance-stats">
         <Stat
@@ -885,40 +894,6 @@ export function Finance({ w }) {
           </section>
         )}
       </>
-      {editable && (
-        <div className="finance-add-dock">
-          {addOpen && (
-            <div className="finance-add-menu" role="menu" aria-label="Add finance record">
-              <button
-                role="menuitem"
-                onClick={() => {
-                  setAddOpen(false);
-                  setForm({ kind: 'income' });
-                }}
-              >
-                Add funding
-              </button>
-              <button
-                role="menuitem"
-                onClick={() => {
-                  setAddOpen(false);
-                  setForm({ kind: 'expenses' });
-                }}
-              >
-                Add expense
-              </button>
-            </div>
-          )}
-          <button
-            className="finance-add-button"
-            aria-label="Add finance record"
-            aria-expanded={addOpen}
-            onClick={() => setAddOpen((open) => !open)}
-          >
-            <Plus size={25} />
-          </button>
-        </div>
-      )}
       {form && (
         <RecordForm w={w} kind={form.kind} record={form.record} onClose={() => setForm(null)} />
       )}

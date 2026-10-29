@@ -17,7 +17,7 @@ import { parseCSV, validateImport } from './importer';
 import { presets, parseCustomTheme, readTheme, saveTheme } from './theme';
 import InviteTeammate from './InviteTeammate';
 import './personal-profile.css';
-export default function Settings({ w, initial }) {
+export default function Settings({ w, initial, onReplayTour }) {
   const [tab, setTab] = useState(initial || 'my profile'),
     [note, setNote] = useState(''),
     [error, setError] = useState(''),
@@ -435,6 +435,11 @@ export default function Settings({ w, initial }) {
       )}
       {tab === 'preferences' && (
         <section className="panel settings-panel">
+          <h2>Tutorial</h2>
+          <p className="muted">New here, or need a refresher? Take the guided tour of the workspace again.</p>
+          <button className="outline" onClick={onReplayTour}>
+            Replay tutorial
+          </button>
           <h2>Notifications</h2>
           <label className="check-label">
             <input

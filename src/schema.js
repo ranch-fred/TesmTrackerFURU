@@ -392,13 +392,17 @@ export const sections = [
 ];
 export const labels = {
   ...Object.fromEntries(Object.entries(entities).map(([k, v]) => [k, v.title])),
-  dashboard: 'Mission control',
+  dashboard: 'Home',
+  tasks: 'Tasks',
+  meetings: 'Meeting notes',
+  robot: 'Robot',
+  designs: 'Design ideas',
   logs: 'Logs',
   attendance: 'Attendance',
-  competition: 'Competition',
-  finance: 'Finance & expenses',
+  competition: 'Competitions',
+  finance: 'Funds',
   resources: 'FTC resources',
   reports: 'Reports',
-  settings: 'Team settings',
+  settings: 'Settings',
   activity: 'Activity log',
 };

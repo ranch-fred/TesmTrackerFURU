@@ -213,54 +213,11 @@
   color: #69d996;
 }
 
-.finance-add-dock {
-  position: fixed;
-  right: 30px;
-  bottom: 26px;
-  z-index: 40;
-}
-
-.finance-add-button {
-  display: grid;
-  place-items: center;
-  width: 56px;
-  height: 56px;
-  border: 1px solid #ffad61;
-  border-radius: 50%;
-  background: var(--orange);
-  color: white;
-  box-shadow: 0 0 28px #ff6b0070;
-  cursor: pointer;
-}
-
-.finance-add-menu {
-  position: absolute;
-  right: 0;
-  bottom: 68px;
-  width: 168px;
-  padding: 7px;
-  border: 1px solid #49413d;
-  border-radius: 12px;
-  background: #24201f;
-  box-shadow: 0 12px 28px #0009;
-}
-
-.finance-add-menu button {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: #f4f4f4;
-  text-align: left;
-  cursor: pointer;
-}
-
-.finance-add-menu button:hover,
-.finance-add-menu button:focus-visible {
-  background: #ff6b0022;
-  color: #ffad69;
+.finance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 @media (max-width: 680px) {
@@ -314,10 +271,5 @@
 
   .finance-transaction-amount {
     margin-left: auto;
-  }
-
-  .finance-add-dock {
-    right: 18px;
-    bottom: 18px;
   }
 }
