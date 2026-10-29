@@ -122,34 +122,79 @@ export function Chart({ data, series = ['raised', 'spent'], height = 220 }) {
 }
 function FinanceBalanceChart({ data }) {
   const { enabled } = useMotion();
-  if (!data.length) return <div className="chart-empty">Add funding or an expense to see your balance.</div>;
-  const points = [{ date: 'Start', balance: 0 }, ...data.map(({ date, balance }) => ({ date, balance }))];
+  if (!data.length)
+    return <div className="chart-empty">Add funding or an expense to see your balance.</div>;
+  const points = [
+    { date: 'Start', balance: 0 },
+    ...data.map(({ date, balance }) => ({ date, balance })),
+  ];
+  const low = Math.min(0, ...points.map((point) => point.balance));
+  const high = Math.max(0, ...points.map((point) => point.balance));
+  const zeroOffset = high === low ? 50 : (100 * high) / (high - low);
+  const balanceColor = (value) => (value < 0 ? '#ef5a55' : value > 0 ? '#58c582' : '#aaa');
+  const dot = ({ cx, cy, payload }) => (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={4}
+      fill={balanceColor(payload.balance)}
+      stroke="#fff"
+      strokeWidth={2}
+    />
+  );
   return (
     <div className="finance-balance-chart">
       <ResponsiveContainer>
         <AreaChart data={points} margin={{ left: 0, right: 16, top: 12, bottom: 0 }}>
           <defs>
             <linearGradient id="financeBalanceFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--orange)" stopOpacity={0.28} />
-              <stop offset="100%" stopColor="var(--orange)" stopOpacity={0.01} />
+              <stop offset="0%" stopColor="#58c582" stopOpacity={0.23} />
+              <stop offset={`${zeroOffset}%`} stopColor="#58c582" stopOpacity={0.14} />
+              <stop offset={`${zeroOffset}%`} stopColor="#ef5a55" stopOpacity={0.14} />
+              <stop offset="100%" stopColor="#ef5a55" stopOpacity={0.23} />
+            </linearGradient>
+            <linearGradient id="financeBalanceStroke" x1="0" y1="0" x2="0" y2="1">
+              <stop offset={`${zeroOffset}%`} stopColor="#58c582" />
+              <stop offset={`${zeroOffset}%`} stopColor="#ef5a55" />
             </linearGradient>
           </defs>
           <CartesianGrid stroke="#333" vertical={false} strokeDasharray="3 6" />
-          <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fill: '#929292', fontSize: 11 }} dy={8} />
-          <YAxis width={52} axisLine={false} tickLine={false} tick={{ fill: '#929292', fontSize: 11 }} tickFormatter={money} />
+          <XAxis
+            dataKey="date"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fill: '#929292', fontSize: 11 }}
+            dy={8}
+          />
+          <YAxis
+            width={52}
+            domain={low === high ? [-1, 1] : [low, high]}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#929292', fontSize: 11 }}
+            tickFormatter={money}
+          />
           <Tooltip
-            contentStyle={{ background: '#1b1b1b', border: '1px solid #555', borderRadius: 10 }}
-            formatter={(value) => [money(value), 'Balance']}
+            content={({ active, payload, label }) =>
+              active && payload?.length ? (
+                <div className="finance-balance-tooltip">
+                  <small>{label}</small>
+                  <strong style={{ color: balanceColor(payload[0].value) }}>
+                    Balance: {money(payload[0].value)}
+                  </strong>
+                </div>
+              ) : null
+            }
           />
           <Area
             isAnimationActive={enabled}
             type="monotone"
             dataKey="balance"
-            stroke="var(--orange)"
+            stroke="url(#financeBalanceStroke)"
             strokeWidth={3}
             fill="url(#financeBalanceFill)"
-            dot={{ r: 4, fill: 'var(--orange)', stroke: '#fff', strokeWidth: 2 }}
-            activeDot={{ r: 6, fill: 'var(--orange)', stroke: '#fff', strokeWidth: 2 }}
+            dot={dot}
+            activeDot={dot}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -626,8 +671,18 @@ export function Finance({ w }) {
     ),
   }));
   const transactions = [
-    ...d.income.map((record) => ({ kind: 'income', record, date: record.lastContact || '', amount: record.received })),
-    ...d.expenses.map((record) => ({ kind: 'expenses', record, date: record.date || '', amount: record.amount })),
+    ...d.income.map((record) => ({
+      kind: 'income',
+      record,
+      date: record.lastContact || '',
+      amount: record.received,
+    })),
+    ...d.expenses.map((record) => ({
+      kind: 'expenses',
+      record,
+      date: record.date || '',
+      amount: record.amount,
+    })),
   ].sort((a, b) => b.date.localeCompare(a.date));
   const editable = !parent && canEdit(w.member.role, w.member.mentor_edit);
   return (
@@ -645,7 +700,9 @@ export function Finance({ w }) {
           value={money(f.balance)}
           note="Received less recorded expenses"
           icon={Wallet}
-          tone="accent"
+          tone={
+            f.balance < 0 ? 'finance-negative' : f.balance > 0 ? 'finance-positive' : 'finance-zero'
+          }
         />
         <Stat
           label="MONEY RECEIVED"
@@ -749,7 +806,9 @@ export function Finance({ w }) {
               <div className="finance-timeline-list">
                 {transactions.map(({ kind, record, date, amount }) => {
                   const incoming = kind === 'income';
-                  const title = incoming ? record.company || 'Funding source' : record.description || 'Expense';
+                  const title = incoming
+                    ? record.company || 'Funding source'
+                    : record.description || 'Expense';
                   return (
                     <div className="finance-transaction" key={`${kind}-${record.id}`}>
                       <time dateTime={date}>{date || 'No date'}</time>
@@ -760,16 +819,27 @@ export function Finance({ w }) {
                         <span className={`finance-category ${incoming ? 'incoming' : ''}`}>
                           {incoming ? 'Funding' : record.category || 'Other'}
                         </span>
-                        <strong className={`finance-transaction-amount ${incoming ? 'incoming' : ''}`}>
-                          {incoming ? '+' : '−'}{money(amount)}
+                        <strong
+                          className={`finance-transaction-amount ${incoming ? 'incoming' : ''}`}
+                        >
+                          {incoming ? '+' : '−'}
+                          {money(amount)}
                         </strong>
                         {editable && (
-                          <button className="icon-button" aria-label={`Edit ${incoming ? 'funding from' : 'expense'} ${title}`} onClick={() => setForm({ kind, record })}>
+                          <button
+                            className="icon-button"
+                            aria-label={`Edit ${incoming ? 'funding from' : 'expense'} ${title}`}
+                            onClick={() => setForm({ kind, record })}
+                          >
                             <Pencil size={16} />
                           </button>
                         )}
                         {canDelete(w.member.role) && (
-                          <button className="icon-button danger" aria-label={`Delete ${incoming ? 'funding from' : 'expense'} ${title}`} onClick={() => setDeleting({ kind, record })}>
+                          <button
+                            className="icon-button danger"
+                            aria-label={`Delete ${incoming ? 'funding from' : 'expense'} ${title}`}
+                            onClick={() => setDeleting({ kind, record })}
+                          >
                             <Trash2 size={16} />
                           </button>
                         )}
@@ -788,11 +858,32 @@ export function Finance({ w }) {
         <div className="finance-add-dock">
           {addOpen && (
             <div className="finance-add-menu" role="menu" aria-label="Add finance record">
-              <button role="menuitem" onClick={() => { setAddOpen(false); setForm({ kind: 'income' }); }}>Add funding</button>
-              <button role="menuitem" onClick={() => { setAddOpen(false); setForm({ kind: 'expenses' }); }}>Add expense</button>
+              <button
+                role="menuitem"
+                onClick={() => {
+                  setAddOpen(false);
+                  setForm({ kind: 'income' });
+                }}
+              >
+                Add funding
+              </button>
+              <button
+                role="menuitem"
+                onClick={() => {
+                  setAddOpen(false);
+                  setForm({ kind: 'expenses' });
+                }}
+              >
+                Add expense
+              </button>
             </div>
           )}
-          <button className="finance-add-button" aria-label="Add finance record" aria-expanded={addOpen} onClick={() => setAddOpen((open) => !open)}>
+          <button
+            className="finance-add-button"
+            aria-label="Add finance record"
+            aria-expanded={addOpen}
+            onClick={() => setAddOpen((open) => !open)}
+          >
             <Plus size={25} />
           </button>
         </div>

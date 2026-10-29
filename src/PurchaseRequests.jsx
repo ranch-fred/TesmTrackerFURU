@@ -1,10 +1,46 @@
 import React, { useState } from 'react';
-import { CalendarDays, ChevronDown, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+  Box,
+  CalendarDays,
+  Camera,
+  Check,
+  ChevronRight,
+  ChevronUp,
+  CircuitBoard,
+  ClipboardList,
+  Cog,
+  Pencil,
+  Plus,
+  Shirt,
+  Trash2,
+  Truck,
+  UserRound,
+} from 'lucide-react';
 import { canDelete, canEdit } from './domain';
 import { Modal, RecordForm } from './Records';
 import './purchase-requests.css';
 
 const stages = ['Requested', 'Approved', 'Ordered', 'Received'];
+const stageIcons = [ClipboardList, Check, Box, Truck];
+const itemIcon = (item) =>
+  /camera/i.test(item)
+    ? Camera
+    : /shirt|uniform/i.test(item)
+      ? Shirt
+      : /hub|control|board/i.test(item)
+        ? CircuitBoard
+        : /motor|drive/i.test(item)
+          ? Cog
+          : Box;
+const readableDate = (date) =>
+  date
+    ? new Intl.DateTimeFormat('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        timeZone: 'UTC',
+      }).format(new Date(`${date}T12:00:00Z`))
+    : 'Date not set';
 
 export default function PurchaseRequests({ w }) {
   const [openId, setOpenId] = useState(null);
@@ -18,13 +54,10 @@ export default function PurchaseRequests({ w }) {
 
   return (
     <>
-      <div className="page-intro purchase-intro">
+      <div className="purchase-intro">
         <div>
-          <div className="eyebrow">BUSINESS / PURCHASES</div>
-          <h1>
-            PURCHASE <span>REQUESTS.</span>
-          </h1>
-          <p>See what the team needs and follow each request through.</p>
+          <h1>Purchase requests</h1>
+          <p>Request team purchases and track their status.</p>
         </div>
         {editable && (
           <button className="primary" onClick={() => setForm({})}>
@@ -48,6 +81,8 @@ export default function PurchaseRequests({ w }) {
             const name = person?.display_name || row.requestedBy || 'Team member';
             const items = Array.isArray(row.parts) ? row.parts : [];
             const stage = Math.max(0, stages.indexOf(row.status));
+            const primaryItem = items[0]?.split(/\s+[—–-]\s+/) || [];
+            const ItemIcon = itemIcon(primaryItem[0] || '');
             return (
               <article className={`purchase-card ${open ? 'open' : ''}`} key={row.id}>
                 <button
@@ -68,78 +103,124 @@ export default function PurchaseRequests({ w }) {
                   </span>
                   <span className="purchase-card-identity">
                     <strong>{name}</strong>
-                    <small>Request {row.number || '—'}</small>
+                    <small>Request #{row.number || '—'}</small>
                   </span>
                   <span
                     className={`purchase-status status-${(row.status || 'Requested').toLowerCase()}`}
                   >
                     {row.status || 'Requested'}
                   </span>
-                  {open ? <ChevronDown size={19} /> : <ChevronRight size={19} />}
+                  {open && <ChevronUp className="purchase-expand-icon" size={21} />}
                 </button>
                 {!open ? (
-                  <div className="purchase-card-preview">
-                    <strong>{items[0] || 'Items to be added'}</strong>
-                    {items.length > 1 && <small>+{items.length - 1} more</small>}
-                    <span>
-                      <CalendarDays size={15} /> Needed {row.neededBy || 'date not set'}
+                  <button
+                    className="purchase-card-preview"
+                    onClick={() => setOpenId(row.id)}
+                    aria-label={`Open request ${row.number || ''} from ${name}`}
+                  >
+                    <span className="purchase-preview-item">
+                      <span className="purchase-item-icon">
+                        <ItemIcon size={34} strokeWidth={1.5} />
+                      </span>
+                      <strong>{primaryItem[0] || 'Items to be added'}</strong>
+                      {items.length > 1 && <small>+{items.length - 1} more</small>}
+                      <ChevronRight className="purchase-expand-icon" size={22} />
                     </span>
-                  </div>
+                    <span className="purchase-preview-date">
+                      <CalendarDays size={22} strokeWidth={1.6} />
+                      <span>
+                        Needed by<strong>{readableDate(row.neededBy)}</strong>
+                      </span>
+                    </span>
+                  </button>
                 ) : (
                   <div className="purchase-card-details">
                     <ol className="purchase-progress" aria-label="Request status">
-                      {stages.map((status, index) => (
-                        <li className={index <= stage ? 'reached' : ''} key={status}>
-                          <span>{index + 1}</span>
-                          {status}
-                        </li>
-                      ))}
+                      {stages.map((status, index) => {
+                        const StageIcon = stageIcons[index];
+                        return (
+                          <li
+                            className={
+                              index === stage ? 'current' : index < stage ? 'completed' : ''
+                            }
+                            key={status}
+                          >
+                            <span>
+                              <StageIcon size={20} strokeWidth={1.7} />
+                            </span>
+                            <strong>{status}</strong>
+                          </li>
+                        );
+                      })}
                     </ol>
                     <div className="purchase-facts">
                       <div>
-                        <small>REQUEST #</small>
-                        <strong>{row.number || '—'}</strong>
+                        <ClipboardList size={25} strokeWidth={1.5} />
+                        <span>
+                          <small>Request #</small>
+                          <strong>{row.number || '—'}</strong>
+                        </span>
                       </div>
                       <div>
-                        <small>REQUESTED BY</small>
-                        <strong>{name}</strong>
+                        <UserRound size={25} strokeWidth={1.5} />
+                        <span>
+                          <small>Requested by</small>
+                          <strong>{name}</strong>
+                        </span>
                       </div>
                       <div>
-                        <small>NEEDED BY</small>
-                        <strong>{row.neededBy || 'Not set'}</strong>
+                        <CalendarDays size={25} strokeWidth={1.5} />
+                        <span>
+                          <small>Needed by</small>
+                          <strong>{readableDate(row.neededBy)}</strong>
+                        </span>
                       </div>
                     </div>
-                    {person?.bio && (
-                      <p className="purchase-requester-bio">
-                        About {name}: {person.bio}
-                      </p>
-                    )}
-                    <div className="purchase-items">
-                      <small>ITEM DETAILS</small>
-                      {items.length ? (
-                        items.map((item, index) => <div key={`${item}-${index}`}>{item}</div>)
-                      ) : (
-                        <p>No items added yet.</p>
-                      )}
-                    </div>
-                    {row.notes && (
-                      <div className="purchase-note">
-                        <small>NOTE</small>
-                        <p>{row.notes}</p>
-                      </div>
-                    )}
-                    {editable && (
-                      <div className="purchase-card-actions">
-                        <button className="outline" onClick={() => setForm(row)}>
-                          <Pencil size={15} /> Edit request
-                        </button>
-                        {canDelete(w.member.role) && (
-                          <button className="outline danger" onClick={() => setDeleting(row)}>
-                            <Trash2 size={15} /> Delete
-                          </button>
+                    <div className="purchase-items-wrap">
+                      <small>Item details</small>
+                      <div className="purchase-items">
+                        {items.length ? (
+                          items.map((item, index) => {
+                            const [title, detail] = item.split(/\s+[—–-]\s+/);
+                            const Icon = itemIcon(title);
+                            return (
+                              <div className="purchase-item-detail" key={`${item}-${index}`}>
+                                <span className="purchase-item-icon">
+                                  <Icon size={31} strokeWidth={1.5} />
+                                </span>
+                                <span>
+                                  <strong>{title}</strong>
+                                  {detail && <small>{detail}</small>}
+                                </span>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <p>No items added yet.</p>
                         )}
                       </div>
-                    )}
+                    </div>
+                    <div className="purchase-card-footer">
+                      <div className="purchase-note">
+                        <small>Note</small>
+                        <p>{row.notes || 'No note added.'}</p>
+                      </div>
+                      <div className="purchase-card-actions">
+                        {canDelete(w.member.role) && (
+                          <button className="purchase-delete-link" onClick={() => setDeleting(row)}>
+                            <Trash2 size={14} /> Delete
+                          </button>
+                        )}
+                        {editable && (
+                          <button className="outline" onClick={() => setForm(row)}>
+                            <Pencil size={17} /> Edit
+                          </button>
+                        )}
+                        <button className="outline purchase-close" onClick={() => setOpenId(null)}>
+                          × <span>Close</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </article>
