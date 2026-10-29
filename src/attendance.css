@@ -1,69 +1,3 @@
-.account-roster .panel-heading p {
-  margin: 5px 0 0;
-}
-.roster-invite {
-  display: flex;
-  align-items: end;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 0 24px 16px;
-}
-.roster-invite label {
-  display: grid;
-  gap: 6px;
-  flex: 1 1 230px;
-}
-.roster-invite input {
-  width: 100%;
-}
-.roster-invite-error {
-  margin: 0 24px 12px;
-}
-.account-roster-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 14px 24px 24px;
-}
-.account-roster-card {
-  display: flex;
-  gap: 15px;
-  padding: 17px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--panel) 88%, white);
-}
-.account-roster-avatar {
-  flex: none;
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--orange) 18%, var(--panel));
-  color: var(--orange);
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-}
-.account-roster-card > div:last-child {
-  display: grid;
-  gap: 4px;
-  min-width: 0;
-}
-.account-roster-card strong {
-  font-size: 15px;
-}
-.account-roster-card span {
-  color: var(--orange);
-  font-size: 12px;
-}
-.account-roster-card small {
-  color: var(--muted);
-  overflow-wrap: anywhere;
-}
-.attendance-empty {
-  margin: 10px 24px 24px;
-  color: var(--muted);
-}
 .attendance-calendar {
   padding: 24px;
 }
@@ -238,9 +172,6 @@
   margin: 14px 0 0;
 }
 @media (max-width: 760px) {
-  .account-roster-grid {
-    grid-template-columns: 1fr;
-  }
   .attendance-calendar-top,
   .attendance-calendar-tools {
     align-items: stretch;

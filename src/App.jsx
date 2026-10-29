@@ -67,7 +67,7 @@ const hiddenKinds = new Set([
   'sessions',
 ]);
 function pageForKind(kind) {
-  if (['sessions', 'roster'].includes(kind)) return 'attendance';
+  if (kind === 'sessions') return 'attendance';
   if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
   if (['expenses', 'income', 'budgets'].includes(kind)) return 'finance';
   if (['hardware', 'inspection'].includes(kind)) return 'robot';
@@ -168,14 +168,13 @@ export default function App() {
   else if (page === 'finance') view = <Finance w={w} />;
   else if (page === 'purchases') view = <PurchaseRequests w={w} />;
   else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
-  else if (page === 'attendance')
-    view = <AttendanceHub key={innerPage || 'sessions'} w={w} initial={innerPage || 'sessions'} />;
+  else if (page === 'attendance') view = <AttendanceHub w={w} />;
   else if (page === 'competition')
     view = <CompetitionHub key={innerPage || 'matches'} w={w} initial={innerPage || 'matches'} />;
   else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
   else if (page === 'logs') view = <LogsHub key={innerPage || ''} w={w} initial={innerPage} />;
   else if (page === 'designs') view = <DesignLibrary w={w} />;
-  else if (page === 'settings') view = <Settings w={w} />;
+  else if (page === 'settings') view = <Settings key={innerPage || ''} w={w} initial={innerPage} />;
   else if (page === 'activity')
     view = (
       <section className="panel">
@@ -509,8 +508,8 @@ export default function App() {
             </p>
             <h3>5 / Keep everyone organized</h3>
             <p>
-              Attendance & roster shows the team calendar and everyone who joined through the app.
-              Check in when you arrive on Saturday, Sunday, or an extra weekday.
+              Attendance shows the team calendar. Check in when you arrive on Saturday, Sunday, or
+              an extra weekday. Captains manage members and invitations in Team settings.
             </p>
             <p className="note">
               Demo mode stores only on this device. Live accounts, files and shared data require the
