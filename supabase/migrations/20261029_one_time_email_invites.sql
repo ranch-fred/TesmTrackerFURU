@@ -21,7 +21,7 @@ begin
  if not public.team_admin(t) then raise exception 'Captain or coach required';end if;
  if length(normalized)>254 or normalized !~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$' then raise exception 'Valid email required';end if;
  update email_invites set revoked_at=now() where team_id=t and lower(email)=normalized and used_at is null and revoked_at is null;
- raw:=upper(encode(gen_random_bytes(10),'hex'));
+ raw:=upper(md5(gen_random_uuid()::text||gen_random_uuid()::text));
  code:=substr(raw,1,4)||'-'||substr(raw,5,4)||'-'||substr(raw,9,4)||'-'||substr(raw,13,4)||'-'||substr(raw,17,4);
  insert into email_invites(team_id,email,token_hash) values(t,normalized,md5(code));
  return code;

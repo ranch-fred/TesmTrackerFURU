@@ -50,6 +50,12 @@ await db.exec(
     'utf8',
   ),
 );
+await db.exec(
+  await readFile(
+    new URL('../supabase/migrations/20261029_fix_one_time_invite_randomness.sql', import.meta.url),
+    'utf8',
+  ),
+);
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
   parent = '10000000-0000-0000-0000-000000000003',
