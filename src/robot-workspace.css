@@ -891,12 +891,10 @@ html[data-motion='on'] .rw-workspace .rw-port-hotspot:active:not(:disabled) {
   min-width: 0;
   min-height: 0;
   padding: 0;
-  border: 1.5px solid #ff7a18;
+  border: 1.5px solid transparent;
   border-radius: 4px;
   background: transparent;
-  box-shadow:
-    0 0 5px #ff6b0080,
-    inset 0 0 3px #ff6b0030;
+  box-shadow: none;
   color: transparent;
 }
 .rw-workspace .rw-hub-photo .rw-port-hotspot > span {
