@@ -9,6 +9,7 @@ export function LogEntry({ kind, w }) {
   const [whatDone, setWhatDone] = useState('');
   const [place, setPlace] = useState('');
   const [gained, setGained] = useState('');
+  const [mechanismId, setMechanismId] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
@@ -20,10 +21,12 @@ export function LogEntry({ kind, w }) {
     try {
       const entry = makeLogRecord(kind, { date, whatDone, place, gained }, w.member, w.user.id);
       setBusy(true);
-      await w.save(kind, entry);
+      const mech = w.data.subsystems.find((m) => m.id === mechanismId);
+      await w.save(kind, mech ? { ...entry, mechanismId: mech.id, subsystem: mech.name } : entry);
       setWhatDone('');
       setPlace('');
       setGained('');
+      setMechanismId('');
       setDate(localDate());
       setSaved(true);
     } catch (e) {
@@ -65,6 +68,23 @@ export function LogEntry({ kind, w }) {
                 disabled={busy}
                 placeholder="Library, school, event…"
               />
+            </label>
+          )}
+          {['build', 'programming'].includes(kind) && (
+            <label>
+              Mechanism
+              <select
+                value={mechanismId}
+                onChange={(event) => setMechanismId(event.target.value)}
+                disabled={busy}
+              >
+                <option value="">No mechanism</option>
+                {w.data.subsystems.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
             </label>
           )}
           <label className="span-2">

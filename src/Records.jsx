@@ -189,6 +189,26 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                       </small>
                     )}
                   </span>
+                ) : f.type === 'mechanism' ? (
+                  <select
+                    value={form.mechanismId || ''}
+                    onChange={(e) => {
+                      const mech = w.data.subsystems.find((m) => m.id === e.target.value);
+                      setForm((a) => ({
+                        ...a,
+                        mechanismId: mech?.id || '',
+                        [f.key]: mech?.name || '',
+                      }));
+                    }}
+                  >
+                    <option value="">No mechanism</option>
+                    {!form.mechanismId && form[f.key] && <option disabled>{form[f.key]}</option>}
+                    {w.data.subsystems.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
+                  </select>
                 ) : f.type === 'select' ? (
                   <select value={form[f.key] || ''} onChange={(e) => set(f.key, e.target.value)}>
                     {options.map((o) => (
@@ -391,6 +411,7 @@ export default function Records({ kind, w, compact = false }) {
     [month, setMonth] = useState('2026-10');
   const editAllowed = canEdit(w.member.role, w.member.mentor_edit);
   const filterField =
+    schema.fields.find((f) => f.type === 'mechanism') ||
     schema.fields.find((f) => f.type === 'select') ||
     schema.fields.find((f) => f.type === 'date') ||
     schema.fields[0];
