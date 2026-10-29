@@ -18,6 +18,7 @@ import { canEdit, canDelete, csvText, attendance, sum } from './domain';
 import { csv } from './exports';
 import { supabase } from './client';
 import Announcements from './Announcements';
+import MeetingLogs from './MeetingLogs';
 export function Badge({ children, tone = '' }) {
   return (
     <span
@@ -54,6 +55,8 @@ export function Modal({ title, onClose, children }) {
 }
 export function RecordForm({ kind, record, w, onClose, onSaved }) {
   const schema = entities[kind];
+  const today = new Date();
+  const meetingToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const [form, setForm] = useState(
       record ||
         Object.fromEntries(
@@ -68,7 +71,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                   : f.type === 'select'
                     ? f.options[0]
                     : f.type === 'date' && ['date', 'assigned', 'joined'].includes(f.key)
-                      ? new Date().toISOString().slice(0, 10)
+                      ? kind === 'meetings' ? meetingToday : new Date().toISOString().slice(0, 10)
                       : '',
           ]),
         ),
@@ -96,7 +99,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
   }
   return (
     <Modal title={`${record ? 'Edit' : 'New'} ${schema.title.toLowerCase()}`} onClose={onClose}>
-      <form onSubmit={submit}>
+      <form onSubmit={submit} className={kind === 'meetings' ? 'meeting-composer' : undefined}>
         <div className="form-grid">
           {schema.fields.map((f, index) => {
             let options = f.options || [];
@@ -524,6 +527,21 @@ export default function Records({ kind, w, compact = false }) {
       )}
     </>
   );
+  if (kind === 'meetings') {
+    return (
+      <>
+        <MeetingLogs
+          records={w.data.meetings || []}
+          actions={actions}
+          canCreate={editAllowed}
+          onCreate={() => setEdit({})}
+          onExport={(visibleRows) => csv(kind, visibleRows, schema.fields)}
+          error={err}
+        />
+        {dialogs}
+      </>
+    );
+  }
   if (kind === 'announcements') {
     return (
       <section className="announcements-page">
