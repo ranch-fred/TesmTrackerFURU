@@ -14,7 +14,7 @@ import {
   LayoutList,
 } from 'lucide-react';
 import { entities } from './schema';
-import { canEdit, canDelete, csvText, attendance, sum } from './domain';
+import { canEdit, canDelete, csvText, attendance, sum, rosterWithMembers } from './domain';
 import { csv } from './exports';
 import { supabase } from './client';
 import Announcements from './Announcements';
@@ -400,7 +400,9 @@ export default function Records({ kind, w, compact = false }) {
     ),
   ];
   const rows = useMemo(() => {
-    let rows = (w.data[kind] || []).filter(
+    const source =
+      kind === 'roster' ? rosterWithMembers(w.data.roster, w.members) : w.data[kind] || [];
+    let rows = source.filter(
       (r) =>
         Object.values(r).join(' ').toLowerCase().includes(search.toLowerCase()) &&
         (!filter || r[filterField?.key] === filter),
@@ -416,7 +418,7 @@ export default function Records({ kind, w, compact = false }) {
     });
     if (kind === 'announcements') rows.sort((a, b) => Number(b.pinned) - Number(a.pinned));
     return rows;
-  }, [w.data, kind, search, filter, sort, descending]);
+  }, [w.data, w.members, kind, search, filter, sort, descending]);
   async function update(row, changes) {
     try {
       await w.save(kind, { ...row, ...changes });
@@ -425,6 +427,7 @@ export default function Records({ kind, w, compact = false }) {
     }
   }
   function actions(r) {
+    if (r.fromAccount) return <small className="muted">Team account · manage in Settings</small>;
     return (
       <div className="row-actions">
         <button
