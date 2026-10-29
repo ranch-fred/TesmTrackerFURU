@@ -28,12 +28,18 @@ export const PORT_GROUPS = [
   ['Analog', 2],
   ['UART', 2],
   ['RS485', 2],
-  ['Battery', 2],
   ['Power', 2],
 ];
 export function hubPort(type, index) {
   if (type === 'UART') return `UART ${index + 1}`;
   return `${type} ${['Digital', 'Analog'].includes(type) ? `${index * 2}/${index * 2 + 1}` : index}`;
+}
+export function portSize(type) {
+  if (type === 'Motor') return [6.2, 8.2];
+  if (type === 'Encoder') return [7, 4.2];
+  if (type === 'Servo' || type === 'Power') return [5.9, 2.8];
+  if (type === 'UART' || type === 'RS485') return [5.5, 3.7];
+  return [6.4, 4.2];
 }
 // Coordinates follow the photographed connectors, in percentages of the image.
 export function portPosition(hub, type, index) {

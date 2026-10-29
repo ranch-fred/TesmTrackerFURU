@@ -1,6 +1,6 @@
 import React from 'react';
 import { hardwarePortName } from './robot-rules';
-import { portPosition } from './robot-workspace';
+import { portPosition, portSize } from './robot-workspace';
 
 const colors = {
   Motor: ['#e84536', '#191b20'],
@@ -11,7 +11,6 @@ const colors = {
   Analog: ['#191b20', '#e84636', '#eeeeea'],
   UART: ['#191b20', '#e84636', '#5cbae3', '#eeeeea'],
   RS485: ['#5cbae3', '#eeeeea'],
-  Battery: ['#e84536', '#191b20'],
   Power: ['#e84536', '#191b20'],
 };
 
@@ -23,6 +22,9 @@ function Plug({ hub, type, index }) {
   const left = ['Motor', 'Encoder', 'Battery'].includes(type);
   const wires = colors[type] || colors.I2C;
   const housing = type === 'Battery' ? '#e8b62d' : type === 'Motor' ? '#deded8' : '#272a2f';
+  const [portWidth, portHeight] = portSize(type);
+  const width = portWidth * 9;
+  const height = portHeight * 9;
   return (
     <g>
       {wires.map((color, i) => {
@@ -56,20 +58,20 @@ function Plug({ hub, type, index }) {
       })}
       <g transform={`translate(${x} ${y})`}>
         <rect
-          x={bottom ? -17 : -13}
-          y={bottom ? -12 : -18}
-          width={bottom ? 34 : 26}
-          height={bottom ? 24 : 36}
+          x={-width / 2}
+          y={-height / 2}
+          width={width}
+          height={height}
           rx="4"
           fill={housing}
           stroke="#a5a8ad"
           strokeWidth="1"
         />
         <rect
-          x={bottom ? -14 : -10}
-          y={bottom ? -9 : -14}
-          width={bottom ? 28 : 20}
-          height={bottom ? 18 : 28}
+          x={-width / 2 + 3}
+          y={-height / 2 + 3}
+          width={width - 6}
+          height={height - 6}
           rx="2"
           fill="#15171a"
           stroke="#54585d"
