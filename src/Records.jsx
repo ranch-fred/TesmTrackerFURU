@@ -71,7 +71,9 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                   : f.type === 'select'
                     ? f.options[0]
                     : f.type === 'date' && ['date', 'assigned', 'joined'].includes(f.key)
-                      ? kind === 'meetings' ? meetingToday : new Date().toISOString().slice(0, 10)
+                      ? kind === 'meetings'
+                        ? meetingToday
+                        : new Date().toISOString().slice(0, 10)
                       : '',
           ]),
         ),
@@ -103,7 +105,10 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
         <div className="form-grid">
           {schema.fields.map((f, index) => {
             let options = f.options || [];
-            if (f.type === 'members') options = w.members.filter((member) => member.status === 'approved').map((member) => member.name);
+            if (f.type === 'members')
+              options = w.members
+                .filter((member) => member.status === 'approved')
+                .map((member) => member.name);
             if (f.type === 'hardware') options = w.data.hardware.map((x) => x.name);
             const multi = ['multi', 'members', 'hardware'].includes(f.type);
             return (
@@ -225,7 +230,11 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                   </>
                 ) : (
                   <input
-                    required={index === 0}
+                    required={
+                      index === 0 ||
+                      (kind === 'income' && ['lastContact', 'received'].includes(f.key)) ||
+                      (kind === 'expenses' && ['description', 'amount'].includes(f.key))
+                    }
                     type={
                       ['number', 'percent', 'score'].includes(f.type)
                         ? 'number'
@@ -234,11 +243,13 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
                           : 'text'
                     }
                     min={
-                      f.type === 'score'
-                        ? 1
-                        : ['number', 'percent'].includes(f.type)
-                          ? 0
-                          : undefined
+                      ['income', 'expenses'].includes(kind) && f.type === 'number'
+                        ? 0.01
+                        : f.type === 'score'
+                          ? 1
+                          : ['number', 'percent'].includes(f.type)
+                            ? 0
+                            : undefined
                     }
                     max={f.type === 'score' ? 5 : f.type === 'percent' ? 100 : undefined}
                     step={f.type === 'score' ? '1' : 'any'}
