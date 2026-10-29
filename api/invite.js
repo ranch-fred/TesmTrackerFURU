@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { publicSupabaseConfig } from '../src/public-env.js';
+import { inviteEmailHtml } from './invite-email.js';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,12 +39,10 @@ export default async function handler(req, res) {
   const webAppUrl = process.env.GOOGLE_INVITE_WEB_APP_URL;
   const secret = process.env.GOOGLE_INVITE_SECRET;
   if (!webAppUrl || !secret)
-    return res
-      .status(503)
-      .json({
-        error:
-          'Email sending is not configured yet. Ask the site owner to connect the team Gmail account.',
-      });
+    return res.status(503).json({
+      error:
+        'Email sending is not configured yet. Ask the site owner to connect the team Gmail account.',
+    });
   if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(webAppUrl))
     return res.status(503).json({ error: 'The Google mail connection URL is invalid.' });
   const base = process.env.SITE_URL || 'https://tesm-tracker-furu.vercel.app';
@@ -59,16 +58,15 @@ export default async function handler(req, res) {
         email,
         teamName: safeName,
         inviteUrl: invite.toString(),
+        htmlBody: inviteEmailHtml(safeName, invite.toString(), team.join_code),
       }),
     });
     const result = await response.json().catch(() => null);
     if (!response.ok || result?.ok !== true)
-      return res
-        .status(502)
-        .json({
-          error:
-            'Google could not send the invitation. Check the Apps Script deployment and Gmail quota.',
-        });
+      return res.status(502).json({
+        error:
+          'Google could not send the invitation. Check the Apps Script deployment and Gmail quota.',
+      });
     return res.status(200).json({ sent: true });
   } catch {
     return res.status(502).json({ error: 'The email service is unavailable. Try again shortly.' });

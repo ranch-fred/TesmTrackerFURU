@@ -4,36 +4,19 @@ import { Matches, Events } from './Views';
 import PracticeMatches from './PracticeMatches';
 import PillTabs from './PillTabs';
 import FtcScout from './FtcScout';
-import { AttendanceCalendar, TeamRoster } from './AttendanceCalendar';
+import { AttendanceCalendar } from './AttendanceCalendar';
 
-export function AttendanceHub({ w, initial = 'sessions' }) {
-  const [tab, setTab] = useState(initial === 'roster' ? 'roster' : 'sessions');
+export function AttendanceHub({ w }) {
   return (
     <>
       <div className="page-intro compact-intro">
-        <div className="eyebrow">TEAM / PEOPLE</div>
+        <div className="eyebrow">TEAM / ATTENDANCE</div>
         <h1>
           SHOW UP. <span>BUILD TOGETHER.</span>
         </h1>
-        <p>Check in on team days and see everyone who joined through the app.</p>
+        <p>Check in on team days and track your time together.</p>
       </div>
-      <div className="tabs page-tabs" role="tablist" aria-label="Attendance sections">
-        {[
-          ['sessions', 'Attendance calendar'],
-          ['roster', 'Team roster'],
-        ].map(([key, label]) => (
-          <button
-            key={key}
-            role="tab"
-            aria-selected={tab === key}
-            className={tab === key ? 'active' : ''}
-            onClick={() => setTab(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-      {tab === 'sessions' ? <AttendanceCalendar w={w} /> : <TeamRoster w={w} />}
+      <AttendanceCalendar w={w} />
     </>
   );
 }

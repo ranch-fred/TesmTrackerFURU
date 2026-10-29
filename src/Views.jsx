@@ -388,7 +388,11 @@ export function Dashboard({ w, navigate }) {
           value={parent ? '—' : approvedMembers(w.members).length.toString().padStart(2, '0')}
           note={parent ? 'Visible to operational members' : 'Approved app accounts'}
           icon={CalendarDays}
-          onClick={parent ? undefined : () => navigate('attendance', 'roster')}
+          onClick={
+            parent || !['Captain', 'Coach'].includes(w.member.role)
+              ? undefined
+              : () => navigate('settings', 'members')
+          }
         />
         <Stat
           label="NEXT COMPETITION"
@@ -617,9 +621,11 @@ export function Dashboard({ w, navigate }) {
                   <b>Joined</b>
                 </div>
               ))}
-            <button className="panel-link" onClick={() => navigate('attendance', 'roster')}>
-              View team roster <ArrowRight size={16} />
-            </button>
+            {['Captain', 'Coach'].includes(w.member.role) && (
+              <button className="panel-link" onClick={() => navigate('settings', 'members')}>
+                Manage members <ArrowRight size={16} />
+              </button>
+            )}
           </section>
           <section className="panel">
             <div className="panel-heading">

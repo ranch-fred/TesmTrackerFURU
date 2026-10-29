@@ -16,9 +16,10 @@ import { download, csv } from './exports';
 import { Modal, Badge } from './Records';
 import { parseCSV, validateImport } from './importer';
 import { presets, parseCustomTheme, readTheme, saveTheme } from './theme';
+import InviteTeammate from './InviteTeammate';
 import './personal-profile.css';
-export default function Settings({ w }) {
-  const [tab, setTab] = useState('my profile'),
+export default function Settings({ w, initial }) {
+  const [tab, setTab] = useState(initial || 'my profile'),
     [note, setNote] = useState(''),
     [error, setError] = useState(''),
     [confirm, setConfirm] = useState(null),
@@ -323,8 +324,7 @@ export default function Settings({ w }) {
             </button>
           </div>
           <p className="note">
-            Approved accounts appear automatically in the team roster. Captains and coaches can
-            administer the team.
+            Approved accounts appear here. Captains and coaches can administer the team.
           </p>
           {w.members.map((m) => (
             <div key={m.id} className="membership-row">
@@ -425,8 +425,12 @@ export default function Settings({ w }) {
       {tab === 'invites' && admin && (
         <section className="panel settings-panel">
           <div className="eyebrow">BRING YOUR CREW</div>
-          <h2>One code. A whole team.</h2>
-          <p>New members request access. A captain or coach approves each request.</p>
+          <h2>Bring the crew in.</h2>
+          <p>
+            Send an email invitation or share a link. A captain or coach approves each join request.
+          </p>
+          <InviteTeammate w={w} />
+          <div className="invite-share-label">OR SHARE AN INVITE LINK</div>
           <div className="invite-code">{w.team.join_code}</div>
           <div className="inline">
             <button
