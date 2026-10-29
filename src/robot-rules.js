@@ -172,6 +172,8 @@ export const hubPorts = [
   ['I2C', 4],
 ];
 export function hardwarePortName(record) {
+  if (/^(Motor|Servo|I2C|Digital|Analog) \d+(?:\/\d+)?$/.test(String(record.port ?? '')))
+    return String(record.port);
   const type = record.kind === 'DC motor' ? 'Motor' : record.kind === 'Servo' ? 'Servo' : 'I2C';
   const raw = String(record.port ?? '');
   const number = raw.match(/(\d+)\s*$/)?.[1];

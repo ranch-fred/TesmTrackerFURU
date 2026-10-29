@@ -5,6 +5,7 @@ import { entities } from './schema';
 import { uid, canEdit, canDelete } from './domain';
 import { removeTeamFiles } from './delete-team';
 import { validateCadFile } from './cad';
+import { validateRobotCounts } from './robot-workspace';
 const EMPTY = () => Object.fromEntries(Object.keys(entities).map((k) => [k, []]));
 function readDemo() {
   try {
@@ -209,6 +210,7 @@ export function useWorkspace() {
   }
   async function save(kind, record) {
     if (!canEdit(member.role, member.mentor_edit)) throw Error('Your role is read-only.');
+    if (kind === 'robot') validateRobotCounts(record);
     const id = record.id || uid(),
       old = data[kind].find((r) => r.id === id),
       next = { ...record, id };
