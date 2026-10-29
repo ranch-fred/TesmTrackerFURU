@@ -83,13 +83,15 @@ export function useWorkspace() {
         await supabase.from('records').select('*').eq('team_id', t.id).order('created_at'),
       );
       const next = EMPTY();
-      rows.forEach((r) => next[r.kind]?.push({
-        ...r.data,
-        ...(r.kind === 'sessions' && r.data?.attendanceCheckin
-          ? { attendanceUserId: r.created_by }
-          : {}),
-        id: r.id,
-      }));
+      rows.forEach((r) =>
+        next[r.kind]?.push({
+          ...r.data,
+          ...(r.kind === 'sessions' && r.data?.attendanceCheckin
+            ? { attendanceUserId: r.created_by }
+            : {}),
+          id: r.id,
+        }),
+      );
       setData(next);
       setMembers(
         checked(
@@ -280,6 +282,20 @@ export function useWorkspace() {
     checked(await supabase.from('teams').update(profile).eq('id', team.id));
     await refresh();
   }
+  async function updateProfile(profile) {
+    if (demo) {
+      const next = { ...member, ...profile };
+      setMember(next);
+      setMembers((rows) => rows.map((row) => (row.id === member.id ? next : row)));
+      return;
+    }
+    await rpc('update_own_profile', {
+      t: team.id,
+      new_display_name: profile.display_name,
+      new_bio: profile.bio,
+      new_photo: profile.photo,
+    });
+  }
   async function deleteTeam() {
     if (!team || !user || team.owner_id !== user.id)
       throw Error('Only the team owner can delete the team.');
@@ -397,6 +413,7 @@ export function useWorkspace() {
     remove,
     rpc,
     updateTeam,
+    updateProfile,
     deleteTeam,
     manage,
     upload,

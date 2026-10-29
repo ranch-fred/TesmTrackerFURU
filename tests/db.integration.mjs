@@ -35,6 +35,15 @@ await db.exec(
 await db.exec(
   await readFile(new URL('../supabase/migrations/20261025_build_log.sql', import.meta.url), 'utf8'),
 );
+// Simulate the existing production schema before applying the personal-profile upgrade.
+await db.exec(`drop function public.update_own_profile(uuid,text,text,text);
+alter table public.memberships drop column display_name, drop column bio, drop column photo;`);
+await db.exec(
+  await readFile(
+    new URL('../supabase/migrations/20261029_personal_profiles.sql', import.meta.url),
+    'utf8',
+  ),
+);
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
   parent = '10000000-0000-0000-0000-000000000003',
@@ -89,6 +98,30 @@ ok(
   (await db.query('select * from activity')).rows.length === 2,
   'Team and membership creation audited',
 );
+await db.query('select update_own_profile($1,$2,$3,$4)', [
+  t,
+  'Ace Captain',
+  'Build lead',
+  'data:image/png;base64,aGVsbG8=',
+]);
+const ownProfile = (
+  await db.query('select name,display_name,bio,photo from memberships where user_id=$1', [owner])
+).rows[0];
+ok(
+  ownProfile.name === 'Captain One' &&
+    ownProfile.display_name === 'Ace Captain' &&
+    ownProfile.bio === 'Build lead' &&
+    ownProfile.photo.startsWith('data:image/png'),
+  'Personal profile saves without changing member identity',
+);
+ok(
+  (
+    await db.query(
+      "select after_data from activity where kind='memberships' order by created_at desc limit 1",
+    )
+  ).rows[0].after_data.photo === undefined,
+  'Audit history omits profile photo bytes',
+);
 await db.query("insert into records(team_id,kind,data) values ($1,'expenses',$2)", [
   t,
   { description: 'Private purchase', amount: 25 },
@@ -110,6 +143,10 @@ await rejects(
   'Direct ownership mutation denied',
 );
 await as(outsider);
+await rejects(
+  () => db.query('select update_own_profile($1,$2,$3,$4)', [t, 'Intruder', '', '']),
+  'Unrelated account cannot edit a team profile',
+);
 ok(
   (await db.query('select * from records')).rows.length === 0,
   'Unrelated account cannot read team records',

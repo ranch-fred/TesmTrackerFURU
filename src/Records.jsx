@@ -66,15 +66,17 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
               ? false
               : ['members', 'multi', 'parts', 'hardware'].includes(f.type)
                 ? []
-                : ['number', 'percent', 'score'].includes(f.type)
-                  ? 0
-                  : f.type === 'select'
-                    ? f.options[0]
-                    : f.type === 'date' && ['date', 'assigned', 'joined'].includes(f.key)
-                      ? kind === 'meetings'
-                        ? meetingToday
-                        : new Date().toISOString().slice(0, 10)
-                      : '',
+                : kind === 'purchases' && f.key === 'requestedBy'
+                  ? w.member.name
+                  : ['number', 'percent', 'score'].includes(f.type)
+                    ? 0
+                    : f.type === 'select'
+                      ? f.options[0]
+                      : f.type === 'date' && ['date', 'assigned', 'joined'].includes(f.key)
+                        ? kind === 'meetings'
+                          ? meetingToday
+                          : new Date().toISOString().slice(0, 10)
+                        : '',
           ]),
         ),
     ),

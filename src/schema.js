@@ -110,6 +110,7 @@ export const entities = {
       f('requestedBy', 'Requested by'),
       f('neededBy', 'Needed-by date', 'date'),
       f('parts', 'Parts on request', 'parts'),
+      f('notes', 'Why is it needed?', 'textarea'),
       f('status', 'Status', 'select', ['Requested', 'Approved', 'Ordered', 'Received']),
     ],
   },

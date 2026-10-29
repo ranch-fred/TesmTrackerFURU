@@ -16,8 +16,9 @@ import { download, csv } from './exports';
 import { Modal, Badge } from './Records';
 import { parseCSV, validateImport } from './importer';
 import { presets, parseCustomTheme, readTheme, saveTheme } from './theme';
+import './personal-profile.css';
 export default function Settings({ w }) {
-  const [tab, setTab] = useState(canDelete(w.member.role) ? 'profile' : 'preferences'),
+  const [tab, setTab] = useState('my profile'),
     [note, setNote] = useState(''),
     [error, setError] = useState(''),
     [confirm, setConfirm] = useState(null),
@@ -38,6 +39,41 @@ export default function Settings({ w }) {
     location: w.team.location,
     logo: w.team.logo,
   });
+  const [personal, setPersonal] = useState({
+    display_name: w.member.display_name || w.member.name,
+    bio: w.member.bio || '',
+    photo: w.member.photo || '',
+  });
+  async function preparePhoto(file) {
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type))
+      throw Error('Choose a PNG, JPEG, or WebP photo.');
+    if (file.size > 5 * 1024 * 1024) throw Error('Choose a photo smaller than 5 MB.');
+    const bitmap = await createImageBitmap(file);
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const context = canvas.getContext('2d');
+      const side = Math.min(bitmap.width, bitmap.height);
+      context.drawImage(
+        bitmap,
+        (bitmap.width - side) / 2,
+        (bitmap.height - side) / 2,
+        side,
+        side,
+        0,
+        0,
+        256,
+        256,
+      );
+      const photo = canvas.toDataURL('image/webp', 0.8);
+      if (photo.length > 200000)
+        throw Error('This photo could not be compressed enough. Choose another.');
+      return photo;
+    } finally {
+      bitmap.close();
+    }
+  }
   async function act(fn) {
     setError('');
     setNote('');
@@ -111,13 +147,23 @@ export default function Settings({ w }) {
         value={tab}
         onChange={setTab}
         tabs={(admin
-          ? ['profile', 'members', 'invites', 'preferences', 'theme', 'data', 'delete team']
+          ? [
+              'my profile',
+              'profile',
+              'members',
+              'invites',
+              'preferences',
+              'theme',
+              'data',
+              'delete team',
+            ]
           : [
+              'my profile',
               'preferences',
               'theme',
               ...(canEdit(w.member.role, w.member.mentor_edit) ? ['data'] : []),
             ]
-        ).map((t) => [t, t[0].toUpperCase() + t.slice(1)])}
+        ).map((t) => [t, t === 'profile' ? 'Team profile' : t[0].toUpperCase() + t.slice(1)])}
       />
       {error && (
         <p role="alert" className="error notice">
@@ -128,6 +174,94 @@ export default function Settings({ w }) {
         <p role="status" className="success notice">
           {note}
         </p>
+      )}
+      {tab === 'my profile' && (
+        <section className="panel settings-panel personal-profile">
+          <div className="eyebrow">SETTINGS / MY PROFILE</div>
+          <h2>Make your profile yours.</h2>
+          <p>Your photo, display name, and bio appear on your purchase requests.</p>
+          <div className="personal-profile-preview">
+            <span className="personal-profile-avatar">
+              {personal.photo ? (
+                <img src={personal.photo} alt="Your profile preview" />
+              ) : (
+                (personal.display_name || w.member.name)
+                  .split(' ')
+                  .map((part) => part[0])
+                  .slice(0, 2)
+                  .join('')
+              )}
+            </span>
+            <div>
+              <strong>{personal.display_name || w.member.name}</strong>
+              <small>{w.member.role}</small>
+              <p>{personal.bio || 'Add a short bio about yourself.'}</p>
+            </div>
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              act(async () => {
+                await w.updateProfile({
+                  ...personal,
+                  display_name: personal.display_name.trim(),
+                  bio: personal.bio.trim(),
+                });
+                setNote('Your profile was saved.');
+              });
+            }}
+          >
+            <div className="form-grid">
+              <label>
+                Display name
+                <input
+                  required
+                  maxLength={60}
+                  value={personal.display_name}
+                  onChange={(e) =>
+                    setPersonal((value) => ({ ...value, display_name: e.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Profile photo
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file)
+                      act(async () => {
+                        const photo = await preparePhoto(file);
+                        setPersonal((value) => ({ ...value, photo }));
+                      });
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+            </div>
+            {personal.photo && (
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => setPersonal((value) => ({ ...value, photo: '' }))}
+              >
+                Remove photo
+              </button>
+            )}
+            <label>
+              Bio
+              <textarea
+                rows={3}
+                maxLength={240}
+                value={personal.bio}
+                onChange={(e) => setPersonal((value) => ({ ...value, bio: e.target.value }))}
+                placeholder="A little about you and what you work on"
+              />
+            </label>
+            <button className="primary">Save my profile</button>
+          </form>
+        </section>
       )}
       {tab === 'profile' && admin && (
         <section className="panel settings-panel">
