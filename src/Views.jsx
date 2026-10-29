@@ -3,6 +3,8 @@ import {
   ArrowUpRight,
   ArrowRight,
   Plus,
+  Pencil,
+  Trash2,
   Wallet,
   ArrowDownLeft,
   ArrowUpRight as Out,
@@ -12,13 +14,10 @@ import {
   Clock3,
   Users,
   Package,
-  AlertTriangle,
   Radio,
   Target,
   Flame,
   ChevronRight,
-  Download,
-  FileText,
   Check,
   ShieldCheck,
 } from 'lucide-react';
@@ -30,19 +29,15 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
   LineChart,
   Line,
-  Legend,
 } from 'recharts';
-import { finance, money, sum, trend, legality, canEdit } from './domain';
-import Records, { Badge, RecordForm } from './Records';
+import { finance, money, sum, trend, legality, canEdit, canDelete } from './domain';
+import Records, { Badge, Modal, RecordForm } from './Records';
 import { entities } from './schema';
-import { pdf, csv } from './exports';
 import { AnimatedValue, useMotion } from './Motion';
 import { loggedToday } from './logs';
 import { seasonBadge } from './branding';
@@ -140,11 +135,17 @@ function Countdown({ event }) {
     ['SEC', Math.floor(left / 1e3) % 60],
   ];
   return (
-    <section className="panel accent countdown-panel" aria-label={`${parts[0][1]} days until ${event.name}`}>
+    <section
+      className="panel accent countdown-panel"
+      aria-label={`${parts[0][1]} days until ${event.name}`}
+    >
       <div>
         <div className="eyebrow">NEXT COMPETITION</div>
         <h2>{event.name}</h2>
-        <small className="muted">{event.date}{event.location ? ` · ${event.location}` : ''}</small>
+        <small className="muted">
+          {event.date}
+          {event.location ? ` · ${event.location}` : ''}
+        </small>
       </div>
       <div className="countdown" role="timer">
         {parts.map(([label, value]) => (
@@ -495,7 +496,9 @@ export function Dashboard({ w, navigate }) {
               </h3>
               <span className="muted">TEAM ROSTER</span>
             </div>
-            {approvedMembers(w.members).slice(0, 3).map((p) => (
+            {approvedMembers(w.members)
+              .slice(0, 3)
+              .map((p) => (
                 <div className="member-row" key={p.id}>
                   <div className="avatar">
                     {p.name
@@ -505,11 +508,13 @@ export function Dashboard({ w, navigate }) {
                   </div>
                   <span>
                     {p.name}
-                    <small>{p.role} · {p.subteams?.join(', ') || 'Team member'}</small>
+                    <small>
+                      {p.role} · {p.subteams?.join(', ') || 'Team member'}
+                    </small>
                   </span>
                   <b>Joined</b>
                 </div>
-            ))}
+              ))}
             <button className="panel-link" onClick={() => navigate('attendance', 'roster')}>
               View team roster <ArrowRight size={16} />
             </button>
@@ -567,21 +572,14 @@ export function Dashboard({ w, navigate }) {
     </>
   );
 }
-export function Finance({ w, initial = 'overview' }) {
+export function Finance({ w }) {
   const { enabled } = useMotion();
-  const [tab, setTab] = useState(initial),
-    [form, setForm] = useState(null);
+  const [form, setForm] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [error, setError] = useState('');
   const d = w.data,
     parent = w.member.role === 'Parent/Sponsor',
     f = parent && w.summary ? w.summary : finance(d);
-  const categories = d.budgets.map((b) => ({
-    category: b.category,
-    budget: Number(b.amount),
-    actual: sum(
-      d.expenses.filter((e) => e.category === b.category),
-      'amount',
-    ),
-  }));
   const split = [...new Set(d.expenses.map((e) => e.category))].map((category) => ({
     name: category,
     value: sum(
@@ -589,29 +587,6 @@ export function Finance({ w, initial = 'overview' }) {
       'amount',
     ),
   }));
-  function report() {
-    pdf(
-      'Finance report',
-      [
-        {
-          title: 'Season finances',
-          lines: [
-            `Received: ${money(f.received)}`,
-            `Spent: ${money(f.spent)}`,
-            `Balance: ${money(f.balance)}`,
-            `Pledged: ${money(f.pledged)}`,
-          ],
-        },
-        {
-          title: 'Budget vs actual',
-          lines: categories.map(
-            (c) => `${c.category}: budget ${money(c.budget)} / actual ${money(c.actual)}`,
-          ),
-        },
-      ],
-      w.team,
-    );
-  }
   return (
     <>
       <div className="page-intro">
@@ -636,258 +611,220 @@ export function Finance({ w, initial = 'overview' }) {
           icon={ArrowDownLeft}
         />
         <Stat label="MONEY SPENT" value={money(f.spent)} note="All recorded expenses" icon={Out} />
-        <Stat
-          label="PLEDGED, NOT RECEIVED"
-          value={money(f.pledged - f.received)}
-          note="Keep those conversations moving"
-          icon={Clock3}
-        />
       </div>
       <div className="page-actions">
-        <PillTabs
-          label="Finance sections"
-          value={tab}
-          onChange={setTab}
-          tabs={(parent ? ['overview'] : ['overview', 'expenses', 'income', 'budgets']).map((t) => [
-            t,
-            t === 'overview' ? 'Overview' : entities[t].title,
-            t === 'overview' ? undefined : d[t]?.length,
-          ])}
-        />
         <div className="inline">
-          <button className="outline" onClick={report}>
-            <FileText size={16} /> Sponsor PDF
-          </button>
-          <button
-            className="outline"
-            onClick={() =>
-              csv(
-                'finance-summary',
-                [f],
-                ['received', 'spent', 'balance', 'pledged'].map((key) => ({ key, label: key })),
-              )
-            }
-          >
-            <Download size={15} /> Summary CSV
-          </button>
           {!parent && canEdit(w.member.role, w.member.mentor_edit) && (
-            <button className="primary" onClick={() => setForm('expenses')}>
-              <Plus size={16} /> Log expense
-            </button>
+            <>
+              <button className="outline" onClick={() => setForm({ kind: 'income' })}>
+                <Plus size={16} /> Log funding
+              </button>
+              <button className="primary" onClick={() => setForm({ kind: 'expenses' })}>
+                <Plus size={16} /> Add expense
+              </button>
+            </>
           )}
         </div>
       </div>
-      {tab !== 'overview' ? (
-        <Records key={tab} kind={tab} w={w} />
-      ) : (
-        <>
-          <div className="finance-layout">
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <>
+        <div className="finance-layout">
+          <section className="panel">
+            <div className="panel-heading">
+              <div>
+                <span className="eyebrow subtle">CASH FLOW</span>
+                <h2>Resources for the road ahead.</h2>
+              </div>
+              <Badge tone="orange">SEASON TO DATE</Badge>
+            </div>
+            {parent ? (
+              <div className="sponsor-summary">
+                <h2>{money(f.balance)} available for the next build.</h2>
+                <p>Thank you for helping the team turn ideas into working engineering.</p>
+              </div>
+            ) : (
+              <>
+                <Chart data={trend(d)} height={280} />
+                <small className="chart-footnote">
+                  Cumulative recorded totals by funding and expense date.
+                </small>
+              </>
+            )}
+          </section>
+          {!parent && (
             <section className="panel">
               <div className="panel-heading">
                 <div>
-                  <span className="eyebrow subtle">CASH FLOW</span>
-                  <h2>Resources for the road ahead.</h2>
+                  <span className="eyebrow subtle">SPENDING MIX</span>
+                  <h2>Where it goes.</h2>
                 </div>
-                <Badge tone="orange">SEASON TO DATE</Badge>
               </div>
-              {parent ? (
-                <div className="sponsor-summary">
-                  <h2>{money(f.balance)} available for the next build.</h2>
-                  <p>Thank you for helping the team turn ideas into working engineering.</p>
-                </div>
-              ) : (
+              {split.length ? (
                 <>
-                  <Chart data={trend(d)} height={280} />
-                  <small className="chart-footnote">
-                    Cumulative recorded totals · Funding is grouped by last contact date.
-                  </small>
-                </>
-              )}
-            </section>
-            {!parent && (
-              <section className="panel">
-                <div className="panel-heading">
-                  <div>
-                    <span className="eyebrow subtle">SPENDING MIX</span>
-                    <h2>Where it goes.</h2>
-                  </div>
-                </div>
-                {split.length ? (
-                  <>
-                    <div style={{ height: 210 }}>
-                      <ResponsiveContainer>
-                        <PieChart>
-                          <Pie
-                            isAnimationActive={enabled}
-                            data={split}
-                            dataKey="value"
-                            innerRadius={60}
-                            outerRadius={85}
-                            paddingAngle={4}
-                            stroke="none"
-                          >
-                            {split.map((c, i) => (
-                              <Cell key={c.name} fill={palette[i % palette.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip
-                            contentStyle={{ background: '#222', border: '1px solid #555' }}
-                            formatter={money}
-                          />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                    <div className="chart-legend">
-                      {split.map((c, i) => (
-                        <div key={c.name}>
-                          <i style={{ background: palette[i % palette.length] }} />
-                          {c.name}
-                          <b>{money(c.value)}</b>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="empty-copy">Log an expense to see your spending mix.</p>
-                )}
-              </section>
-            )}
-          </div>
-          {!parent && (
-            <>
-              <div className="finance-layout">
-                <section className="panel">
-                  <div className="panel-heading">
-                    <div>
-                      <span className="eyebrow subtle">PLAN VS. REALITY</span>
-                      <h2>Stay ahead of the budget.</h2>
-                    </div>
-                    <button className="text-button" onClick={() => setTab('budgets')}>
-                      Edit budgets <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                  <div style={{ height: 270 }}>
+                  <div style={{ height: 210 }}>
                     <ResponsiveContainer>
-                      <BarChart data={categories}>
-                        <CartesianGrid stroke="#303030" vertical={false} />
-                        <XAxis
-                          dataKey="category"
-                          tick={{ fill: '#999', fontSize: 10 }}
-                          tickLine={false}
-                          axisLine={false}
-                        />
-                        <YAxis
-                          tick={{ fill: '#999', fontSize: 11 }}
-                          tickLine={false}
-                          axisLine={false}
-                        />
+                      <PieChart>
+                        <Pie
+                          isAnimationActive={enabled}
+                          data={split}
+                          dataKey="value"
+                          innerRadius={60}
+                          outerRadius={85}
+                          paddingAngle={4}
+                          stroke="none"
+                        >
+                          {split.map((c, i) => (
+                            <Cell key={c.name} fill={palette[i % palette.length]} />
+                          ))}
+                        </Pie>
                         <Tooltip
                           contentStyle={{ background: '#222', border: '1px solid #555' }}
                           formatter={money}
                         />
-                        <Bar
-                          isAnimationActive={enabled}
-                          dataKey="budget"
-                          fill="#414141"
-                          radius={[3, 3, 0, 0]}
-                        />
-                        <Bar
-                          isAnimationActive={enabled}
-                          dataKey="actual"
-                          fill="var(--orange)"
-                          radius={[3, 3, 0, 0]}
-                        />
-                        <Legend />
-                      </BarChart>
+                      </PieChart>
                     </ResponsiveContainer>
                   </div>
-                  {categories
-                    .filter((c) => c.actual > c.budget)
-                    .map((c) => (
-                      <p className="error" key={c.category}>
-                        {c.category} is {money(c.actual - c.budget)} over budget.
-                      </p>
-                    ))}
-                </section>
-                <section className="panel">
-                  <div className="panel-heading">
-                    <div>
-                      <span className="eyebrow subtle">FOLLOW THROUGH</span>
-                      <h2>Next conversations.</h2>
-                    </div>
-                  </div>
-                  {[...d.income]
-                    .filter((i) => i.followUp)
-                    .sort((a, b) => a.followUp.localeCompare(b.followUp))
-                    .slice(0, 4)
-                    .map((i) => (
-                      <div className="funding-row" key={i.id}>
-                        <span className="funding-icon">{i.company?.[0]}</span>
-                        <div>
-                          <strong>{i.company}</strong>
-                          <small>Follow up {i.followUp}</small>
-                        </div>
-                        <Badge>{i.status}</Badge>
+                  <div className="chart-legend">
+                    {split.map((c, i) => (
+                      <div key={c.name}>
+                        <i style={{ background: palette[i % palette.length] }} />
+                        {c.name}
+                        <b>{money(c.value)}</b>
                       </div>
                     ))}
-                  <div className="finance-warning">
-                    <AlertTriangle size={18} />
-                    <div>
-                      <b>
-                        {d.expenses.filter((e) => e.reimbursement === 'Pending').length}{' '}
-                        reimbursements pending
-                      </b>
-                      <small>Keep your team’s out-of-pocket costs in view.</small>
-                    </div>
                   </div>
-                </section>
-              </div>
-              <section className="panel">
-                <div className="panel-heading">
-                  <h2>Recent transactions</h2>
-                  <button className="text-button" onClick={() => setTab('expenses')}>
-                    View all expenses <ArrowRight size={16} />
-                  </button>
-                </div>
-                <div className="table-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Paid by</th>
-                        <th>Status</th>
-                        <th>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...d.expenses]
-                        .sort((a, b) => b.date.localeCompare(a.date))
-                        .slice(0, 5)
-                        .map((e) => (
-                          <tr key={e.id}>
-                            <td>{e.date}</td>
-                            <td>
-                              <strong>{e.description}</strong>
-                            </td>
-                            <td>{e.category}</td>
-                            <td>{e.paidBy}</td>
-                            <td>
-                              <Badge>{e.reimbursement}</Badge>
-                            </td>
-                            <td className="money">−{money(e.amount)}</td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            </>
+                </>
+              ) : (
+                <p className="empty-copy">Log an expense to see your spending mix.</p>
+              )}
+            </section>
           )}
-        </>
+        </div>
+        {!parent && (
+          <div className="finance-layout">
+            <section className="panel">
+              <div className="panel-heading">
+                <h2>Funding</h2>
+              </div>
+              {[...d.income]
+                .sort((a, b) => (b.lastContact || '').localeCompare(a.lastContact || ''))
+                .map((item) => (
+                  <div className="funding-row" key={item.id}>
+                    <span className="funding-icon">{item.company?.[0] || '$'}</span>
+                    <div>
+                      <strong>{item.company || 'Funding source'}</strong>
+                      <small>{item.lastContact || 'No date'}</small>
+                    </div>
+                    <strong className="money">+{money(item.received)}</strong>
+                    {canEdit(w.member.role, w.member.mentor_edit) && (
+                      <button
+                        className="icon-button"
+                        aria-label={`Edit funding from ${item.company}`}
+                        onClick={() => setForm({ kind: 'income', record: item })}
+                      >
+                        <Pencil size={16} />
+                      </button>
+                    )}
+                    {canDelete(w.member.role) && (
+                      <button
+                        className="icon-button danger"
+                        aria-label={`Delete funding from ${item.company}`}
+                        onClick={() => setDeleting({ kind: 'income', record: item })}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              {!d.income.length && <p className="empty-copy">No funding logged yet.</p>}
+            </section>
+            <section className="panel">
+              <div className="panel-heading">
+                <h2>Expenses</h2>
+              </div>
+              <div className="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...d.expenses]
+                      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+                      .map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.date}</td>
+                          <td>
+                            <strong>{item.description}</strong>
+                          </td>
+                          <td>{item.category}</td>
+                          <td className="money">−{money(item.amount)}</td>
+                          <td>
+                            {canEdit(w.member.role, w.member.mentor_edit) && (
+                              <button
+                                className="icon-button"
+                                aria-label={`Edit expense ${item.description}`}
+                                onClick={() => setForm({ kind: 'expenses', record: item })}
+                              >
+                                <Pencil size={16} />
+                              </button>
+                            )}
+                            {canDelete(w.member.role) && (
+                              <button
+                                className="icon-button danger"
+                                aria-label={`Delete expense ${item.description}`}
+                                onClick={() => setDeleting({ kind: 'expenses', record: item })}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                {!d.expenses.length && <p className="empty-copy">No expenses logged yet.</p>}
+              </div>
+            </section>
+          </div>
+        )}
+      </>
+      {form && (
+        <RecordForm w={w} kind={form.kind} record={form.record} onClose={() => setForm(null)} />
       )}
-      {form && <RecordForm w={w} kind={form} onClose={() => setForm(null)} />}
+      {deleting && (
+        <Modal title="Delete this record?" onClose={() => setDeleting(null)}>
+          <p>This permanently removes the record from your team finances.</p>
+          <div className="modal-actions">
+            <button className="outline" onClick={() => setDeleting(null)}>
+              Cancel
+            </button>
+            <button
+              className="primary danger-button"
+              onClick={async () => {
+                try {
+                  await w.remove(deleting.kind, deleting.record.id);
+                  setDeleting(null);
+                } catch (e) {
+                  setError(e.message);
+                  setDeleting(null);
+                }
+              }}
+            >
+              Delete record
+            </button>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }
@@ -946,7 +883,8 @@ export function Matches({ w, embedded = false }) {
         />
       </div>
       <p className="note">
-        Use Practice matches for point-by-point BIOBUZZ scoring. Other match totals are entered manually.
+        Use Practice matches for point-by-point BIOBUZZ scoring. Other match totals are entered
+        manually.
       </p>
       <section className="panel">
         <div className="panel-heading">

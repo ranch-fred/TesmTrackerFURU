@@ -55,7 +55,16 @@ const icons = {
   finance: Wallet,
   purchases: ShoppingCart,
 };
-const hiddenKinds = new Set(['subsystems', 'rules', 'judging', 'portfolio', 'reports', 'parts', 'roster', 'sessions']);
+const hiddenKinds = new Set([
+  'subsystems',
+  'rules',
+  'judging',
+  'portfolio',
+  'reports',
+  'parts',
+  'roster',
+  'sessions',
+]);
 function pageForKind(kind) {
   if (['sessions', 'roster'].includes(kind)) return 'attendance';
   if (['matches', 'events', 'milestones', 'risks', 'packing'].includes(kind)) return 'competition';
@@ -155,7 +164,7 @@ export default function App() {
     .slice(0, 20);
   let view;
   if (page === 'dashboard') view = <Dashboard w={w} navigate={navigate} />;
-  else if (page === 'finance') view = <Finance w={w} initial={innerPage || 'overview'} />;
+  else if (page === 'finance') view = <Finance w={w} />;
   else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
   else if (page === 'attendance')
     view = <AttendanceHub key={innerPage || 'sessions'} w={w} initial={innerPage || 'sessions'} />;
@@ -376,7 +385,11 @@ export default function App() {
             </button>
           </div>
         )}
-        <main id="main-content" className={`main-content page-${page}`} key={`${page}:${innerPage || ''}`}>
+        <main
+          id="main-content"
+          className={`main-content page-${page}`}
+          key={`${page}:${innerPage || ''}`}
+        >
           {w.error && (
             <div className="error notice" role="alert">
               {w.error}
@@ -478,8 +491,8 @@ export default function App() {
             </p>
             <h3>3 / Keep the books</h3>
             <p>
-              Finance & expenses → Log expense. Enter date, amount, category, paid by, reimbursement
-              status and a receipt link or upload.
+              Finance & expenses → Log funding or add an expense. Enter the funding source, date,
+              and amount, or record an expense with its receipt.
             </p>
             <h3>4 / Learn from every match</h3>
             <p>
