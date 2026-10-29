@@ -38,6 +38,7 @@ import DesignLibrary from './DesignLibrary';
 import LogsHub from './LogsHub';
 import ResourcesCenter from './ResourcesCenter';
 import Settings from './Settings';
+import PurchaseRequests from './PurchaseRequests';
 import { MotionScene, MotionToggle } from './Motion';
 import { teamMonogram, teamPageTitle } from './branding';
 import IsoLoop from './IsoLoop';
@@ -165,6 +166,7 @@ export default function App() {
   let view;
   if (page === 'dashboard') view = <Dashboard w={w} navigate={navigate} />;
   else if (page === 'finance') view = <Finance w={w} />;
+  else if (page === 'purchases') view = <PurchaseRequests w={w} />;
   else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
   else if (page === 'attendance')
     view = <AttendanceHub key={innerPage || 'sessions'} w={w} initial={innerPage || 'sessions'} />;

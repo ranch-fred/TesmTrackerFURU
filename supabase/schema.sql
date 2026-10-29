@@ -1,7 +1,7 @@
 -- Run once in a NEW Supabase project's SQL editor. No service-role key is used by the app.
 create extension if not exists pgcrypto;
 create table public.teams(id uuid primary key default gen_random_uuid(),owner_id uuid not null references auth.users(id),name text not null,number text not null,school text default '',season text default '',logo text default '',location text default '',join_code text unique not null default upper(encode(gen_random_bytes(6),'hex')),created_at timestamptz default now());
-create table public.memberships(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,user_id uuid not null references auth.users(id),name text not null,grade text default '',requested_role text default 'Member',role text not null default 'Member' check(role in ('Captain','Coach','Mentor','Member','Parent/Sponsor')),subteams text[] default '{}',status text not null default 'pending' check(status in ('pending','approved','denied')),mentor_edit boolean not null default false,notification_preferences boolean not null default true,onboarded boolean not null default false,created_at timestamptz default now(),unique(team_id,user_id));
+create table public.memberships(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,user_id uuid not null references auth.users(id),name text not null,display_name text default '',bio text default '',photo text default '',grade text default '',requested_role text default 'Member',role text not null default 'Member' check(role in ('Captain','Coach','Mentor','Member','Parent/Sponsor')),subteams text[] default '{}',status text not null default 'pending' check(status in ('pending','approved','denied')),mentor_edit boolean not null default false,notification_preferences boolean not null default true,onboarded boolean not null default false,created_at timestamptz default now(),unique(team_id,user_id));
 create table public.records(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,kind text not null check(kind in ('announcements','tasks','roster','sessions','meetings','expenses','income','purchases','budgets','parts','packing','robot','subsystems','hardware','inspection','rules','programming','build','designs','matches','events','milestones','risks','outreach','judging','resources','portfolio')),data jsonb not null default '{}',created_by uuid not null default auth.uid() references auth.users(id),created_at timestamptz default now(),updated_at timestamptz default now());
 create index on public.records(team_id,kind);
 create table public.comments(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,record_id uuid not null references public.records(id) on delete cascade,user_id uuid not null default auth.uid() references auth.users(id),message text not null check(length(message) between 1 and 5000),created_at timestamptz default now());
@@ -38,6 +38,7 @@ declare t uuid; rid uuid; b jsonb; a jsonb; k text;
 begin
  if tg_op<>'INSERT' then b:=to_jsonb(old); end if;
  if tg_op<>'DELETE' then a:=to_jsonb(new); end if;
+ if tg_table_name='memberships' then b:=b-'photo'; a:=a-'photo'; end if;
  t:=(case when tg_table_name='teams' then coalesce(a,b)->>'id' else coalesce(a,b)->>'team_id' end)::uuid;
  rid:=(coalesce(a,b)->>'id')::uuid;
  k:=coalesce(coalesce(a,b)->>'kind',tg_table_name);
@@ -105,6 +106,13 @@ begin
 end $$;
 create function public.rotate_invite(t uuid) returns text language plpgsql security definer set search_path=public as $$ declare c text;begin if not public.team_admin(t) then raise exception 'Captain or coach required';end if;update teams set join_code=upper(encode(gen_random_bytes(6),'hex')) where id=t returning join_code into c;return c;end $$;
 create function public.update_preferences(t uuid,notify boolean,welcome boolean) returns void language plpgsql security definer set search_path=public as $$ begin update memberships set notification_preferences=notify,onboarded=welcome where team_id=t and user_id=auth.uid();end $$;
+create function public.update_own_profile(t uuid,new_display_name text,new_bio text,new_photo text) returns void language plpgsql security definer set search_path=public as $$ begin
+ if length(trim(coalesce(new_display_name,''))) not between 1 and 60 then raise exception 'Display name must be 1 to 60 characters'; end if;
+ if length(coalesce(new_bio,''))>240 then raise exception 'Bio must be 240 characters or fewer'; end if;
+ if length(coalesce(new_photo,''))>200000 or (coalesce(new_photo,'')<>'' and new_photo !~ '^data:image/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$') then raise exception 'Invalid profile photo'; end if;
+ update memberships set display_name=trim(new_display_name),bio=trim(coalesce(new_bio,'')),photo=coalesce(new_photo,'') where team_id=t and user_id=auth.uid() and status='approved';
+ if not found then raise exception 'Approved membership required'; end if;
+end $$;
 create function public.finance_summary(t uuid) returns jsonb language plpgsql security definer set search_path=public as $$ declare received numeric;spent numeric;pledged numeric;begin if public.team_role(t) is null then raise exception 'Approved member required';end if;select coalesce(sum((data->>'received')::numeric),0),coalesce(sum((data->>'pledged')::numeric),0) into received,pledged from records where team_id=t and kind='income';select coalesce(sum((data->>'amount')::numeric),0) into spent from records where team_id=t and kind='expenses';return jsonb_build_object('received',received,'spent',spent,'balance',received-spent,'pledged',pledged);end $$;
 create function public.dashboard_summary(t uuid) returns jsonb language plpgsql security definer set search_path=public as $$ begin if public.team_role(t) is null then raise exception 'Approved member required';end if;return jsonb_build_object('robot',(select data from records where team_id=t and kind='robot' order by created_at limit 1),'events',(select coalesce(jsonb_agg(jsonb_build_object('id',id,'name',data->>'name','date',data->>'date')),'[]') from records where team_id=t and kind='events'));end $$;
 create function public.delete_team(t uuid, expected_name text, check_only boolean default false) returns void language plpgsql security definer set search_path='' as $$
@@ -128,7 +136,7 @@ begin
  delete from public.teams where id=t;
 end $$;
 revoke execute on all functions in schema public from public,anon;
-grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.rotate_invite(uuid),public.update_preferences(uuid,boolean,boolean),public.finance_summary(uuid),public.dashboard_summary(uuid),public.delete_team(uuid,text,boolean) to authenticated;
+grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.rotate_invite(uuid),public.update_preferences(uuid,boolean,boolean),public.update_own_profile(uuid,text,text,text),public.finance_summary(uuid),public.dashboard_summary(uuid),public.delete_team(uuid,text,boolean) to authenticated;
 grant select on public.memberships,public.notifications,public.activity to authenticated;
 grant select,insert,update,delete on public.records to authenticated;
 grant select,insert on public.comments to authenticated;

@@ -48,6 +48,8 @@ Run [`supabase/migrations/20261025_cad_files.sql`](supabase/migrations/20261025_
 
 Run [`supabase/migrations/20261025_build_log.sql`](supabase/migrations/20261025_build_log.sql) in the existing project's Supabase SQL Editor. It adds `build` as an allowed team record type while preserving the existing entries and team permissions.
 
+Run [`supabase/migrations/20261029_personal_profiles.sql`](supabase/migrations/20261029_personal_profiles.sql) in the existing project's Supabase SQL Editor before using **Team settings → My profile** on live accounts. It adds optional display name, bio, and photo fields and a guarded self-update function; existing member names and access permissions stay intact.
+
 1. Create a Supabase project you control.
 2. In its SQL editor, run **supabase/schema.sql** once in a new project. It creates the application tables, private storage bucket, guarded administration functions, audit triggers, Realtime policies and row-level permissions. It is an initial migration, not an idempotent reset script.
 3. In Supabase Authentication settings, enable email/password and email confirmation. Set the Site URL to the production Vercel URL. Add localhost and your actual Vercel production/preview URLs to the allowed redirect URLs. Configure your own SMTP provider for reliable confirmation email delivery. The app sends in-app announcement notifications, not announcement emails.

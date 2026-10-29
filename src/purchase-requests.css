@@ -1,0 +1,295 @@
+.purchase-intro {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.purchase-intro .primary {
+  flex: none;
+}
+
+.purchase-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+}
+
+.purchase-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #49403a;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #201b18, #171717 45%, #151515);
+  box-shadow: 0 16px 32px #0003;
+}
+
+.purchase-card::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: var(--orange);
+}
+
+.purchase-card::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 0;
+  border-left: 28px solid transparent;
+  border-top: 28px solid #60432c;
+  pointer-events: none;
+}
+
+.purchase-card.open {
+  grid-column: 1 / -1;
+}
+
+.purchase-card-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 24px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.purchase-card-toggle:hover,
+.purchase-card-toggle:focus-visible {
+  background: #ff6b000b;
+}
+
+.purchase-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid #915824;
+  border-radius: 50%;
+  background: #56351f;
+  color: #ffbb80;
+  font-size: 15px;
+  overflow: hidden;
+}
+
+.purchase-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.purchase-card-identity {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.purchase-card-identity strong {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+.purchase-card-identity small {
+  color: #999;
+  font-size: 11px;
+}
+
+.purchase-status {
+  flex: none;
+  padding: 7px 12px;
+  border: 1px solid #9c5c1f;
+  border-radius: 999px;
+  background: #ff6b0016;
+  color: #ffab58;
+  font-size: 11px;
+}
+
+.purchase-status.status-approved {
+  border-color: #347f54;
+  background: #54c58219;
+  color: #71dda0;
+}
+
+.purchase-status.status-ordered {
+  border-color: #3d658d;
+  background: #63a4e01a;
+  color: #7ebcff;
+}
+
+.purchase-status.status-received {
+  border-color: #777;
+  background: #ffffff0f;
+  color: #c5c5c5;
+}
+
+.purchase-card-preview {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 24px 22px;
+  padding: 20px 0 0;
+  border-top: 1px solid #393939;
+}
+
+.purchase-card-preview strong {
+  flex: 1;
+  min-width: 150px;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.purchase-card-preview small {
+  color: #aaa;
+}
+
+.purchase-card-preview > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-top: 12px;
+  color: #aaa;
+  font-size: 11px;
+}
+
+.purchase-card-details {
+  margin: 0 24px 24px;
+  padding-top: 20px;
+  border-top: 1px solid #393939;
+}
+
+.purchase-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 0 25px;
+  padding: 0;
+  list-style: none;
+}
+
+.purchase-progress li {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  flex: 1;
+  color: #858585;
+  font-size: 11px;
+}
+
+.purchase-progress li span {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 1px solid #666;
+  border-radius: 50%;
+}
+
+.purchase-progress li.reached {
+  color: #ffab58;
+}
+
+.purchase-progress li.reached span {
+  border-color: var(--orange);
+  background: #ff6b0024;
+}
+
+.purchase-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.purchase-facts > div,
+.purchase-items,
+.purchase-note {
+  padding: 15px 17px;
+  border: 1px solid #393939;
+  border-radius: 10px;
+  background: #1b1b1b;
+}
+
+.purchase-facts small,
+.purchase-items small,
+.purchase-note small {
+  display: block;
+  margin-bottom: 7px;
+  color: #999;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+
+.purchase-facts strong {
+  overflow-wrap: anywhere;
+}
+
+.purchase-items,
+.purchase-note {
+  margin-top: 12px;
+}
+
+.purchase-requester-bio {
+  margin: 14px 0 0;
+  color: #aaa;
+  font-size: 12px;
+}
+
+.purchase-items > div {
+  padding: 7px 0;
+  border-top: 1px solid #303030;
+}
+
+.purchase-items > div:first-of-type {
+  border-top: 0;
+}
+
+.purchase-note p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.purchase-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.purchase-empty {
+  padding: 28px;
+}
+
+@media (max-width: 760px) {
+  .purchase-intro {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .purchase-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .purchase-card-toggle {
+    padding: 18px;
+    gap: 10px;
+  }
+
+  .purchase-card-preview,
+  .purchase-card-details {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+}
