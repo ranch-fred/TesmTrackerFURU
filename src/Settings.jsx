@@ -322,6 +322,7 @@ export default function Settings({ w, initial }) {
               <RefreshCw size={15} /> Refresh
             </button>
           </div>
+          <InviteTeammate w={w} />
           <p className="note">
             Approved accounts appear here. Captains and coaches can administer the team.
           </p>

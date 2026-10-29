@@ -381,7 +381,19 @@ export function useWorkspace() {
     await rpc('update_preferences', { t: team.id, notify, welcome: onboarded });
   }
   async function logout() {
-    if (supabase && !demo) await supabase.auth.signOut();
+    // Always clear local state, even if the network sign-out fails, so nobody is stuck on an account.
+    if (supabase && !demo) {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) await supabase.auth.signOut({ scope: 'local' });
+      } catch {
+        try {
+          await supabase.auth.signOut({ scope: 'local' });
+        } catch {
+          /* local state is cleared below */
+        }
+      }
+    }
     setDemo(false);
     setUser(null);
     setTeam(null);

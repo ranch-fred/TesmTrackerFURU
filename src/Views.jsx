@@ -320,6 +320,11 @@ export function Dashboard({ w, navigate }) {
             <button onClick={() => navigate('attendance')}>
               <Users size={15} /> Attendance <ArrowUpRight size={14} />
             </button>
+            {['Captain', 'Coach'].includes(w.member.role) && (
+              <button onClick={() => navigate('settings', 'members')}>
+                <Plus size={15} /> Add teammate <ArrowUpRight size={14} />
+              </button>
+            )}
           </div>
         ) : (
           <button className="text-button" onClick={() => navigate('announcements')}>
