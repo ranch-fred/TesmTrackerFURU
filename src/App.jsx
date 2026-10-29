@@ -31,6 +31,7 @@ import {
   Hammer,
   HeartHandshake,
   Ellipsis,
+  Workflow,
   GraduationCap,
 } from 'lucide-react';
 import Auth, { Brand } from './Auth';
@@ -38,6 +39,7 @@ import { useWorkspace } from './store';
 import { labels, entities } from './schema';
 import { visibleNav, isMoreActive } from './nav';
 import Tour from './Tour';
+import MechanismMap from './MechanismMap';
 import { canView } from './domain';
 import Records, { Modal, Badge } from './Records';
 import { Dashboard, Finance, Robot } from './Views';
@@ -64,6 +66,7 @@ const icons = {
   finance: Wallet,
   purchases: ShoppingCart,
   roster: Contact,
+  mechanisms: Workflow,
   build: Hammer,
   programming: Code2,
   outreach: HeartHandshake,
@@ -211,6 +214,7 @@ export default function App() {
       </>
     );
   else if (page === 'purchases') view = <PurchaseRequests w={w} />;
+  else if (page === 'mechanisms') view = <MechanismMap w={w} />;
   else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
   else if (page === 'attendance') view = <AttendanceHub w={w} />;
   else if (page === 'competition')
