@@ -402,7 +402,7 @@ export const labels = {
   meetings: 'Meeting notes',
   robot: 'Robot',
   designs: 'Design ideas',
-  mechanisms: 'Flow chart',
+  mechanisms: 'Mechanism chart',
   logs: 'Logs',
   attendance: 'Attendance',
   competition: 'Competitions',

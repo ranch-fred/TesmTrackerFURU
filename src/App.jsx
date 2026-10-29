@@ -32,6 +32,7 @@ import {
   HeartHandshake,
   Ellipsis,
   Workflow,
+  Box,
   GraduationCap,
 } from 'lucide-react';
 import Auth, { Brand } from './Auth';
@@ -67,6 +68,7 @@ const icons = {
   purchases: ShoppingCart,
   roster: Contact,
   mechanisms: Workflow,
+  cad: Box,
   build: Hammer,
   programming: Code2,
   outreach: HeartHandshake,

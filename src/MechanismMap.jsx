@@ -537,7 +537,7 @@ export default function MechanismMap({ w }) {
   return (
     <>
       <div className="page-intro compact-intro">
-        <div className="eyebrow">ROBOT / FLOW CHART</div>
+        <div className="eyebrow">ROBOT / MECHANISM CHART</div>
         <h1>
           FROM IDEA TO <span>CODE.</span>
         </h1>

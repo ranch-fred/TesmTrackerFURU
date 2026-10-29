@@ -12,9 +12,10 @@ export const mainNav = [
   { id: 'finance', label: 'Funds', page: 'finance' },
   { id: 'competition', label: 'Competitions', page: 'competition' },
   { id: 'robot', label: 'Robot', page: 'robot' },
-  { id: 'mechanisms', label: 'Flow chart', page: 'mechanisms' },
+  { id: 'mechanisms', label: 'Mechanism chart', page: 'mechanisms' },
 ];
 export const logNav = [
+  { id: 'cad', label: 'CAD log', page: 'designs' },
   { id: 'build', label: 'Build log', page: 'logs', inner: 'build' },
   { id: 'programming', label: 'Programming log', page: 'logs', inner: 'programming' },
   { id: 'outreach', label: 'Outreach log', page: 'logs', inner: 'outreach' },
