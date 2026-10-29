@@ -64,13 +64,6 @@
 .invite-teammate > .note {
   margin: 12px 0 0;
 }
-.invite-share-label {
-  margin: 4px 0 14px;
-  color: #a49a91;
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  font-weight: 700;
-}
 @media (max-width: 620px) {
   .invite-teammate {
     padding: 18px;

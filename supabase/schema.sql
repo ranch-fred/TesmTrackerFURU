@@ -2,6 +2,8 @@
 create extension if not exists pgcrypto;
 create table public.teams(id uuid primary key default gen_random_uuid(),owner_id uuid not null references auth.users(id),name text not null,number text not null,school text default '',season text default '',logo text default '',location text default '',join_code text unique not null default upper(encode(gen_random_bytes(6),'hex')),created_at timestamptz default now());
 create table public.memberships(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,user_id uuid not null references auth.users(id),name text not null,display_name text default '',bio text default '',photo text default '',grade text default '',requested_role text default 'Member',role text not null default 'Member' check(role in ('Captain','Coach','Mentor','Member','Parent/Sponsor')),subteams text[] default '{}',status text not null default 'pending' check(status in ('pending','approved','denied')),mentor_edit boolean not null default false,notification_preferences boolean not null default true,onboarded boolean not null default false,created_at timestamptz default now(),unique(team_id,user_id));
+create table public.email_invites(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,email text not null,token_hash text unique not null,expires_at timestamptz not null default now()+interval '7 days',used_at timestamptz,used_by uuid references auth.users(id),revoked_at timestamptz,created_at timestamptz not null default now());
+create index on public.email_invites(team_id,lower(email)) where used_at is null and revoked_at is null;
 create table public.records(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,kind text not null check(kind in ('announcements','tasks','roster','sessions','meetings','expenses','income','purchases','budgets','parts','packing','robot','subsystems','hardware','inspection','rules','programming','build','designs','matches','events','milestones','risks','outreach','judging','resources','portfolio')),data jsonb not null default '{}',created_by uuid not null default auth.uid() references auth.users(id),created_at timestamptz default now(),updated_at timestamptz default now());
 create index on public.records(team_id,kind);
 create table public.comments(id uuid primary key default gen_random_uuid(),team_id uuid not null references public.teams(id) on delete cascade,record_id uuid not null references public.records(id) on delete cascade,user_id uuid not null default auth.uid() references auth.users(id),message text not null check(length(message) between 1 and 5000),created_at timestamptz default now());
@@ -14,6 +16,7 @@ create function public.team_editor(t uuid) returns boolean language sql stable s
 create function public.team_view(t uuid,k text) returns boolean language sql stable security definer set search_path=public as $$ select coalesce(public.team_role(t) is not null and (public.team_role(t)<>'Parent/Sponsor' or k in ('announcements','outreach')),false) $$;
 alter table public.teams enable row level security;
 alter table public.memberships enable row level security;
+alter table public.email_invites enable row level security;
 alter table public.records enable row level security;
 alter table public.comments enable row level security;
 alter table public.notifications enable row level security;
@@ -77,14 +80,27 @@ begin
  insert into memberships(team_id,user_id,name,grade,requested_role,role,status) values(t,auth.uid(),full_name,grade_value,'Captain','Captain','approved');
  return t;
 end $$;
+create function public.create_email_invite(t uuid,invite_email text) returns text language plpgsql security definer set search_path=public as $$
+declare normalized text:=lower(trim(coalesce(invite_email,''))); raw text; code text;
+begin
+ if not public.team_admin(t) then raise exception 'Captain or coach required';end if;
+ if length(normalized)>254 or normalized !~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$' then raise exception 'Valid email required';end if;
+ update email_invites set revoked_at=now() where team_id=t and lower(email)=normalized and used_at is null and revoked_at is null;
+ raw:=upper(encode(gen_random_bytes(10),'hex'));
+ code:=substr(raw,1,4)||'-'||substr(raw,5,4)||'-'||substr(raw,9,4)||'-'||substr(raw,13,4)||'-'||substr(raw,17,4);
+ insert into email_invites(team_id,email,token_hash) values(t,normalized,md5(code));
+ return code;
+end $$;
 create function public.request_join(code text,full_name text,grade_value text,desired_role text,teams_value text[]) returns uuid language plpgsql security definer set search_path=public as $$
-declare t uuid;
+declare t uuid; invite_id uuid; account_email text;
 begin
  if auth.uid() is null then raise exception 'Sign in first';end if;
- select id into t from teams where join_code=upper(trim(code));
- if t is null then raise exception 'Invite code not found';end if;
+ select lower(email) into account_email from auth.users where id=auth.uid();
+ select id,team_id into invite_id,t from email_invites where token_hash=md5(upper(trim(code))) and lower(email)=account_email and used_at is null and revoked_at is null and expires_at>now() for update;
+ if invite_id is null then raise exception 'Invite code invalid, expired, or already used for this account';end if;
  if length(trim(full_name))<1 or desired_role not in ('Captain','Coach','Mentor','Member','Parent/Sponsor') then raise exception 'Invalid profile';end if;
  insert into memberships(team_id,user_id,name,grade,requested_role,role,subteams,status) values(t,auth.uid(),full_name,grade_value,desired_role,'Member',teams_value,'pending');
+ update email_invites set used_at=now(),used_by=auth.uid() where id=invite_id;
  return t;
 end $$;
 create function public.manage_member(member_id uuid,new_role text,new_status text,allow_edit boolean default false,remove_member boolean default false) returns void language plpgsql security definer set search_path=public as $$
@@ -104,7 +120,6 @@ begin
  update memberships set role='Captain' where team_id=t and user_id=to_user;
  update teams set owner_id=to_user where id=t;
 end $$;
-create function public.rotate_invite(t uuid) returns text language plpgsql security definer set search_path=public as $$ declare c text;begin if not public.team_admin(t) then raise exception 'Captain or coach required';end if;update teams set join_code=upper(encode(gen_random_bytes(6),'hex')) where id=t returning join_code into c;return c;end $$;
 create function public.update_preferences(t uuid,notify boolean,welcome boolean) returns void language plpgsql security definer set search_path=public as $$ begin update memberships set notification_preferences=notify,onboarded=welcome where team_id=t and user_id=auth.uid();end $$;
 create function public.update_own_profile(t uuid,new_display_name text,new_bio text,new_photo text) returns void language plpgsql security definer set search_path=public as $$ begin
  if length(trim(coalesce(new_display_name,''))) not between 1 and 60 then raise exception 'Display name must be 1 to 60 characters'; end if;
@@ -136,7 +151,7 @@ begin
  delete from public.teams where id=t;
 end $$;
 revoke execute on all functions in schema public from public,anon;
-grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.rotate_invite(uuid),public.update_preferences(uuid,boolean,boolean),public.update_own_profile(uuid,text,text,text),public.finance_summary(uuid),public.dashboard_summary(uuid),public.delete_team(uuid,text,boolean) to authenticated;
+grant execute on function public.team_role(uuid),public.team_admin(uuid),public.team_editor(uuid),public.team_view(uuid,text),public.create_team(jsonb,text,text),public.create_email_invite(uuid,text),public.request_join(text,text,text,text,text[]),public.manage_member(uuid,text,text,boolean,boolean),public.transfer_ownership(uuid,uuid),public.update_preferences(uuid,boolean,boolean),public.update_own_profile(uuid,text,text,text),public.finance_summary(uuid),public.dashboard_summary(uuid),public.delete_team(uuid,text,boolean) to authenticated;
 grant select on public.memberships,public.notifications,public.activity to authenticated;
 grant select,insert,update,delete on public.records to authenticated;
 grant select,insert on public.comments to authenticated;

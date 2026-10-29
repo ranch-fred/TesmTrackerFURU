@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: 'Only captains and coaches can invite teammates.' });
   const { data: team, error: teamError } = await client
     .from('teams')
-    .select('name,join_code')
+    .select('name')
     .eq('id', teamId)
     .single();
   if (teamError || !team) return res.status(404).json({ error: 'Team not found.' });
@@ -45,9 +45,20 @@ export default async function handler(req, res) {
     });
   if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(webAppUrl))
     return res.status(503).json({ error: 'The Google mail connection URL is invalid.' });
+  const { data: inviteCode, error: inviteError } = await client.rpc('create_email_invite', {
+    t: teamId,
+    invite_email: email,
+  });
+  if (inviteError || !inviteCode)
+    return res
+      .status(503)
+      .json({
+        error:
+          'One-time invites need the Supabase database update. Ask the site owner to apply the invite migration.',
+      });
   const base = process.env.SITE_URL || 'https://tesm-tracker-furu.vercel.app';
   const invite = new URL('/', base);
-  invite.searchParams.set('invite', team.join_code);
+  invite.searchParams.set('invite', inviteCode);
   const safeName = team.name.replace(/[\r\n]/g, ' ').slice(0, 100);
   try {
     const response = await fetch(webAppUrl, {
@@ -58,7 +69,7 @@ export default async function handler(req, res) {
         email,
         teamName: safeName,
         inviteUrl: invite.toString(),
-        htmlBody: inviteEmailHtml(safeName, invite.toString(), team.join_code),
+        htmlBody: inviteEmailHtml(safeName, invite.toString(), inviteCode),
       }),
     });
     const result = await response.json().catch(() => null);

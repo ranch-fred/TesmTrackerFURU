@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
 const db = new PGlite();
 await db.exec(`create role anon;create role authenticated;create schema auth;create schema storage;create schema realtime;
-create table auth.users(id uuid primary key);
+create table auth.users(id uuid primary key,email text);
 create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
 grant usage on schema auth,storage,realtime to authenticated;grant execute on function auth.uid() to authenticated;
 create function public.gen_random_bytes(n int) returns bytea language sql as $$ select decode(substr(repeat(md5(random()::text),20),1,n*2),'hex') $$;
@@ -44,17 +44,28 @@ await db.exec(
     'utf8',
   ),
 );
+await db.exec(
+  await readFile(
+    new URL('../supabase/migrations/20261029_one_time_email_invites.sql', import.meta.url),
+    'utf8',
+  ),
+);
 const owner = '10000000-0000-0000-0000-000000000001',
   member = '10000000-0000-0000-0000-000000000002',
   parent = '10000000-0000-0000-0000-000000000003',
   outsider = '10000000-0000-0000-0000-000000000004',
   mentor = '10000000-0000-0000-0000-000000000005';
-await db.query('insert into auth.users(id) values ($1),($2),($3),($4),($5)', [
+await db.query('insert into auth.users(id,email) values ($1,$6),($2,$7),($3,$8),($4,$9),($5,$10)', [
   owner,
   member,
   parent,
   outsider,
   mentor,
+  'captain@example.com',
+  'member@example.com',
+  'parent@example.com',
+  'outsider@example.com',
+  'mentor@example.com',
 ]);
 async function as(id) {
   await db.exec('reset role');
@@ -89,7 +100,12 @@ const t = (
     JSON.stringify({ name: 'Test team', number: '30439', season: 'BIOBUZZ' }),
   ])
 ).rows[0].id;
-const code = (await db.query('select join_code from teams where id=$1', [t])).rows[0].join_code;
+const legacyCode = (await db.query('select join_code from teams where id=$1', [t])).rows[0]
+  .join_code;
+const memberCode = (
+  await db.query("select create_email_invite($1,'member@example.com') as code", [t])
+).rows[0].code;
+ok(memberCode.length === 24, 'Captain creates a unique one-time email code');
 ok(
   (await db.query('select role from memberships')).rows[0].role === 'Captain',
   'Team creation assigns approved captain',
@@ -156,11 +172,31 @@ await rejects(
   'Unrelated account cannot read finance summary',
 );
 await rejects(
-  () => db.query('select rotate_invite($1)', [t]),
-  'Unrelated account cannot rotate invite',
+  () => db.query("select create_email_invite($1,'outsider@example.com')", [t]),
+  'Unrelated account cannot create email invites',
 );
 await as(member);
-await db.query("select request_join($1,'Member Two','10','Captain',array['Programming'])", [code]);
+await rejects(
+  () =>
+    db.query("select request_join($1,'Member Two','10','Captain',array['Programming'])", [
+      legacyCode,
+    ]),
+  'Old reusable team code cannot join',
+);
+await db.query("select request_join($1,'Member Two','10','Captain',array['Programming'])", [
+  memberCode,
+]);
+await rejects(
+  () => db.query('select * from email_invites'),
+  'Recipient cannot read private invite tokens',
+);
+await db.exec('reset role');
+ok(
+  (await db.query('select used_at from email_invites where token_hash=md5($1)', [memberCode]))
+    .rows[0].used_at !== null,
+  'One-time code is spent after join request',
+);
+await as(member);
 ok(
   (await db.query('select role,status from memberships where user_id=$1', [member])).rows[0]
     .role === 'Member',
@@ -217,8 +253,26 @@ await rejects(
   'Negative money rejected at database boundary',
 );
 await as(parent);
+await rejects(
+  () =>
+    db.query("select request_join($1,'Sponsor Three','','Parent/Sponsor',array[]::text[])", [
+      memberCode,
+    ]),
+  'Spent code cannot be used by another account',
+);
+await as(owner);
+const parentCode = (
+  await db.query("select create_email_invite($1,'parent@example.com') as code", [t])
+).rows[0].code;
+await as(outsider);
+await rejects(
+  () =>
+    db.query("select request_join($1,'Outsider Four','','Member',array[]::text[])", [parentCode]),
+  'Invite only works for the addressed email',
+);
+await as(parent);
 await db.query("select request_join($1,'Sponsor Three','','Parent/Sponsor',array[]::text[])", [
-  code,
+  parentCode,
 ]);
 await as(owner);
 const p = (await db.query('select * from memberships where user_id=$1', [parent])).rows[0];
@@ -243,7 +297,12 @@ await rejects(
   'Sponsor cannot insert outreach records',
 );
 await as(mentor);
-await db.query("select request_join($1,'Mentor Five','','Mentor',array[]::text[])", [code]);
+await as(owner);
+const mentorCode = (
+  await db.query("select create_email_invite($1,'mentor@example.com') as code", [t])
+).rows[0].code;
+await as(mentor);
+await db.query("select request_join($1,'Mentor Five','','Mentor',array[]::text[])", [mentorCode]);
 await as(owner);
 const me = (await db.query('select * from memberships where user_id=$1', [mentor])).rows[0];
 await db.query("select manage_member($1,'Mentor','approved',false,false)", [me.id]);

@@ -474,8 +474,9 @@ export default function Auth({ w }) {
                             ))}
                           </div>
                           <p className="note">
-                            Joining an existing team? Ask your captain for the invite code. Everyone
-                            joins the same shared workspace after approval.
+                            Use the email address your captain invited. The code in that email works
+                            once and expires after 7 days. Your captain or coach approves your
+                            request.
                           </p>
                         </fieldset>
                       </>
