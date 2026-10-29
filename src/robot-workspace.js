@@ -26,23 +26,38 @@ export const PORT_GROUPS = [
   ['I2C', 4],
   ['Digital', 4],
   ['Analog', 2],
+  ['UART', 2],
+  ['RS485', 2],
+  ['Battery', 2],
+  ['Power', 2],
 ];
 export function hubPort(type, index) {
+  if (type === 'UART') return `UART ${index + 1}`;
   return `${type} ${['Digital', 'Analog'].includes(type) ? `${index * 2}/${index * 2 + 1}` : index}`;
 }
 // Coordinates follow the photographed connectors, in percentages of the image.
 export function portPosition(hub, type, index) {
   const control = hub === 'Control Hub';
   if (control) {
+    if (type === 'Encoder') return [9.4, 40.2 + index * 13.5];
     if (type === 'Motor') return [5.4, 33.8 + index * 13.5];
     if (type === 'Servo') return [22.5 + index * 7.1, 90.2];
     if (type === 'I2C') return [88.6, 51 - index * 4.9];
     if (type === 'Digital') return [88.6, 71.2 - index * 4.7];
-    return [88.6, 82.3 - index * 4.6];
+    if (type === 'Analog') return [88.6, 82.3 - index * 4.6];
+    if (type === 'UART') return [88.3, 20.5 - index * 4.8];
+    if (type === 'RS485') return [88.3, 30.4 - index * 4.9];
+    if (type === 'Battery') return [5.8 + index * 4.7, 21.6];
+    return [68.4 + index * 7.1, 90.2];
   }
-  if (type === 'Motor') return [5.6, 32.6 + index * 17.5];
-  if (type === 'Servo') return [22.2 + index * 7.2, 91.2];
-  if (type === 'I2C') return [88.2, 55.8 - index * 5];
-  if (type === 'Digital') return [88.2, 76.3 - index * 5];
-  return [88.2, 87.2 - index * 5];
+  if (type === 'Motor') return [5.2, 34.1 + index * 13.65];
+  if (type === 'Encoder') return [9.4, 40.5 + index * 13.65];
+  if (type === 'Servo') return [22.7 + index * 7, 91.35];
+  if (type === 'I2C') return [88.95, 51.4 - index * 4.9];
+  if (type === 'Digital') return [88.95, 72.3 - index * 4.94];
+  if (type === 'Analog') return [88.95, 83.2 - index * 4.8];
+  if (type === 'UART') return [88.3, 20.8 - index * 4.8];
+  if (type === 'RS485') return [88.3, 30.7 - index * 4.9];
+  if (type === 'Battery') return [5.8 + index * 4.7, 22.2];
+  return [68.7 + index * 7.1, 91.35];
 }

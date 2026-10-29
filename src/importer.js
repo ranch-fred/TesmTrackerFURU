@@ -75,6 +75,10 @@ export function validateImport(entries) {
         clean[f.key] = v;
       }
       if (kind === 'robot') validateRobotCounts(clean);
+      if (kind === 'hardware' && r.encoderConnected !== undefined) {
+        if (typeof r.encoderConnected !== 'boolean') throw Error('Invalid motor encoder option.');
+        clean.encoderConnected = r.encoderConnected;
+      }
       if (['robot', 'hardware', 'inspection'].includes(kind)) {
         const key = r.robotKey || (kind === 'robot' ? r.id : undefined);
         if (key !== undefined) {
