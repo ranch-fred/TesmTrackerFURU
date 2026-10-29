@@ -297,8 +297,24 @@ export function seed() {
       }),
     ],
     subsystems: [
-      row('sub1', { name: 'Drivetrain', purpose: 'Omnidirectional field movement' }),
-      row('sub2', { name: 'Intake', purpose: 'Collect and transfer game elements' }),
+      row('sub1', {
+        name: 'Drivetrain',
+        purpose: 'Omnidirectional field movement',
+        builder: 'Jordan Patel',
+        programmer: 'Maya Brooks',
+        parts: [
+          { id: 'sp1', name: 'Mecanum drive class', done: true },
+          { id: 'sp2', name: 'Heading hold', done: false },
+        ],
+        done: { cad: true, build: true },
+      }),
+      row('sub2', {
+        name: 'Intake',
+        purpose: 'Collect and transfer game elements',
+        builder: 'Sam Rivera',
+        parts: [],
+        done: {},
+      }),
     ],
     hardware: [
       ...['frontLeft', 'frontRight', 'backLeft', 'backRight'].map((name, i) =>
@@ -342,6 +358,9 @@ export function seed() {
         whatDone: 'Tuned autonomous heading control and ran ten test drives.',
         author: 'Maya Brooks',
         subsystem: 'Drivetrain',
+        mechanismId: 'sub1',
+        github: 'https://github.com/example-team/robot/blob/main/Drive.java',
+        snippet: 'drive.setHeadingTarget(90);',
         hardware: ['frontLeft', 'frontRight'],
         constants: 'kP = 0.025; heading tolerance = 1.5°',
         result: 'Pass',
@@ -353,11 +372,16 @@ export function seed() {
         date: '2026-10-23',
         whatDone: 'Assembled and aligned the intake rollers.',
         author: 'Sam Rivera',
+        subsystem: 'Intake',
+        mechanismId: 'sub2',
       }),
     ],
     designs: [
       row('d1', {
         title: 'Compliant roller intake',
+        subsystem: 'Intake',
+        mechanismId: 'sub2',
+        cadLink: 'https://drive.google.com/drive/folders/example',
         problem: 'Rigid rollers jam on off-center elements.',
         brainstorm: 'Wider wheels; funnel guides; lower compression.',
         description: 'Prototype v3 with adjustable spacers.',
