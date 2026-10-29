@@ -219,7 +219,14 @@ export default function App() {
   else if (page === 'logs') view = <LogsHub key={innerPage || ''} w={w} initial={innerPage} />;
   else if (page === 'designs') view = <DesignLibrary w={w} />;
   else if (page === 'settings')
-    view = <Settings key={innerPage || ''} w={w} initial={innerPage} onReplayTour={() => setTour(true)} />;
+    view = (
+      <Settings
+        key={innerPage || ''}
+        w={w}
+        initial={innerPage}
+        onReplayTour={() => setTour(true)}
+      />
+    );
   else if (page === 'activity')
     view = (
       <section className="panel">
@@ -551,11 +558,7 @@ export default function App() {
         </Modal>
       )}
       {tour && (
-        <Tour
-          onClose={closeTour}
-          openMenu={() => setMenu(true)}
-          closeMenu={() => setMenu(false)}
-        />
+        <Tour onClose={closeTour} openMenu={() => setMenu(true)} closeMenu={() => setMenu(false)} />
       )}
       {help && (
         <Modal title="Your quick-start field guide" onClose={() => setHelp(false)}>
@@ -567,18 +570,18 @@ export default function App() {
             </p>
             <h3>2 / Bring the crew</h3>
             <p>
-              Send an email invite from Settings, then Members. Members sign up, enter their profile,
-              and request a role. A captain or coach approves them under Members.
+              Send an email invite from Settings, then Members. Members sign up, enter their
+              profile, and request a role. A captain or coach approves them under Members.
             </p>
             <h3>3 / Keep the books</h3>
             <p>
-              Funds → Add funding or Add expense. Enter the funding source, date,
-              and amount, or record an expense with its receipt.
+              Funds → Add funding or Add expense. Enter the funding source, date, and amount, or
+              record an expense with its receipt.
             </p>
             <h3>4 / Learn from every match</h3>
             <p>
-              Competitions → Matches → Add record. Enter match details, the BIOBUZZ metrics, recorded
-              points, and mechanism issues.
+              Competitions → Matches → Add record. Enter match details, the BIOBUZZ metrics,
+              recorded points, and mechanism issues.
             </p>
             <h3>5 / Keep everyone organized</h3>
             <p>
