@@ -15,7 +15,6 @@ import { Modal } from './Records';
 import { InspectionChecklist } from './RobotTools';
 import { ACTUATOR_LIMIT, robotKey, robotRecords, validateRobotCounts } from './robot-workspace';
 import './robot-workspace.css';
-import RobotCube from './RobotCube';
 import PhotoHardwareMap from './PhotoHardwareMap';
 
 const sections = [
@@ -83,7 +82,31 @@ function RobotSpecForm({ robot, w, onSaved, onCancel }) {
         <section className="rw-visual">
           <span className="rw-kicker">YOUR MACHINE / {w.team.number}</span>
           <h2>{draft.name || 'A new beginning.'}</h2>
-          <RobotCube robot={draft} number={w.team.number} />
+          <div className="robot-schematic rw-live-schematic" aria-label="Robot dimensional diagram">
+            <div
+              className="schematic-body"
+              style={{
+                '--rw-body-width': `${Number(draft.width) > 0 ? Math.min(190, Math.max(12, Number(draft.width) * 7)) : 128}px`,
+                '--rw-body-length': `${Number(draft.length) > 0 ? Math.min(190, Math.max(12, Number(draft.length) * 7)) : 128}px`,
+              }}
+            >
+              <div
+                className="rw-dimension-width"
+                aria-label={`Width ${draft.width || 'not entered'} inches`}
+              >
+                {draft.width || '—'} IN
+              </div>
+              <div
+                className="rw-dimension-length"
+                aria-label={`Length ${draft.length || 'not entered'} inches`}
+              >
+                <span>{draft.length || '—'} IN</span>
+              </div>
+              <span className="schematic-core">{w.team.number}</span>
+              <span className="schematic-line" />
+            </div>
+            <span className="schematic-caption">TOP VIEW / DIMENSIONAL REFERENCE</span>
+          </div>
           <div className="rw-capacities">
             {[
               ['motorsUsed', 'MOTORS'],

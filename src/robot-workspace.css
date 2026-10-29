@@ -704,161 +704,6 @@
   }
 }
 
-/* Six real CSS 3D faces, with pointer and keyboard orbit controls. */
-.rw-workspace .rw-cube-preview {
-  margin: 24px 0;
-  flex: 1;
-  min-width: 0;
-}
-.rw-workspace .rw-cube-stage {
-  position: relative;
-  min-height: 310px;
-  perspective: 650px;
-  touch-action: none;
-  cursor: grab;
-  user-select: none;
-  border-radius: 16px;
-}
-.rw-workspace .rw-cube-stage.dragging {
-  cursor: grabbing;
-}
-.rw-workspace .rw-cube {
-  position: absolute;
-  left: 50%;
-  top: 47%;
-  width: var(--cube-w);
-  height: var(--cube-h);
-  margin-left: calc(var(--cube-w) / -2);
-  margin-top: calc(var(--cube-h) / -2);
-  transform-style: preserve-3d;
-}
-.rw-workspace .rw-cube-face {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  display: grid;
-  place-items: center;
-  width: var(--cube-w);
-  height: var(--cube-h);
-  border: 1px solid var(--accent-line);
-  border-radius: 5px;
-  background:
-    linear-gradient(
-      90deg,
-      transparent 49.5%,
-      var(--accent-line) 49.5%,
-      var(--accent-line) 50%,
-      transparent 50%
-    ),
-    linear-gradient(
-      transparent 49.5%,
-      var(--accent-line) 49.5%,
-      var(--accent-line) 50%,
-      transparent 50%
-    ),
-    color-mix(in srgb, var(--accent) 12%, var(--surface));
-  background-size: 26px 26px;
-  box-shadow: inset 0 0 20px var(--accent-dim);
-  backface-visibility: hidden;
-}
-.rw-workspace .rw-cube-face::before {
-  content: '';
-  position: absolute;
-  inset: 12px;
-  border: 1px solid var(--accent-line);
-  border-radius: 3px;
-  pointer-events: none;
-}
-.rw-workspace .rw-face-front {
-  transform: translate(-50%, -50%) translateZ(calc(var(--cube-d) / 2));
-}
-.rw-workspace .rw-face-back {
-  transform: translate(-50%, -50%) rotateY(180deg) translateZ(calc(var(--cube-d) / 2));
-}
-.rw-workspace .rw-face-left {
-  width: var(--cube-d);
-  transform: translate(-50%, -50%) rotateY(-90deg) translateZ(calc(var(--cube-w) / 2));
-}
-.rw-workspace .rw-face-right {
-  width: var(--cube-d);
-  transform: translate(-50%, -50%) rotateY(90deg) translateZ(calc(var(--cube-w) / 2));
-}
-.rw-workspace .rw-face-top {
-  height: var(--cube-d);
-  transform: translate(-50%, -50%) rotateX(90deg) translateZ(calc(var(--cube-h) / 2));
-  background-color: color-mix(in srgb, var(--accent) 19%, var(--surface));
-}
-.rw-workspace .rw-face-bottom {
-  height: var(--cube-d);
-  transform: translate(-50%, -50%) rotateX(-90deg) translateZ(calc(var(--cube-h) / 2));
-}
-.rw-workspace .rw-cube-face > b {
-  position: relative;
-  font: 14px var(--mono);
-  letter-spacing: 1px;
-  padding: 7px;
-  background: var(--surface);
-  color: var(--accent);
-  border: 1px solid var(--accent-line);
-  font-weight: 500;
-}
-.rw-workspace .rw-cube-width,
-.rw-workspace .rw-cube-length {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -25px;
-  padding-top: 7px;
-  border-top: 1px solid var(--accent-line);
-  text-align: center;
-  font: 9px var(--mono);
-  white-space: nowrap;
-  color: var(--ink-2);
-}
-.rw-workspace .rw-cube-height {
-  position: absolute;
-  right: -30px;
-  top: 50%;
-  transform: translate(50%, -50%) rotate(90deg);
-  font: 9px var(--mono);
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-.rw-workspace .rw-cube-shadow {
-  position: absolute;
-  width: 150px;
-  height: 45px;
-  left: 50%;
-  top: 73%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0.09;
-  filter: blur(18px);
-  pointer-events: none;
-}
-.rw-workspace .rw-cube-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font: 9px var(--mono);
-  color: var(--ink-2);
-}
-.rw-workspace .rw-cube-toolbar > span {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-.rw-workspace .rw-cube-toolbar > button {
-  background: transparent;
-  color: var(--ink-2);
-  border: 1px solid var(--rw-line);
-  padding: 7px 9px;
-  border-radius: 7px;
-  font: inherit;
-}
-
 /* Wires are SVG so they stay crisp; the photo frame clips their open ends. */
 .rw-workspace .rw-wiring {
   position: absolute;
@@ -907,7 +752,7 @@
   z-index: 3;
 }
 html[data-motion='on'] .rw-workspace .rw-port-hotspot:active:not(:disabled) {
-  transform: translate(-50%, -50%) scale(.97);
+  transform: translate(-50%, -50%) scale(0.97);
 }
 .rw-workspace .rw-encoder-hotspot.active-type {
   min-width: 20px;
@@ -1039,6 +884,30 @@ html[data-motion='on'] .rw-workspace .rw-port-hotspot:active:not(:disabled) {
   .rw-workspace .rw-map-layout {
     grid-template-columns: 1fr;
   }
+}
+
+/* Connector-sized, transparent hit targets leave the hub graphic unobstructed. */
+.rw-workspace .rw-hub-photo .rw-port-hotspot {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
+  color: transparent;
+}
+.rw-workspace .rw-hub-photo .rw-port-hotspot > span {
+  display: none;
+}
+.rw-workspace .rw-hub-photo .rw-port-hotspot:hover,
+.rw-workspace .rw-hub-photo .rw-port-hotspot:focus-visible,
+.rw-workspace .rw-hub-photo .rw-port-hotspot.selected {
+  background: transparent;
+  border-color: #ff8b32;
+  box-shadow:
+    0 0 0 1px #ff6b0080,
+    0 0 12px #ff6b00b0;
 }
 :root[data-motion='off'] .rw-workspace .rw-deck > button,
 :root[data-motion='off'] .rw-workspace .rw-port-hotspot {

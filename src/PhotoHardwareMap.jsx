@@ -11,8 +11,8 @@ import {
   PORT_GROUPS,
   hubPort,
   portPosition,
+  portSize,
 } from './robot-workspace';
-import HubWiring from './HubWiring';
 
 const displayType = (type) => (type === 'I2C' ? 'I²C' : type === 'Power' ? '5V power' : type);
 const shortType = (type) =>
@@ -55,12 +55,15 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
     if (dirty) setPending(() => action);
     else action();
   }
-  function open(nextType, port) {
-    if (selected?.port === port && selected.hub === hub) return;
+  function open(nextType, port, encoder = false) {
+    if (selected?.port === port && selected.hub === hub) {
+      setSelected((old) => ({ ...old, encoder }));
+      return;
+    }
     request(() => {
       const record = recordAt(port);
       setType(nextType);
-      setSelected({ port, record, hub, type: nextType });
+      setSelected({ port, record, hub, type: nextType, encoder });
       setForm({
         name: record?.name || '',
         device: record?.device || '',
@@ -130,7 +133,7 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
             disabled={!editable || busy}
             value={form.name}
             onChange={(e) => change('name', e.target.value)}
-            placeholder="frontLeft, claw, mainBattery…"
+            placeholder="frontLeft, claw, liftSensor…"
           />
         </label>
         <label>
@@ -240,7 +243,6 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
             alt={`REV ${hub}, select a connector to configure it`}
             draggable="false"
           />
-          <HubWiring hub={hub} records={records} />
           {PORT_GROUPS.flatMap(([name, count]) =>
             Array.from({ length: count }, (_, i) => {
               const port = hubPort(name, i),
@@ -250,11 +252,16 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
                 <button
                   key={port}
                   disabled={busy}
-                  className={`rw-port-hotspot ${name === type ? 'active-type' : 'inactive-type'} ${record?.name ? 'assigned' : ''} ${selected?.port === port ? 'selected' : ''}`}
-                  style={{ left: `${x}%`, top: `${y}%` }}
+                  className={`rw-port-hotspot ${name === type ? 'active-type' : 'inactive-type'} ${record?.name ? 'assigned' : ''} ${selected?.port === port && !selected.encoder ? 'selected' : ''}`}
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    width: `${portSize(name)[0]}%`,
+                    height: `${portSize(name)[1]}%`,
+                  }}
                   onClick={() => open(name, port)}
                   aria-label={`${hub} ${port}: ${record?.name || 'Unassigned'}`}
-                  aria-pressed={selected?.port === port}
+                  aria-pressed={selected?.port === port && !selected.encoder}
                   title={`${port} · ${record?.name || 'Click to assign'}`}
                 >
                   <span>
@@ -271,10 +278,15 @@ export default function PhotoHardwareMap({ w, robot, firstRobot, onDirtyChange }
             return (
               <button
                 key={`encoder${i}`}
-                className={`rw-port-hotspot rw-encoder-hotspot ${type === 'Motor' ? 'active-type' : 'inactive-type'} ${motor?.name && motor.encoderConnected ? 'assigned' : ''}`}
-                style={{ left: `${x}%`, top: `${y}%` }}
+                className={`rw-port-hotspot rw-encoder-hotspot ${type === 'Motor' ? 'active-type' : 'inactive-type'} ${motor?.name && motor.encoderConnected ? 'assigned' : ''} ${selected?.port === `Motor ${i}` && selected.encoder ? 'selected' : ''}`}
+                style={{
+                  left: `${x}%`,
+                  top: `${y}%`,
+                  width: `${portSize('Encoder')[0]}%`,
+                  height: `${portSize('Encoder')[1]}%`,
+                }}
                 disabled={busy}
-                onClick={() => open('Motor', `Motor ${i}`)}
+                onClick={() => open('Motor', `Motor ${i}`, true)}
                 aria-label={`${hub} Motor ${i} encoder settings`}
                 title={`Motor ${i} encoder`}
               >
