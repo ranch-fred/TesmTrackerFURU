@@ -272,7 +272,7 @@ export function RecordForm({ kind, record, w, onClose, onSaved }) {
         </div>
         {kind === 'roster' && (
           <p className="note">
-            Roster roles describe the team. Change account permissions in Team settings.
+            Roster roles describe the team. Change account permissions in Settings, under Members.
           </p>
         )}
         {error && (

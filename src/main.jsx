@@ -7,6 +7,7 @@ import './refinements.css';
 import './auth.css';
 import './themes.css';
 import './construction.css';
+import './nav.css';
 import { applyTheme, readTheme } from './theme';
 applyTheme(readTheme());
 class ErrorBoundary extends React.Component {

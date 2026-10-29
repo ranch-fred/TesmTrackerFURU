@@ -26,10 +26,18 @@ import {
   ChevronRight,
   RefreshCw,
   ScrollText,
+  Contact,
+  Code2,
+  Hammer,
+  HeartHandshake,
+  Ellipsis,
+  GraduationCap,
 } from 'lucide-react';
 import Auth, { Brand } from './Auth';
 import { useWorkspace } from './store';
-import { sections, labels, entities } from './schema';
+import { labels, entities } from './schema';
+import { visibleNav, isMoreActive } from './nav';
+import Tour from './Tour';
 import { canView } from './domain';
 import Records, { Modal, Badge } from './Records';
 import { Dashboard, Finance, Robot } from './Views';
@@ -55,6 +63,11 @@ const icons = {
   resources: BookOpen,
   finance: Wallet,
   purchases: ShoppingCart,
+  roster: Contact,
+  build: Hammer,
+  programming: Code2,
+  outreach: HeartHandshake,
+  activity: Activity,
 };
 const hiddenKinds = new Set([
   'subsystems',
@@ -83,6 +96,8 @@ export default function App() {
     [showSearch, setShowSearch] = useState(false),
     [showNotifications, setShowNotifications] = useState(false),
     [help, setHelp] = useState(false),
+    [tour, setTour] = useState(false),
+    [more, setMore] = useState(false),
     [seen, setSeen] = useState(() => localStorage.getItem('cnp-notifications-seen') || '');
   function navigate(p, inner = null) {
     setPage(p);
@@ -113,6 +128,20 @@ export default function App() {
   useEffect(() => {
     document.title = teamPageTitle(w.member?.status === 'approved' ? w.team : null);
   }, [w.team?.name, w.team?.number, w.member?.status]);
+  const tourKey = `cnp-tour-v1:${w.user?.id || 'demo'}`;
+  useEffect(() => {
+    // first time in the workspace: offer the tour once per account on this device
+    if (w.member?.status !== 'approved' || !w.member.onboarded) return;
+    try {
+      if (!localStorage.getItem(tourKey)) setTour(true);
+    } catch {}
+  }, [w.member?.status, w.member?.onboarded, tourKey]);
+  function closeTour() {
+    setTour(false);
+    try {
+      localStorage.setItem(tourKey, '1');
+    } catch {}
+  }
   if (!w.user || !w.team || !w.member || w.member.status !== 'approved')
     return (
       <>
@@ -166,6 +195,21 @@ export default function App() {
   let view;
   if (page === 'dashboard') view = <Dashboard w={w} navigate={navigate} />;
   else if (page === 'finance') view = <Finance w={w} />;
+  else if (page === 'roster')
+    view = (
+      <>
+        <div className="page-intro compact-intro">
+          <div className="eyebrow">TEAM / TEAM {w.team.number}</div>
+          <h1>
+            TEAM ROSTER<span>.</span>
+          </h1>
+          <p className="muted">
+            Who is on the team. To invite someone by email, go to Settings, then Members.
+          </p>
+        </div>
+        <Records key="roster" kind="roster" w={w} />
+      </>
+    );
   else if (page === 'purchases') view = <PurchaseRequests w={w} />;
   else if (page === 'robot') view = <Robot w={w} initial={innerPage || 'robot'} />;
   else if (page === 'attendance') view = <AttendanceHub w={w} />;
@@ -174,7 +218,15 @@ export default function App() {
   else if (page === 'resources') view = <ResourcesCenter w={w} initial={innerPage || 'official'} />;
   else if (page === 'logs') view = <LogsHub key={innerPage || ''} w={w} initial={innerPage} />;
   else if (page === 'designs') view = <DesignLibrary w={w} />;
-  else if (page === 'settings') view = <Settings key={innerPage || ''} w={w} initial={innerPage} />;
+  else if (page === 'settings')
+    view = (
+      <Settings
+        key={innerPage || ''}
+        w={w}
+        initial={innerPage}
+        onReplayTour={() => setTour(true)}
+      />
+    );
   else if (page === 'activity')
     view = (
       <section className="panel">
@@ -264,60 +316,73 @@ export default function App() {
           <ChevronRight size={15} />
         </button>
         <nav aria-label="Team navigation">
-          {sections.map(([group, items]) => {
-            const visible = items.filter((p) => canView(role, p));
-            if (!visible.length) return null;
+          {(() => {
+            const v = visibleNav(role);
+            const item = (i) => {
+              const Icon = icons[i.id] || FileText;
+              const active = page === i.page && (i.inner ? innerPage === i.inner : true);
+              return (
+                <button
+                  key={i.id}
+                  data-tour={`nav-${i.id}`}
+                  onClick={() => navigate(i.page, i.inner || null)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`nav-item ${active ? 'active' : ''}`}
+                >
+                  <Icon size={17} />
+                  <span>{i.label}</span>
+                  {i.id === 'tasks' && (
+                    <small>{w.data.tasks.filter((t) => t.status !== 'Done').length}</small>
+                  )}
+                </button>
+              );
+            };
+            const moreOpen = more || isMoreActive(page);
             return (
-              <div className="nav-group" key={group}>
-                <div className="nav-heading">{group}</div>
-                {visible.map((p) => {
-                  const Icon = icons[p] || FileText;
-                  const highlight =
-                    (p === 'logs' && w.member.subteams?.includes('Programming')) ||
-                    (p === 'designs' && w.member.subteams?.includes('CAD')) ||
-                    (p === 'robot' && w.member.subteams?.includes('Mechanical'));
-                  return (
+              <>
+                <div className="nav-group">{v.main.map(item)}</div>
+                {v.logs.length > 0 && (
+                  <div className="nav-group">
+                    <div className="nav-heading">Add to your logs</div>
+                    {v.logs.map(item)}
+                  </div>
+                )}
+                {v.more.length > 0 && (
+                  <div className="nav-group">
                     <button
-                      key={p}
-                      onClick={() => navigate(p)}
-                      aria-current={p === page ? 'page' : undefined}
-                      className={`nav-item ${page === p ? 'active' : ''}`}
+                      data-tour="nav-more"
+                      className="nav-item nav-more"
+                      aria-expanded={moreOpen}
+                      aria-controls="nav-more-list"
+                      onClick={() => setMore(!moreOpen)}
                     >
-                      <Icon size={17} />
-                      <span>{labels[p]}</span>
-                      {p === 'tasks' && (
-                        <small>{w.data.tasks.filter((t) => t.status !== 'Done').length}</small>
-                      )}
-                      {highlight && <i className="subteam-dot" title="Your sub-team" />}
+                      <Ellipsis size={17} />
+                      <span>More</span>
+                      <ChevronDown size={15} className={moreOpen ? 'flip' : ''} />
                     </button>
-                  );
-                })}
-              </div>
+                    {moreOpen && (
+                      <div id="nav-more-list" className="nav-more-list">
+                        {v.more.map(item)}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
             );
-          })}
+          })()}
         </nav>
         <div className="sidebar-bottom">
-          {role !== 'Parent/Sponsor' && (
-            <button
-              className={`nav-item ${page === 'activity' ? 'active' : ''}`}
-              onClick={() => navigate('activity')}
-            >
-              <Activity size={16} />
-              Activity log
-            </button>
-          )}
           <button
+            data-tour="nav-settings"
             className={`nav-item ${page === 'settings' ? 'active' : ''}`}
             onClick={() => navigate('settings')}
           >
-            <SettingsIcon size={16} />
-            Team settings
+            <SettingsIcon size={17} />
+            <span>Settings</span>
           </button>
-          <button className="help-link" onClick={() => setHelp(true)}>
-            <span>
-              New to the console?<small>Get your bearings.</small>
-            </span>
-            <ArrowUpRight size={17} />
+          <button className="nav-item" onClick={() => setTour(true)}>
+            <GraduationCap size={17} />
+            <span>Replay tutorial</span>
           </button>
         </div>
       </aside>
@@ -339,6 +404,15 @@ export default function App() {
           </div>
           <div className="top-actions">
             <MotionToggle />
+            <button
+              data-tour="tour-replay"
+              className="icon-button"
+              title="Replay the tutorial"
+              aria-label="Replay the tutorial"
+              onClick={() => setTour(true)}
+            >
+              <GraduationCap size={18} />
+            </button>
             <button className="global-search" onClick={() => setShowSearch(true)}>
               <Search size={16} />
               <span>Search anything</span>
@@ -479,9 +553,12 @@ export default function App() {
               <p>Your team is all caught up.</p>
             )
           ) : (
-            <p>In-app notifications are off. Enable them in Team settings.</p>
+            <p>In-app notifications are off. Enable them in Settings.</p>
           )}
         </Modal>
+      )}
+      {tour && (
+        <Tour onClose={closeTour} openMenu={() => setMenu(true)} closeMenu={() => setMenu(false)} />
       )}
       {help && (
         <Modal title="Your quick-start field guide" onClose={() => setHelp(false)}>
@@ -493,23 +570,23 @@ export default function App() {
             </p>
             <h3>2 / Bring the crew</h3>
             <p>
-              Copy the invite from Team settings → Invites. Members sign up, enter their profile,
-              and request a role. A captain or coach approves them under Members.
+              Send an email invite from Settings, then Members. Members sign up, enter their
+              profile, and request a role. A captain or coach approves them under Members.
             </p>
             <h3>3 / Keep the books</h3>
             <p>
-              Finance & expenses → Log funding or add an expense. Enter the funding source, date,
-              and amount, or record an expense with its receipt.
+              Funds → Add funding or Add expense. Enter the funding source, date, and amount, or
+              record an expense with its receipt.
             </p>
             <h3>4 / Learn from every match</h3>
             <p>
-              Competition → Matches → Add record. Enter match details, the BIOBUZZ metrics, recorded
-              points, and mechanism issues.
+              Competitions → Matches → Add record. Enter match details, the BIOBUZZ metrics,
+              recorded points, and mechanism issues.
             </p>
             <h3>5 / Keep everyone organized</h3>
             <p>
               Attendance shows the team calendar. Check in when you arrive on Saturday, Sunday, or
-              an extra weekday. Captains manage members and invitations in Team settings.
+              an extra weekday. Captains manage members and invitations in Settings.
             </p>
             <p className="note">
               Demo mode stores only on this device. Live accounts, files and shared data require the
