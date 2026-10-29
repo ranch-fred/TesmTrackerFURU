@@ -71,9 +71,8 @@ export const entities = {
     fields: [
       f('date', 'Date', 'date'),
       f('attendees', 'Attendees', 'members'),
-      f('summary', 'Summary / agenda covered', 'textarea'),
+      f('summary', 'Summary', 'textarea'),
       f('decisions', 'Decisions made', 'textarea'),
-      f('actions', 'Action items (one per line)', 'textarea'),
     ],
   },
   expenses: {
