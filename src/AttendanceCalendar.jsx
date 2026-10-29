@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw, Plus, Send } from 'lucide-react';
 import { supabase } from './client';
 import { canEdit } from './domain';
 import { localDate } from './logs';
@@ -26,6 +26,39 @@ const statusLabels = {
 
 export function TeamRoster({ w }) {
   const members = approvedMembers(w.members);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState('');
+  const [inviteError, setInviteError] = useState('');
+  const canInvite = ['Captain', 'Coach'].includes(w.member.role);
+  async function sendInvite(event) {
+    event.preventDefault();
+    setInviteMessage('');
+    setInviteError('');
+    setSending(true);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session) throw Error('Sign in again to send invitations.');
+      const response = await fetch('/api/invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+        body: JSON.stringify({ email, teamId: w.team.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw Error(result.error || 'Could not send invitation.');
+      setInviteMessage(`Invitation sent to ${email}.`);
+      setEmail('');
+      setInviteOpen(false);
+    } catch (error) {
+      setInviteError(error.message);
+    } finally {
+      setSending(false);
+    }
+  }
   return (
     <section className="panel account-roster">
       <div className="panel-heading">
@@ -35,10 +68,46 @@ export function TeamRoster({ w }) {
             Approved teammates who joined through FTC Manager appear here automatically.
           </p>
         </div>
-        <button className="outline" onClick={w.refresh}>
-          <RefreshCw size={15} /> Refresh
-        </button>
+        <div className="inline">
+          {canInvite && (
+            <button className="primary" onClick={() => setInviteOpen((open) => !open)}>
+              <Plus size={15} /> Add teammate
+            </button>
+          )}
+          <button className="outline" onClick={w.refresh}>
+            <RefreshCw size={15} /> Refresh
+          </button>
+        </div>
       </div>
+      {inviteOpen && (
+        <form className="roster-invite" onSubmit={sendInvite}>
+          <label>
+            Teammate email
+            <input
+              required
+              type="email"
+              autoComplete="email"
+              placeholder="teammate@example.com"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+          </label>
+          <button className="primary" disabled={sending || w.demo}>
+            <Send size={15} /> {sending ? 'Sending…' : 'Send invitation'}
+          </button>
+          {w.demo && <small>Sending invitations requires a live team account.</small>}
+        </form>
+      )}
+      {inviteMessage && (
+        <p className="attendance-message" role="status">
+          {inviteMessage}
+        </p>
+      )}
+      {inviteError && (
+        <p className="error roster-invite-error" role="alert">
+          {inviteError}
+        </p>
+      )}
       {members.length ? (
         <div className="account-roster-grid">
           {members.map((member) => (

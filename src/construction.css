@@ -767,9 +767,8 @@ table tbody tr:hover {
   transition: opacity 0.9s ease;
 }
 .entry.intro > :not(.field-backdrop):not(.intro-caption) {
-  opacity: 0;
-  visibility: hidden;
-  transition: none;
+  opacity: 1;
+  visibility: visible;
 }
 .entry.intro::after {
   opacity: 0;
