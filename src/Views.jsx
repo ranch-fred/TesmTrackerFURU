@@ -47,7 +47,7 @@ import { AnimatedValue, useMotion } from './Motion';
 import { loggedToday } from './logs';
 import { seasonBadge } from './branding';
 import { approvedMembers } from './attendance';
-import { HardwareMap, InspectionChecklist, LimitPanel } from './RobotTools';
+import RobotWorkspace from './RobotWorkspace';
 import { officialRules } from './robot-rules';
 import PillTabs from './PillTabs';
 import IsoLoop from './IsoLoop';
@@ -892,83 +892,7 @@ export function Finance({ w, initial = 'overview' }) {
   );
 }
 export function Robot({ w, initial = 'robot' }) {
-  const [tab, setTab] = useState(
-      ['robot', 'hardware', 'inspection', 'limits'].includes(initial) ? initial : 'robot',
-    ),
-    r = w.data.robot[0],
-    check = legality(r, w.data.hardware, officialRules);
-  const missing = check.checks.some((c) => c.actual === 'Missing');
-  return (
-    <>
-      <div className="page-intro">
-        <div className="eyebrow">ROBOT / DESIGN. BUILD. VERIFY.</div>
-        <h1>
-          MEET THE <span>MACHINE.</span>
-        </h1>
-        <p>Every mechanism has a purpose. Every connection has a name.</p>
-      </div>
-      <div className="robot-top">
-        <section className="panel robot-detail">
-          <div className="blueprint-grid">
-            <div className="technical-title">{r?.name || 'NO ROBOT CONFIGURED'}</div>
-            <div className="technical-number">{w.team.number}</div>
-            <div className="technical-dims">
-              L {r?.length || '—'}″ / W {r?.width || '—'}″ / H {r?.height || '—'}″
-            </div>
-            <span>SEASON DESIGN / DIMENSIONAL REFERENCE</span>
-          </div>
-        </section>
-        <section className="panel">
-          <div className="panel-heading">
-            <h2>Legality checks</h2>
-            <ShieldCheck className="orange" />
-          </div>
-          {missing ? (
-            <div className="rule-warning">
-              <AlertTriangle />
-              <h3>Measurements still needed.</h3>
-              <p>
-                The current BIOBUZZ limits are loaded from the FIRST manual. Enter your robot's
-                counts and dimensions under Limits &amp; capacity to compare them.
-              </p>
-            </div>
-          ) : (
-            <>
-              <Badge tone={check.pass ? 'green' : 'red'}>
-                {check.pass ? 'WITHIN LISTED LIMITS' : 'OUTSIDE LISTED LIMITS'}
-              </Badge>
-              {check.checks.map((c) => (
-                <div key={c.name} className="check-row">
-                  <span>{c.name}</span>
-                  <b className={c.pass ? 'success' : 'error'}>
-                    {c.actual} / {c.max} {c.pass ? '✓' : '!'}
-                  </b>
-                </div>
-              ))}
-              <p className="note">
-                This checks recorded values only. It does not replace physical inspection.
-              </p>
-            </>
-          )}
-        </section>
-      </div>
-      <PillTabs
-        label="Robot sections"
-        value={tab}
-        onChange={setTab}
-        tabs={['robot', 'hardware', 'inspection', 'limits'].map((t) => [t, t === 'limits' ? 'Limits & capacity' : entities[t].title])}
-      />
-      {tab === 'hardware' ? (
-        <HardwareMap w={w} />
-      ) : tab === 'inspection' ? (
-        <InspectionChecklist w={w} />
-      ) : tab === 'limits' ? (
-        <LimitPanel w={w} />
-      ) : (
-        <Records kind="robot" w={w} />
-      )}
-    </>
-  );
+  return <RobotWorkspace w={w} initial={initial} />;
 }
 export function Matches({ w, embedded = false }) {
   const { enabled } = useMotion();

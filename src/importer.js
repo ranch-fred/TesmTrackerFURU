@@ -1,4 +1,5 @@
 import { entities } from './schema.js';
+import { validateRobotCounts } from './robot-workspace.js';
 export function parseCSV(text, fields) {
   const rows = [];
   let row = [],
@@ -73,10 +74,45 @@ export function validateImport(entries) {
         if (f.type === 'select' && !f.options.includes(v)) throw Error(`Invalid option ${f.label}`);
         clean[f.key] = v;
       }
+      if (kind === 'robot') validateRobotCounts(clean);
+      if (['robot', 'hardware', 'inspection'].includes(kind)) {
+        const key = r.robotKey || (kind === 'robot' ? r.id : undefined);
+        if (key !== undefined) {
+          if (typeof key !== 'string' || !key || key.length > 100)
+            throw Error('Invalid robot association.');
+          clean.robotKey = key;
+        }
+      }
       return clean;
     });
     total += rows.length;
   }
   if (total > 10000) throw Error('Maximum 10,000 rows per import.');
+  if (result.robot?.[0]?.robotKey) {
+    for (const kind of ['hardware', 'inspection'])
+      for (const record of result[kind] || [])
+        if (!record.robotKey) record.robotKey = result.robot[0].robotKey;
+  }
+  // Imports create new robots; remap their associations so a second import stays separate.
+  const robotKeys = new Map();
+  for (const robot of result.robot || []) {
+    if (!robot.robotKey) continue;
+    const previous = robot.robotKey;
+    const next = crypto.randomUUID();
+    if (robotKeys.has(previous)) throw Error('Duplicate robot association in import.');
+    robotKeys.set(previous, next);
+    robot.robotKey = next;
+  }
+  for (const kind of ['hardware', 'inspection'])
+    for (const record of result[kind] || [])
+      if (robotKeys.has(record.robotKey)) record.robotKey = robotKeys.get(record.robotKey);
+  const counts = new Map();
+  for (const record of result.hardware || []) {
+    if (!record.name || !['DC motor', 'Servo'].includes(record.kind)) continue;
+    const key = `${record.robotKey || 'legacy'}:${record.kind}`;
+    const count = (counts.get(key) || 0) + 1;
+    if (count > 8) throw Error('A robot cannot have more than 8 motors or 8 servos assigned.');
+    counts.set(key, count);
+  }
   return result;
 }
