@@ -3,7 +3,6 @@ import {
   Plus,
   ChevronDown,
   ChevronRight,
-  Cpu,
   Bot,
   Cable,
   ShieldCheck,
@@ -14,17 +13,10 @@ import {
 import { canEdit } from './domain';
 import { Modal } from './Records';
 import { InspectionChecklist } from './RobotTools';
-import { hardwarePortName } from './robot-rules';
-import {
-  ACTUATOR_LIMIT,
-  robotKey,
-  robotRecords,
-  validateRobotCounts,
-  PORT_GROUPS,
-  hubPort,
-  portPosition,
-} from './robot-workspace';
+import { ACTUATOR_LIMIT, robotKey, robotRecords, validateRobotCounts } from './robot-workspace';
 import './robot-workspace.css';
+import RobotCube from './RobotCube';
+import PhotoHardwareMap from './PhotoHardwareMap';
 
 const sections = [
   ['robot', 'The machine', 'Specs & dimensions', Bot],
@@ -91,31 +83,7 @@ function RobotSpecForm({ robot, w, onSaved, onCancel }) {
         <section className="rw-visual">
           <span className="rw-kicker">YOUR MACHINE / {w.team.number}</span>
           <h2>{draft.name || 'A new beginning.'}</h2>
-          <div className="robot-schematic rw-live-schematic" aria-label="Robot dimensional diagram">
-            <div
-              className="schematic-body"
-              style={{
-                '--rw-body-width': `${Number(draft.width) > 0 ? Math.min(190, Math.max(12, Number(draft.width) * 7)) : 128}px`,
-                '--rw-body-length': `${Number(draft.length) > 0 ? Math.min(190, Math.max(12, Number(draft.length) * 7)) : 128}px`,
-              }}
-            >
-              <div
-                className="rw-dimension-width"
-                aria-label={`Width ${draft.width || 'not entered'} inches`}
-              >
-                {draft.width || '—'} IN
-              </div>
-              <div
-                className="rw-dimension-length"
-                aria-label={`Length ${draft.length || 'not entered'} inches`}
-              >
-                <span>{draft.length || '—'} IN</span>
-              </div>
-              <span className="schematic-core">{w.team.number}</span>
-              <span className="schematic-line" />
-            </div>
-            <span className="schematic-caption">TOP VIEW / DIMENSIONAL REFERENCE</span>
-          </div>
+          <RobotCube robot={draft} number={w.team.number} />
           <div className="rw-capacities">
             {[
               ['motorsUsed', 'MOTORS'],
@@ -250,214 +218,6 @@ function RobotSpecForm({ robot, w, onSaved, onCancel }) {
         </section>
       </div>
     </form>
-  );
-}
-
-function PhotoHardwareMap({ w, robot, firstRobot }) {
-  const [hub, setHub] = useState('Control Hub');
-  const [type, setType] = useState('Motor');
-  const [selected, setSelected] = useState(null);
-  const [form, setForm] = useState({ name: '', device: '' });
-  const [error, setError] = useState('');
-  const [busy, setBusy] = useState(false);
-  const records = robotRecords(w.data.hardware, robot, firstRobot);
-  const editable = canEdit(w.member.role, w.member.mentor_edit);
-  const recordAt = (port) => records.find((r) => r.hub === hub && hardwarePortName(r) === port);
-  const totals = (kind) => records.filter((r) => r.kind === kind && r.name).length;
-  function open(port) {
-    const record = recordAt(port);
-    setSelected({ port, record });
-    setForm({ name: record?.name || '', device: record?.device || '' });
-    setError('');
-  }
-  async function save(event) {
-    event.preventDefault();
-    setError('');
-    setBusy(true);
-    try {
-      const name = form.name.trim();
-      if (
-        name &&
-        records.some(
-          (r) => r.id !== selected.record?.id && r.name?.toLowerCase() === name.toLowerCase(),
-        )
-      )
-        throw Error('Use a unique configuration name for this robot.');
-      const kind = type === 'Motor' ? 'DC motor' : type === 'Servo' ? 'Servo' : 'Sensor';
-      if (
-        name &&
-        ['DC motor', 'Servo'].includes(kind) &&
-        !selected.record?.name &&
-        totals(kind) >= ACTUATOR_LIMIT
-      )
-        throw Error(`This robot already has 8 ${kind === 'Servo' ? 'servos' : 'motors'} assigned.`);
-      if (!robot.robotKey) await w.save('robot', { ...robot, robotKey: robotKey(robot) });
-      if (selected.record || name)
-        await w.save('hardware', {
-          ...selected.record,
-          robotKey: robotKey(robot),
-          name,
-          device: form.device.trim(),
-          hub,
-          port: selected.port,
-          kind,
-        });
-      setSelected(null);
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(false);
-    }
-  }
-  return (
-    <div className="rw-hardware">
-      <div className="rw-map-heading">
-        <div>
-          <span className="rw-kicker">{robot.name} / HARDWARE MAP</span>
-          <h2>Plug in. Give it purpose.</h2>
-          <p>Click a highlighted connector to name the hardware and describe what it does.</p>
-        </div>
-        <div className="rw-map-counts">
-          <span>
-            <b>{totals('DC motor')}</b>/8 motors
-          </span>
-          <span>
-            <b>{totals('Servo')}</b>/8 servos
-          </span>
-        </div>
-      </div>
-      <div className="rw-hub-switch" role="group" aria-label="Choose a hub">
-        {['Control Hub', 'Expansion Hub'].map((name) => (
-          <button key={name} aria-pressed={hub === name} onClick={() => setHub(name)}>
-            <Cpu size={18} />
-            <span>
-              {name}
-              <small>
-                {name === 'Control Hub' ? 'PRIMARY CONTROLLER' : 'ADDITIONAL CONNECTIONS'}
-              </small>
-            </span>
-            <ChevronRight size={16} />
-          </button>
-        ))}
-      </div>
-      <div className="rw-map-layout">
-        <div className="rw-hub-photo">
-          <img
-            src={`/assets/hubs/${hub === 'Control Hub' ? 'control' : 'expansion'}.png`}
-            alt={`REV ${hub} with selectable ${type} connectors`}
-            draggable="false"
-          />
-          {PORT_GROUPS.filter(([name]) => name === type).flatMap(([name, count]) =>
-            Array.from({ length: count }, (_, i) => {
-              const port = hubPort(name, i),
-                record = recordAt(port),
-                [x, y] = portPosition(hub, name, i);
-              return (
-                <button
-                  key={port}
-                  className={`rw-port-hotspot ${record?.name ? 'assigned' : ''}`}
-                  style={{ left: `${x}%`, top: `${y}%` }}
-                  onClick={() => open(port)}
-                  aria-label={`${hub} ${port}: ${record?.name || 'Unassigned'}`}
-                  title={`${port} · ${record?.name || 'Click to assign'}`}
-                >
-                  <span>
-                    {name === 'Motor'
-                      ? 'M'
-                      : name === 'Servo'
-                        ? 'S'
-                        : name === 'I2C'
-                          ? 'I'
-                          : name === 'Digital'
-                            ? 'D'
-                            : 'A'}
-                    {['Digital', 'Analog'].includes(name) ? `${i * 2}/${i * 2 + 1}` : i}
-                  </span>
-                </button>
-              );
-            }),
-          )}
-        </div>
-        <aside className="rw-port-panel">
-          <span className="rw-kicker">SELECT A CONNECTION</span>
-          <div className="rw-port-types" role="group" aria-label="Port type">
-            {PORT_GROUPS.map(([name]) => (
-              <button key={name} aria-pressed={type === name} onClick={() => setType(name)}>
-                {name === 'I2C' ? 'I²C' : name}
-                <span>
-                  {name === 'Motor' ? '4' : name === 'Servo' ? '6' : name === 'Analog' ? '2' : '4'}
-                </span>
-              </button>
-            ))}
-          </div>
-          <div className="rw-port-list">
-            {Array.from({ length: PORT_GROUPS.find(([name]) => name === type)[1] }, (_, i) => {
-              const port = hubPort(type, i),
-                r = recordAt(port);
-              return (
-                <button key={port} onClick={() => open(port)}>
-                  <span className={r?.name ? 'assigned' : ''} />
-                  <div>
-                    <strong>{r?.name || port}</strong>
-                    <small>
-                      {r?.name
-                        ? `${port} · ${r.device || 'No purpose recorded'}`
-                        : 'Available · click to configure'}
-                    </small>
-                  </div>
-                  <ArrowRight size={14} />
-                </button>
-              );
-            })}
-          </div>
-          <p className="rw-map-note">
-            Changes belong to {robot.name}. Configuration names should match your Robot Controller
-            setup.
-          </p>
-        </aside>
-      </div>
-      {selected && (
-        <Modal title={`${hub} · ${selected.port}`} onClose={() => setSelected(null)}>
-          <form onSubmit={save}>
-            <label>
-              Hardware configuration name
-              <input
-                required={false}
-                autoFocus
-                disabled={!editable || busy}
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="frontLeft, armLift, claw…"
-              />
-            </label>
-            <label>
-              Purpose
-              <input
-                disabled={!editable || busy}
-                value={form.device}
-                onChange={(e) => setForm({ ...form, device: e.target.value })}
-                placeholder="What does this device do?"
-              />
-            </label>
-            {error && (
-              <p className="error" role="alert">
-                {error}
-              </p>
-            )}
-            <div className="modal-actions">
-              <button type="button" className="outline" onClick={() => setSelected(null)}>
-                Cancel
-              </button>
-              {editable && (
-                <button className="primary" disabled={busy}>
-                  {busy ? 'Saving…' : form.name.trim() ? 'Save connection' : 'Clear connection'}
-                </button>
-              )}
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
   );
 }
 
@@ -599,7 +359,13 @@ export default function RobotWorkspace({ w, initial = 'robot' }) {
             />
           </div>
         ) : tab === 'hardware' && active ? (
-          <PhotoHardwareMap key={active.id} robot={active} firstRobot={w.data.robot[0]} w={w} />
+          <PhotoHardwareMap
+            key={active.id}
+            robot={active}
+            firstRobot={w.data.robot[0]}
+            w={w}
+            onDirtyChange={setDraftDirty}
+          />
         ) : tab === 'inspection' && active ? (
           <div className="rw-inspection">
             <InspectionChecklist key={active.id} w={scoped} />
